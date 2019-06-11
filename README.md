@@ -4,7 +4,7 @@ This package contains supplementary functions to handle data input, setup
 for multicore estimation and several pre-programmed likelihood functions that 
 will quickly get you analyzing your data.
 
-This package is written to work together with my other package (gizmo)[https://github.com/edsandorf/gizmo], which contains a collection of useful functions for statistical analysis and choice modeling. 
+This package is written to work together with my other package [gizmo](https://github.com/edsandorf/gizmo), which contains a collection of useful functions for statistical analysis and choice modeling. 
 
 # How to install cmdlR?
 
