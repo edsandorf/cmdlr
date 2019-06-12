@@ -14,4 +14,7 @@ Imports:
   stringr,
   randtoolbox
 Suggests: 
-  testthat
+    testthat,
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
