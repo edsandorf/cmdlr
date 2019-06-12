@@ -18,7 +18,6 @@ the development branch may be more susceptible to bugs.
 
 # How to contribute to cmdlR?
 
-## The process of contributing
 1. Go to Github and create an account if you don't have one.
 2. Fork the project and clone it locally on your computer. Make sure that it is synced to the remote repository before you move on to step 3.
 3. Create a new branch for each separate piece of work, e.g. a bug fix or new feature (see below).
@@ -30,14 +29,17 @@ the development branch may be more susceptible to bugs.
 This list is based on a great post on [how to contribute](https://akrabat.com/the-beginners-guide-to-contributing-to-a-github-project/) to a github project. 
 
 ##  Generally about pull requests
-While I greatly appreciate input and bug fixes to the code, in order keep everything readable, please adhere to the code style.
+- While I greatly appreciate input and bug fixes to the code, in order keep everything readable, please adhere to the code style. For details, please see the [R chapter](http://r-pkgs.had.co.nz/r.html) of 'R packages' by Hadley Wickham.
 
-If you have more than one bug fix or want to add more than one feature, please submit multiple pull requests. A rule of thumb is one pull request per fix or addition. 
+- If you have more than one bug fix or want to add more than one feature, please submit multiple pull requests. A rule of thumb is one pull request per fix or addition. 
 
-If you are adding a new feature or function, please also submit documentation and preferably a test file. This will make it much easier to include with the code. 
+- If you are adding a new feature or function, please also submit documentation and preferably a test file. This will make it much easier to include with the code. 
 
 # How to cite the use of cmdlR?
 
+Please cite as: Sandorf, E. D., 2019, cmdlR: Choice Modeling in R, v. x.x.x.x, https://github.com/edsandorf/cmdlR
+
+Where x.x.x.x is replaced by the version number of the package used. 
 
 # Acknowledgements
 This package is based on years of experience developing and estimating choice
