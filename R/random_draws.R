@@ -2,8 +2,8 @@
 #' 
 #' @param x A vector
 
-shuffle <- function(x) {
-    x[rank(runif(length(x)))]
+shuffle <- function (x) {
+  x[rank(runif(length(x)))]
 }
 
 #' Make Modified Latin Hypercube Draws
@@ -15,24 +15,24 @@ shuffle <- function(x) {
 #' Hypercube Sampling (MLHS) method in the estimation of a Mixed Logit Model
 #' for vehicle choice, Transportation Research Part B, 40, pp. 147-163
 
-make_mlhs <- function(N, R, D) {
-    #   Define local parameters
-    n <- N * R
-    j <- 1L
+make_mlhs <- function (N, R, D) {
+  #   Define local parameters
+  n <- N * R
+  j <- 1L
+  k <- 1L
+  
+  draws <- matrix(0, n, D)
+  uniform <- seq(0, N - 1) / N
+  
+  while (j < R + 1L) {
     k <- 1L
-    
-    draws <- matrix(0, n, D)
-    uniform <- seq(0, N - 1) / N
-    
-    while (j < R + 1L) {
-        k <- 1L
-        while (k < D + 1L) {
-            draws[(1L + N * (j - 1L)):(N * j), k] <- shuffle(uniform + runif(1) / N)
-            k <- k + 1L
-        }
-        j <- j + 1L
+    while (k < D + 1L) {
+      draws[(1L + N * (j - 1L)):(N * j), k] <- shuffle(uniform + runif(1) / N)
+      k <- k + 1L
     }
-    return(draws)
+    j <- j + 1L
+  }
+  return(draws)
 }
 
 #' Expand the sequence of integers
@@ -48,24 +48,24 @@ make_mlhs <- function(N, R, D) {
 #' Models Using Randomized and Scrambled Halton Sequences, Transportation
 #' Research Part B, 9, pp. 837-855
 
-digitize <- function(D, P, count, digit) {
-    m <- 1L
-    x <- NULL
-    
-    while (m <= D) {
-        l <- 1L
-        r <- 1
-        while (r == 1) {
-            x <- count[m, l] != (P[m] - 1)
-            r <- r - x
-            count[m, l] <- (count[m, l] + 1) * (x == 1)
-            digit[m] <- ((l - 1L) == digit[m]) + digit[m]
-            l <- l + 1L
-        }
-        m <- m + 1L
+digitize <- function (D, P, count, digit) {
+  m <- 1L
+  x <- NULL
+  
+  while (m <= D) {
+    l <- 1L
+    r <- 1
+    while (r == 1) {
+      x <- count[m, l] != (P[m] - 1)
+      r <- r - x
+      count[m, l] <- (count[m, l] + 1) * (x == 1)
+      digit[m] <- ((l - 1L) == digit[m]) + digit[m]
+      l <- l + 1L
     }
-    return(list(count = count,
-                digit = digit))
+    m <- m + 1L
+  }
+  return(list(count = count,
+    digit = digit))
 }
 
 #' Compute the radical inverse
@@ -80,21 +80,21 @@ digitize <- function(D, P, count, digit) {
 #' Models Using Randomized and Scrambled Halton Sequences, Transportation
 #' Research Part B, 9, pp. 837-855
 
-radical_inverse <- function(D, P, count, digit, perms) {
-    m <- 1L
-    G <- matrix(0, 1L, D)
-    
-    while (m <= D) {
-        l <- 1L
-        p <- P[m]
-        while (l <= digit[m]) {
-            G[m] <- (perms[m, (count[m, l] + 1L)] / p) + G[m]
-            p <- p * P[m]
-            l <- l + 1L
-        }
-        m <- m + 1L
+radical_inverse <- function (D, P, count, digit, perms) {
+  m <- 1L
+  G <- matrix(0, 1L, D)
+  
+  while (m <= D) {
+    l <- 1L
+    p <- P[m]
+    while (l <= digit[m]) {
+      G[m] <- (perms[m, (count[m, l] + 1L)] / p) + G[m]
+      p <- p * P[m]
+      l <- l + 1L
     }
-    return(G)
+    m <- m + 1L
+  }
+  return(G)
 }
 
 #' Make scrambled Halton draws
@@ -114,31 +114,31 @@ radical_inverse <- function(D, P, count, digit, perms) {
 #' Models Using Randomized and Scrambled Halton Sequences, Transportation
 #' Research Part B, 9, pp. 837-855
 
-make_scrambled_halton <- function(N, R, D) {
-    if (D > 16) {
-        stop("Cannot scramble sequences beyond the 16th prime")
-    }
-    
-    max_digit <- 50
-    
-    primes <- c(2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53)[1L:D]
-    H <- matrix(0, (N * R), D)
-    
-    #   Initialize the scrambling sequence
-    count <- matrix(0, D, max_digit)
-    count[, 1L] <- rep(1, D)
-    digit <- rep(1, D)
-    H[1L, ] <- radical_inverse(D, primes, count, digit, xbrat)
-    
-    j <- 2L
-    while (j <= (N * R)) {
-        count_digit <- digitize(D, primes, count, digit)
-        count <- count_digit[["count"]]
-        digit <- count_digit[["digit"]]
-        H[j, ] <- radical_inverse(D, primes, count, digit, xbrat)
-        j <- j + 1L
-    }
-    return(H)
+make_scrambled_halton <- function (N, R, D) {
+  if (D > 16) {
+    stop("Cannot scramble sequences beyond the 16th prime")
+  }
+  
+  max_digit <- 50
+  
+  primes <- c(2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53)[1L:D]
+  H <- matrix(0, (N * R), D)
+  
+  #   Initialize the scrambling sequence
+  count <- matrix(0, D, max_digit)
+  count[, 1L] <- rep(1, D)
+  digit <- rep(1, D)
+  H[1L, ] <- radical_inverse(D, primes, count, digit, xbrat)
+  
+  j <- 2L
+  while (j <= (N * R)) {
+    count_digit <- digitize(D, primes, count, digit)
+    count <- count_digit[["count"]]
+    digit <- count_digit[["digit"]]
+    H[j, ] <- radical_inverse(D, primes, count, digit, xbrat)
+    j <- j + 1L
+  }
+  return(H)
 }
 
 #' Wrapper for halton()
@@ -147,8 +147,8 @@ make_scrambled_halton <- function(N, R, D) {
 #' 
 #' @inheritParams make_random_draws
 
-make_standard_halton <- function(N, R, D) {
-    randtoolbox::halton(N * R, D)
+make_standard_halton <- function (N, R, D) {
+  randtoolbox::halton(N * R, D)
 }
 
 #' Make sobol draws
@@ -157,8 +157,8 @@ make_standard_halton <- function(N, R, D) {
 #' 
 #' @inheritParams make_random_draws
 
-make_standard_sobol <- function(N, R, D) {
-    randtoolbox::sobol(N * R, D, scrambling = 0)
+make_standard_sobol <- function (N, R, D) {
+  randtoolbox::sobol(N * R, D, scrambling = 0)
 }
 
 #' Make scrambled sobol draws
@@ -168,8 +168,8 @@ make_standard_sobol <- function(N, R, D) {
 #' 
 #' @inheritParams make_random_draws
 
-make_scrambled_sobol <- function(N, R, D) {
-    randtoolbox::sobol(N * R, D, scrambling = 3)
+make_scrambled_sobol <- function (N, R, D) {
+  randtoolbox::sobol(N * R, D, scrambling = 3)
 }
 
 #' Make pseudo random draws
@@ -178,8 +178,8 @@ make_scrambled_sobol <- function(N, R, D) {
 #' 
 #' @inheritParams make_random_draws
 
-make_pseudo_random <- function(N, R, D) {
-    matrix(runif(N * R * D), nrow = N * R, ncol = D)
+make_pseudo_random <- function (N, R, D) {
+  matrix(runif(N * R * D), nrow = N * R, ncol = D)
 }
 
 #' Make random draws 
@@ -205,22 +205,22 @@ make_pseudo_random <- function(N, R, D) {
 #'
 #'@export
 
-make_random_draws <- function(N, R, D, type) {
-    #   Catch accidental capitalization of the type of draws
-    type_draw <- tolower(type)
-    
-    allowed_types <- c("pseudo_random", "mlhs", "standard_halton",
-                       "scrambled_halton", "standard_sobol", "scrambled_sobol")
-    
-    if (!(type_draw %in% allowed_types)) {
-       stop("Unknown type of draws specified.") 
-    }
-    
-    #   Set up a list of functions
-    function_list <- list(make_pseudo_random, make_mlhs, make_standard_halton,
-                          make_scrambled_halton, make_standard_sobol,
-                          make_scrambled_sobol)
-    names(function_list) <- allowed_types
-    
-    function_list[[type_draw]](N, R, D)
+make_random_draws <- function (N, R, D, type) {
+  #   Catch accidental capitalization of the type of draws
+  type_draw <- tolower(type)
+  
+  allowed_types <- c("pseudo_random", "mlhs", "standard_halton",
+    "scrambled_halton", "standard_sobol", "scrambled_sobol")
+  
+  if (!(type_draw %in% allowed_types)) {
+    stop("Unknown type of draws specified.") 
+  }
+  
+  #   Set up a list of functions
+  function_list <- list(make_pseudo_random, make_mlhs, make_standard_halton,
+    make_scrambled_halton, make_standard_sobol,
+    make_scrambled_sobol)
+  names(function_list) <- allowed_types
+  
+  function_list[[type_draw]](N, R, D)
 }
