@@ -4,9 +4,12 @@
 \name{cmldR}
 \alias{cmldR}
 \alias{cmldR-package}
-\title{cmdlR: Choice modeling in R}
+\title{cmdlR: Choice Modeling in R}
 \description{
-cmldR is a package for choice modeling in R. It contains functions to handle 
-data input, setup for multicor estimation and several pre-programmed 
-likelihood functions that will quickly get you analyzing data.
+The problem of choice is fundamental to economics. Choice models are used to 
+understand how people make choices in markets. cmdlR is an easy to use 
+package for choice modeling in R. It contains several pre-programmed 
+likelihood functions for the most common models and the framework is flexible 
+so that the users can extend the functionality of the package with their own 
+functions.
 }
