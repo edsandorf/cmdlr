@@ -44,7 +44,7 @@ make_mlhs <- function (N, R, D) {
 #' @param count A matrix
 #' @param digit A vector
 #' 
-#' @references Bhat, C. R., 2003, Simulation Estimation of Mixed Descrete Choice
+#' @references Bhat, C. R., 2003, Simulation Estimation of Mixed Discrete Choice
 #' Models Using Randomized and Scrambled Halton Sequences, Transportation
 #' Research Part B, 9, pp. 837-855
 

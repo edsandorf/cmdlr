@@ -19,7 +19,7 @@ digitize(D, P, count, digit)
 Equation 1 in Bhat (2003)
 }
 \references{
-Bhat, C. R., 2003, Simulation Estimation of Mixed Descrete Choice
+Bhat, C. R., 2003, Simulation Estimation of Mixed Discrete Choice
 Models Using Randomized and Scrambled Halton Sequences, Transportation
 Research Part B, 9, pp. 837-855
 }
