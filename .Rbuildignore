@@ -1,3 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-\.Rprofile
+^\.travis\.yml$
+^cran-comments\.md$
+^README\.md$
+^CRAN-RELEASE$
