@@ -29,5 +29,8 @@
     installed_version, "\n\n",
     "The latest version is: ", remote_version, "\n\n",
     "To access the latest version, please run \n",
-    "devtools::install_github('edsandorf/cmdlR') \n\n")
+    "devtools::install_github('edsandorf/cmdlR') \n\n",
+    
+    "Please cite as: \n", 
+    "Sandorf, E. D., 2019, cmdlR: Choice Modeling in R, https://github.com/edsandorf/cmdlR \n\n")
 }
