@@ -1,10 +1,12 @@
-# cmdlR: Choice modeling in R
+<!-- badges: start -->
+[![Travis build status](https://travis-ci.com/edsandorf/cmdlR.svg?branch=master)](https://travis-ci.com/edsandorf/cmdlR)
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version-last-release/cmdlR)](https://cran.r-project.org/package=cmdlR)
+[![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/cmdlR)](http://www.r-pkg.org/pkg/cmdlR)
+<!-- badges: end -->
 
-This package contains supplementary functions to handle data input, setup
-for multicore estimation and several pre-programmed likelihood functions that 
-will quickly get you analyzing your data.
+# cmdlR: Choice Modeling in R
 
-This package is written to work together with my other package [gizmo](https://github.com/edsandorf/gizmo), which contains a collection of useful functions for statistical analysis and choice modeling. 
+The problem of choice is fundamental to economics. Choice models are used to understand how people make choices in markets. cmdlR is an easy to use package for choice modeling in R. It contains several pre-programmed likelihood functions for the most common models and the framework is flexible so that the users can extend the functionality of the package with their own functions. 
 
 # How to install cmdlR?
 
@@ -12,14 +14,9 @@ The latest version of the package is available from Github.
 
 `devtools::install_github("edsandorf/cmdlR")`
 
-If you want the
-bleeding edge, you can download the development branch of the package. However,
-the development branch may be more susceptible to bugs. 
-
-
 # How to contribute?
 1. Go to Github and create an account if you don't have one.
-2. Fork the project and clone it locally on your computer. Make sure that the repositoroy is synced remotely before you move on to the next step.
+2. Fork the project and clone it locally on your computer. Make sure that the repository is synced remotely before you move on to the next step.
 3. Create a new branch for each bug fix or new feature you want to add.
 4. Do the work and write a descriptive commit message. If you have added a new feature, please contribute documentation and tests. 
 5. Push the changes to your remote repository.
@@ -31,13 +28,12 @@ This list is based on a great post on [how to contribute](https://akrabat.com/th
 
 In order keep everything readable and maintainable, please adhere to the code style. For details, please see the [R chapter](http://r-pkgs.had.co.nz/r.html) of 'R packages' by Hadley Wickham.
 
-# How to cite the use of cmdlR?
+# How to cite?
 
-Please cite as: Sandorf, E. D., 2019, cmdlR: Choice Modeling in R, v. x.x.x.x, https://github.com/edsandorf/cmdlR
+Sandorf, E. D., 2019, cmdlR: Choice Modeling in R, https://github.com/edsandorf/cmdlR
 
-Where x.x.x.x is replaced by the version number of the package used. 
 
-# Acknowledgements
+# Acknowledgments
 This package is based on years of experience developing and estimating choice
 models. A lot of the inspiration for this has come from existing R packages
 such as [gmnl](https://CRAN.R-project.org/package=gmnl) and [mlogit](https://CRAN.R-project.org/package=mlogit). I have also benefited from the extensive choice modeling software [Apollo](http://www.apollochoicemodelling.com/) and the excellent [Matlab codes](https://github.com/czaj/DCE) written by Mikolaj Czajkowski. I have benefited greatly from discussions with Danny Campbell, Mikolaj Czajkowski, Stephane Hess and David Palma.
