@@ -2,5 +2,7 @@
 
 export(detach_all)
 export(make_random_draws)
+export(mnl_probs)
 export(num_deriv)
+export(validate)
 importFrom(stats,runif)
