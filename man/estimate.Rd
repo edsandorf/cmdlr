@@ -4,10 +4,14 @@
 \alias{estimate}
 \title{Estimates the model}
 \usage{
-estimate(estim_opt)
+estimate(log_lik, estim_opt, workers = NULL)
 }
 \arguments{
+\item{log_lik}{A log likeliohood function to be maximized/minimized}
+
 \item{estim_opt}{List of estimation options}
+
+\item{workers}{A worker cluster for parallel estimation}
 }
 \description{
 The function is a wrapper for several cmdlR functions that sets up parallel
