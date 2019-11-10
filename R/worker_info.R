@@ -8,7 +8,26 @@
 #' @export
 
 get_worker_info <- function(workers) {
-  
+  parLapply(workers, seq_along(workers), function(x) {
+    
+    # Get the object, size and class
+    worker_info <- lapply(ls(.GlobalEnv), function(x) {
+      cbind(x,
+            pryr::object_size(x, envir = .GlobalEnv),
+            class(get(x, envir = .GlobalEnv)))
+    })
+    info <- Reduce(rbind, info)
+    colnames(info) <- c("Object", "Size (bytes)", "Class")
+    
+    # Get the packages loaded on the workers
+    worker_pkgs <- search()
+    
+    # Return the information as a list
+    return(list(
+      worker_info,
+      worker_pkgs
+    ))
+  })
 }
 
 #' Function for summarizing worker information
