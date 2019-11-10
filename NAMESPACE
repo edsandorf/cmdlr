@@ -2,8 +2,11 @@
 
 export(detach_all)
 export(estimate)
+export(get_worker_info)
 export(make_random_draws)
 export(mnl_probs)
 export(num_deriv)
+export(prepare_parallel)
+export(summary_worker_info)
 export(validate)
 importFrom(stats,runif)
