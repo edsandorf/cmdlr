@@ -14,7 +14,9 @@ Imports:
   stringr,
   randtoolbox,
   Rfast,
-  crayon
+  crayon,
+  pryr,
+  parallel
 Suggests: 
     testthat,
     knitr,

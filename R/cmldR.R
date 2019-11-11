@@ -11,4 +11,5 @@
 #' @name cmldR
 #' 
 #' @importFrom stats runif
+#' @import crayon
 NULL
