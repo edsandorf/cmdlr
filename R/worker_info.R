@@ -8,7 +8,7 @@
 #' @export
 
 get_worker_info <- function(workers) {
-  parLapply(workers, seq_along(workers), function(x) {
+  parallel::parLapply(workers, seq_along(workers), function(x) {
     
     # Get the object, size and class
     worker_info <- lapply(ls(.GlobalEnv), function(x) {
