@@ -4,10 +4,12 @@
 \alias{prepare_parallel}
 \title{Function to prepare and set up for parallel estimation}
 \usage{
-prepare_parallel(estim_opt)
+prepare_parallel(estim_opt, save_opt)
 }
 \arguments{
 \item{estim_opt}{List of estimation options}
+
+\item{save_opt}{List of options for saving outputs}
 }
 \description{
 The function will set up the workers, split the data and export necessary
