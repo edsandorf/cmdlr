@@ -21,7 +21,8 @@ prepare_parallel <- function(estim_opt, save_opt) {
     worker_info <- get_worker_info(workers)
     summary_worker_info(worker_info)
     save_path <- paste0(save_opt$path, "-worker-info.txt")
-    cat(silver("" %+% black$bold("Worker information written to: ") %+% save_path))
+    cat(blue$bold("Note: " %+% reset$silver(paste0("Worker information written to \"",
+                                                   save_path, "\"\n"))))
   }
   
   # Print exit message if successful
