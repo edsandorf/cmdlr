@@ -2,7 +2,7 @@
 % Please edit documentation in R/set_estim_opt_defaults.R
 \name{set_estim_opt_defaults}
 \alias{set_estim_opt_defaults}
-\title{Check estimation options}
+\title{Set default estimation options}
 \usage{
 set_estim_opt_defaults(estim_opt_input)
 }
@@ -14,8 +14,6 @@ Returns a list of options with missing input values replaced by
 default values
 }
 \description{
-The function checks the list of estimation options specified by the user. If
-no list of options is supplied or some of the options are not defined, the 
-function will supply reasonable default values. The list of estimation options
-specifies options related to the optimization routines used.
+The function sets default estimation options for options that are not 
+specified by the user
 }

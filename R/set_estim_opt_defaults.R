@@ -1,9 +1,7 @@
-#' Check estimation options
+#' Set default estimation options
 #'
-#' The function checks the list of estimation options specified by the user. If
-#' no list of options is supplied or some of the options are not defined, the 
-#' function will supply reasonable default values. The list of estimation options
-#' specifies options related to the optimization routines used.
+#' The function sets default estimation options for options that are not 
+#' specified by the user
 #'
 #' @param estim_opt_input A list of user specified estimation options
 #'
