@@ -11,17 +11,35 @@
 #' @export
 
 validate <- function(estim_opt, model_opt, save_opt) {
-  # Set estimation options
+  # Set default estimation options
   estim_opt <- tryCatch({
     set_estim_opt_defaults(estim_opt)
+    cat(green$bold("Success: " %+% reset$silver("Default options set for estim_opt().")))
   }, warning = function(w) {
     cat(yellow$bold("Warning: "))
   }, error = function(e) {
-    cat(red$bold("Error: " %+% reset$silver("Failed to set default options for estim_opt. Check your inputs.")))
+    cat(red$bold("Error: " %+% reset$silver("Failed to set default options for estim_opt(). Check your inputs.")))
   })
-  cat(green$bold("Success: " %+% reset$silver("Default estimation options set for unspecified options.")))
   
+  # Set default model options
+  model_opt <- tryCatch({
+    set_model_opt_defaults(model_opt)
+    cat(green$bold("Success: " %+% reset$silver("Default options set for model_opt().")))
+  }, warning = function(w) {
+    cat(yellow$bold("Warning: "))
+  }, error = function(e) {
+    cat(red$bold("Error: " %+% reset$silver("Failed to set default options for model_opt(). Check your inputs.")))
+  })
   
+  # Set default saving options
+  save_opt <- tryCatch({
+    set_save_opt_defaults(save_opt)
+    cat(green$bold("Success: " %+% reset$silver("Default options set for save_opt().")))
+  }, warning = function(w) {
+    cat(yellow$bold("Warning: "))
+  }, error = function(e) {
+    cat(red$bold("Error: " %+% reset$silver("Failed to set default options for save_opt(). Check your inputs.")))
+  })
   
   # Check that the number of cores are reasonable
   if (estim_opt$cores > 1) {
