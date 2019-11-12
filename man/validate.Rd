@@ -4,10 +4,14 @@
 \alias{validate}
 \title{Validates the inputs to the model estimation}
 \usage{
-validate(estim_opt)
+validate(estim_opt, model_opt, save_opt)
 }
 \arguments{
 \item{estim_opt}{List of estimation options}
+
+\item{model_opt}{List of model options}
+
+\item{save_opt}{List of options for saving outputs}
 }
 \description{
 The function is a wrapper for several cmdlR functions that checks the inputs,
