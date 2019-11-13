@@ -35,19 +35,19 @@ estim_opt <- list(
 model_opt <- list(
   name = "MNL model",
   description = "A simple MNL model to use as an example.",
-  id = c(),
-  ct = c(),
+  id = c("id"),
+  ct = c("ct"),
   alt = c(),
   choice = c(),
   fixed = c(),
-  beta = c(
+  param = c(
     b_cost = 0,
     b_small = 0,
     b_large = 0,
     b_oil = 0,
     b_fish = 0,
     b_habitat = 0
-  ),
+  )
 )
 
 #-------------------------------------------------------------------------------
