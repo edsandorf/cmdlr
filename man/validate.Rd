@@ -4,7 +4,7 @@
 \alias{validate}
 \title{Validates the inputs to the model estimation}
 \usage{
-validate(estim_opt, model_opt, save_opt)
+validate(estim_opt, model_opt, save_opt, db)
 }
 \arguments{
 \item{estim_opt}{List of estimation options}
@@ -12,6 +12,8 @@ validate(estim_opt, model_opt, save_opt)
 \item{model_opt}{List of model options}
 
 \item{save_opt}{List of options for saving outputs}
+
+\item{db}{Data}
 }
 \description{
 The function is a wrapper for several cmdlR functions that checks the inputs,

@@ -4,13 +4,14 @@
 #' controls and data. The purpose is to make sure that the combination of 
 #' inputs are allowed and supported by the package. 
 #'
+#' @param db Data
 #' @param estim_opt List of estimation options
 #' @param model_opt List of model options
 #' @param save_opt List of options for saving outputs
 #' 
 #' @export
 
-validate <- function(estim_opt, model_opt, save_opt) {
+validate <- function(estim_opt, model_opt, save_opt, db) {
   # Set default estimation options
   estim_opt <- tryCatch({
     set_estim_opt_defaults(estim_opt)
@@ -52,6 +53,7 @@ validate <- function(estim_opt, model_opt, save_opt) {
     }
   }
   
-  
+  # Check the data
+  check_data(db, estim_opt, model_opt)
   
 }
