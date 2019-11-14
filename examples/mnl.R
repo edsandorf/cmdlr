@@ -74,7 +74,7 @@ log_lik <- function() {
 #-------------------------------------------------------------------------------
 # Validate the model inputs
 #-------------------------------------------------------------------------------
-validate()
+model_inputs <- validate(estim_opt, model_opt, save_opt, db, log_lik)
 
 #-------------------------------------------------------------------------------
 # If we are using parallel estimation, we need to prepare the workers
