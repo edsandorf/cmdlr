@@ -17,3 +17,21 @@ default values
 The function sets default save options for options that are not 
 specified by the user
 }
+\details{
+\describe{
+  \item{path}{The path and file name for your output. Defaults to current
+  working directory and 'model-01'}
+  \item{save_summary}{If \code{TRUE} save summary to .txt file specified
+  in \code{path}. Default is \code{FALSE}.}
+  \item{save_model_object}{If \code{TRUE} save model object to .rds file
+  specified in \code{path}. Default is \code{FALSE}.}
+  \item{save_hessian}{If \code{TRUE} save hessian to .csv file specified in
+  \code{path}. Default is \code{FALSE}.}
+  \item{save_conditionals}{If \code{TRUE} save the conditional estimates to
+  a .csv file specified in \code{path}. Only valid for models with discrete
+  or continuous mixing distributions. Default is \code{FALSE}.}
+  \item{save_worker_info}{If \code{TRUE} save information about workers in
+  .txt file specified in \code{path}. Only valid if \code{cores > 1}.
+   Default is \code{FALSE}.}
+}
+}
