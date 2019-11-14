@@ -13,6 +13,9 @@
 #' @export
 
 validate <- function(estim_opt, model_opt, save_opt, db, log_lik) {
+  #-----------------------------------------------------------------------------
+  # Set the default options
+  #-----------------------------------------------------------------------------
   # Set default estimation options
   estim_opt <- set_estim_opt_defaults(estim_opt)
   cat(green$bold("Success: " %+% reset$silver("Default options set for estim_opt().")))
@@ -52,9 +55,6 @@ validate <- function(estim_opt, model_opt, save_opt, db, log_lik) {
     db <- split_data(db, estim_opt, model_opt)
     
   }
-  
-
-  
   
   #-----------------------------------------------------------------------------
   # Return the list of inputs
