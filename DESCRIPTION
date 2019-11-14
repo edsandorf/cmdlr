@@ -16,7 +16,10 @@ Imports:
   Rfast,
   crayon,
   pryr,
-  parallel
+  parallel,
+  magrittr,
+  tibble,
+  dplyr
 Suggests: 
     testthat,
     knitr,

@@ -12,4 +12,7 @@
 #' 
 #' @importFrom stats runif
 #' @import crayon
+#' @import magrittr
+#' @import tibble
+#' @import dplyr
 NULL
