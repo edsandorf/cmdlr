@@ -11,5 +11,15 @@
 #' @return A list of data matrices with length equal to \code{cores}.
 
 split_data <- function(db, estim_opt, model_opt) {
+  # Get the ids and split them across cores
+  ids <- deframe(db[, model_opt$id])
+  id_index <- split(ids, sort(ids %% estim_opt$cores))
   
+  # Split the data according to the split id variable
+  db <- lapply(id_index, function(x) {
+    db[ids %in% x, ]
+  })
+  
+  # Return the list of data frames
+  return(db)
 }
