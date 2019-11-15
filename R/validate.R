@@ -1,18 +1,22 @@
-#' Validates the inputs to the model estimation
+#' Validates the inputs
 #' 
-#' The function is a wrapper for several cmdlR functions that checks the inputs,
-#' controls and data. The purpose is to make sure that the combination of 
-#' inputs are allowed and supported by the package. 
+#' The function is a wrapper for several cmdlR functions that validates the
+#' inputs. The purpose is to ensure correct specification of the model and that
+#' all information is available. 
 #'
-#' @param db Data
 #' @param estim_opt List of estimation options
 #' @param model_opt List of model options
 #' @param save_opt List of options for saving outputs
 #' @param log_lik Log likelihood function
 #' 
+#' @return A list with updated and validated \code{estim_opt}, \code{model_opt},
+#' and \code{save_opt}. 
+#' 
 #' @export
 
-validate <- function(estim_opt, model_opt, save_opt, db, log_lik) {
+validate <- function(estim_opt, model_opt, save_opt, log_lik) {
+  cat(black("Validating inputs ...\n"))
+  
   #-----------------------------------------------------------------------------
   # Set the default options
   #-----------------------------------------------------------------------------
@@ -33,12 +37,7 @@ validate <- function(estim_opt, model_opt, save_opt, db, log_lik) {
   cat(green$bold("Success: " %+% reset$silver("Default options set for save_opt().")))
   
   #-----------------------------------------------------------------------------
-  # Check the data
-  #-----------------------------------------------------------------------------
-  db <- check_data(db, estim_opt, model_opt)
-  
-  #-----------------------------------------------------------------------------
-  # Check parallel options
+  # Check parallel options and set up workers
   #-----------------------------------------------------------------------------
   if (estim_opt$cores > 1) {
     cat(black("Checking parallel options ...\n"))
@@ -50,20 +49,18 @@ validate <- function(estim_opt, model_opt, save_opt, db, log_lik) {
       estim_opt$cores <- max(1L, parallel::detectCores() - 1L)
       cat(yellow$bold("Warning: " %+% reset$silver("Cores exceed available. Set to max - 1.\n")))
     }
-    
-    # Split the data
-    db <- split_data(db, estim_opt, model_opt)
-    
   }
+  
+  
   
   #-----------------------------------------------------------------------------
   # Return the list of inputs
   #-----------------------------------------------------------------------------
+  cat(green$bold("Success: " %+% reset$silver("All options validated! \n")))
+  
   return(list(
     estim_opt = estim_opt,
     model_opt = model_opt,
-    save_opt = save_opt,
-    db = db,
-    log_lik
+    save_opt = save_opt
   ))
 }

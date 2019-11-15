@@ -2,9 +2,9 @@
 % Please edit documentation in R/validate.R
 \name{validate}
 \alias{validate}
-\title{Validates the inputs to the model estimation}
+\title{Validates the inputs}
 \usage{
-validate(estim_opt, model_opt, save_opt, db, log_lik)
+validate(estim_opt, model_opt, save_opt, log_lik)
 }
 \arguments{
 \item{estim_opt}{List of estimation options}
@@ -13,12 +13,14 @@ validate(estim_opt, model_opt, save_opt, db, log_lik)
 
 \item{save_opt}{List of options for saving outputs}
 
-\item{db}{Data}
-
 \item{log_lik}{Log likelihood function}
 }
+\value{
+A list with updated and validated \code{estim_opt}, \code{model_opt},
+and \code{save_opt}.
+}
 \description{
-The function is a wrapper for several cmdlR functions that checks the inputs,
-controls and data. The purpose is to make sure that the combination of 
-inputs are allowed and supported by the package.
+The function is a wrapper for several cmdlR functions that validates the
+inputs. The purpose is to ensure correct specification of the model and that
+all information is available.
 }
