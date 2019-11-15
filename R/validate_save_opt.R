@@ -25,7 +25,7 @@
 #' @return Returns a list of options with missing input values replaced by 
 #' default values
 
-set_save_opt_defaults <- function(save_opt_input) {
+validate_save_opt <- function(save_opt_input) {
   save_opt <- list(
     path = file.path(getwd(), "model-01"),
     save_summary = FALSE,

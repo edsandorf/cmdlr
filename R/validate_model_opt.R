@@ -8,7 +8,7 @@
 #' @return Returns a list of options with missing input values replaced by 
 #' default values
 
-set_model_opt_defaults <- function(model_opt_input) {
+validate_model_opt <- function(model_opt_input) {
   model_opt <- list(
     
   )

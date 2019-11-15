@@ -21,15 +21,15 @@ validate <- function(estim_opt, model_opt, save_opt, log_lik) {
   # Set the default options
   #-----------------------------------------------------------------------------
   # Set default estimation options
-  estim_opt <- set_estim_opt_defaults(estim_opt)
+  estim_opt <- validate_estim_opt(estim_opt)
   cat(green$bold("Success: " %+% reset$silver("Default options set for estim_opt().")))
 
   # Set default model options
-  model_opt <- set_model_opt_defaults(model_opt)
+  model_opt <- validate_model_opt(model_opt)
   cat(green$bold("Success: " %+% reset$silver("Default options set for model_opt().")))
   
   # Set default saving options
-  save_opt <- set_save_opt_defaults(save_opt)
+  save_opt <- validate_save_opt(save_opt)
   if (save_opt$path == file.path(getwd(), "model-01")) {
     cat(blue$bold("Note: " %+% reset$silver(paste0("Outputs are stored in default location: \"",
                                                    file.path(getwd(), "model-01"), "\"\n"))))

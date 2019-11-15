@@ -8,7 +8,7 @@
 #' @return Returns a list of options with missing input values replaced by 
 #' default values
 
-set_estim_opt_defaults <- function(estim_opt_input) {
+validate_estim_opt <- function(estim_opt_input) {
   estim_opt <- list(
     
   )
