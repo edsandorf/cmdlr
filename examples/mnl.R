@@ -53,7 +53,7 @@ model_opt <- list(
 #-------------------------------------------------------------------------------
 # Log likelihood function
 #-------------------------------------------------------------------------------
-log_lik <- function() {
+log_lik <- function(model_opt) {
   
   # Define the list of utilities 
   V <- list(
@@ -74,16 +74,14 @@ log_lik <- function() {
 #-------------------------------------------------------------------------------
 # Validate the model inputs
 #-------------------------------------------------------------------------------
-model_inputs <- validate(estim_opt, model_opt, save_opt, db, log_lik)
+opts <- validate(estim_opt, model_opt, save_opt, log_lik)
 
 #-------------------------------------------------------------------------------
 # If we are using parallel estimation, we need to prepare the workers
 #-------------------------------------------------------------------------------
-if (estim_opt$cores > 1) {
-  prepare_parallel()
-}
+inputs <- prepare(opts, db)
 
 #-------------------------------------------------------------------------------
 # Estimate the model
 #-------------------------------------------------------------------------------
-model_tmp <- estimate(log_lik, estim_opt)
+model <- estimate(inputs)
