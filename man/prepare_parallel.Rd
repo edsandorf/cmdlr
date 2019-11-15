@@ -4,12 +4,18 @@
 \alias{prepare_parallel}
 \title{Function to prepare and set up for parallel estimation}
 \usage{
-prepare_parallel(estim_opt, save_opt)
+prepare_parallel(db, estim_opt, model_opt, save_opt, workers)
 }
 \arguments{
+\item{db}{Data}
+
 \item{estim_opt}{List of estimation options}
 
+\item{model_opt}{List of model options}
+
 \item{save_opt}{List of options for saving outputs}
+
+\item{workers}{A worker cluster for parallel estimation}
 }
 \description{
 The function will set up the workers, split the data and export necessary
