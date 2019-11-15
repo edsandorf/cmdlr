@@ -21,3 +21,8 @@ The function takes the data and splits it into roughly equal chunks to be
 sent to the workers for parallel processing. The function takes care to not
 split the same individual across multiple workers.
 }
+\details{
+It is important that the function is run after \code{check_data}. The code
+only splits individuals and observations correctly if there are equal
+number of rows per individual.
+}
