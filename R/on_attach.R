@@ -23,14 +23,32 @@
   } else {
     remote_version <- gsub("Version:\\s*", "", description[grep('Version:', description)])    
   }
-  
-  packageStartupMessage("Thank you for using cmdlR! \n\n",
+
+  logo <- paste0("**************************************************************", "\n",
+            "                                             _ _ _ _ _ _ _","\n",
+            "                                            /             \\  ","\n",
+            "                                            |      _ _     \\","\n",
+            "      _ _ _ _ _ _ _ _ _ _ _ _ _ _ _   _ _   |     /   \\     \\ ","\n",
+            "    /        |             |       \\ |   |  |     |   |     |","\n",
+            "   /    _ _ _|             |   _    \\|   |  |     \\_ _/     / ","\n",
+            "  /    /   |    ^     ^    |  |  \\   \\   |  |              /","\n",
+            " |    |    |   | |   | |   |  |   |   |  |  |      _ _     \\  ","\n",
+            " |    |    |   | |   | |   |  |   |   |  |  |     /   \\     \\","\n",
+            " |    |    |   | |   | |   |  |   |   |  |  |    /     \\     \\","\n",
+            "  \\    \\ _ |_  | |   | |   |  |_ /   /   |_ |_ _ |_    |     |","\n",
+            "   \\         | | |   | |   |        /|             |   |     |","\n",
+            "    \\ _ _ _ _|_| |_ _| |_ _|_ _ _ _/ |_ _ _ _ _ _ _|   |_ _ _|","\n",
+            "","\n", "***************************************************************"
+  )
+
+  packageStartupMessage(logo, "\n\n",
+    "Thank you for using cmdlR! \n\n",
     "You are currently using version: ",
     installed_version, "\n\n",
     "The latest version is: ", remote_version, "\n\n",
     "To access the latest version, please run \n",
     "devtools::install_github('edsandorf/cmdlR') \n\n",
     
-    "Please cite as: \n", 
-    "Sandorf, E. D., 2019, cmdlR: Choice Modeling in R, https://github.com/edsandorf/cmdlR \n\n")
+    "To cite this package: \n",
+    "utils::citation('cmdlR')")
 }
