@@ -9,8 +9,6 @@
 #' @param db Data
 #' @param estim_opt List of estimation options
 #' @param model_opt List of model options
-#'
-#' @export
 
 prepare_data <- function(db, estim_opt, model_opt) {
   cat(black$bold("Checking data ...\n"))

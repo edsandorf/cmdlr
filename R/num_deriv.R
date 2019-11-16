@@ -11,8 +11,6 @@
 #'
 #' @return A matrix with rows equal to N and columns equal to the number of
 #' parameters
-#'
-#' @export
 
 num_deriv <- function(param, log_lik, N, eps) {
   K <- length(param)

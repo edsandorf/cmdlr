@@ -4,8 +4,6 @@
 #' objects are loaded on each worker and how the work load is distributed.
 #' 
 #' @param workers A cluster of workers
-#'
-#' @export
 
 get_worker_info <- function(workers) {
   parallel::parLapply(workers, seq_along(workers), function(x) {
@@ -36,8 +34,6 @@ get_worker_info <- function(workers) {
 #' .txt file
 #' 
 #' @param worker_info A worker information object from get_worker_info()
-#'
-#' @export
 summary_worker_info <- function(worker_info) {
   
 }

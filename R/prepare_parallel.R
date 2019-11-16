@@ -8,8 +8,6 @@
 #' @param model_opt List of model options
 #' @param save_opt List of options for saving outputs
 #' @param workers A worker cluster for parallel estimation
-#' 
-#' @export
 
 prepare_parallel <- function(db, estim_opt, model_opt, save_opt, workers) {
 

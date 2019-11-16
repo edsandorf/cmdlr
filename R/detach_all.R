@@ -3,11 +3,6 @@
 #' This function detaches all non-essential objects from all environments and is 
 #' a simple rewrite of a function available through the codes provided by
 #' the Choice Modeling Centre in Leeds.
-#' 
-#' @examples
-#' detach_all()
-#' 
-#' @export
 
 detach_all <- function () {
   subset_environment <- substring(search(), 1L, 8L) != "package:" &
