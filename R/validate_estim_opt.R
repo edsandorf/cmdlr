@@ -1,7 +1,10 @@
-#' Set default estimation options
+#' Validates and sets default estimation options
 #'
-#' The function sets default estimation options for options that are not 
-#' specified by the user
+#' The function validates the user supplied list of estimation options and sets 
+#' defaults for missing options. If these options are essential, an error 
+#' will occur and the program will stop. If the options are important, a
+#' warning will be posted to the terminal and a default option will be used, 
+#' but the program will continue.
 #'
 #' @param estim_opt_input A list of user specified estimation options
 #'

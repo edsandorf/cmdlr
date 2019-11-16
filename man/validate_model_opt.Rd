@@ -2,18 +2,21 @@
 % Please edit documentation in R/validate_model_opt.R
 \name{validate_model_opt}
 \alias{validate_model_opt}
-\title{Set default model options}
+\title{Validates and sets default model options}
 \usage{
 validate_model_opt(model_opt_input)
 }
 \arguments{
-\item{model_opt_input}{A list of user specified estimation options}
+\item{model_opt_input}{A list of user specified model options}
 }
 \value{
 Returns a list of options with missing input values replaced by 
 default values
 }
 \description{
-The function sets default model options for options that are not 
-specified by the user
+The function validates the user supplied list of model options and sets 
+defaults for the missing options. If these options are essential, an error 
+will occur and the program will stop. If the options are important, a
+warning will be posted to the terminal and a default option will be used, 
+but the program will continue.
 }

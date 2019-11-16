@@ -2,9 +2,9 @@
 % Please edit documentation in R/validate.R
 \name{validate}
 \alias{validate}
-\title{Validates the inputs}
+\title{Validates inputs}
 \usage{
-validate(estim_opt, model_opt, save_opt, log_lik)
+validate(estim_opt, model_opt, save_opt, summary_opt, log_lik)
 }
 \arguments{
 \item{estim_opt}{List of estimation options}
@@ -12,6 +12,8 @@ validate(estim_opt, model_opt, save_opt, log_lik)
 \item{model_opt}{List of model options}
 
 \item{save_opt}{List of options for saving outputs}
+
+\item{summary_opt}{List of options for summary statistics}
 
 \item{log_lik}{Log likelihood function}
 }

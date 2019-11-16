@@ -1,7 +1,10 @@
-#' Set default estimation options
+#' Validates and sets default estimation options
 #'
-#' The function sets default save options for options that are not 
-#' specified by the user
+#' The function validates the user supplied list of save options and sets 
+#' defaults for the missing options. If these options are essential, an error 
+#' will occur and the program will stop. If the options are important, a
+#' warning will be posted to the terminal and a default option will be used, 
+#' but the program will continue.
 #'
 #' \describe{
 #'   \item{path}{The path and file name for your output. Defaults to current
@@ -20,7 +23,7 @@
 #'    Default is \code{FALSE}.}
 #' }
 #' 
-#' @param save_opt_input A list of user specified estimation options
+#' @param save_opt_input A list of user specified save options
 #' 
 #' @return Returns a list of options with missing input values replaced by 
 #' default values

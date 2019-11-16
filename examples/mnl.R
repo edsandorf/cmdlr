@@ -23,6 +23,13 @@ save_opt <- list(
 )
 
 #-------------------------------------------------------------------------------
+# Define the list of summary options
+#-------------------------------------------------------------------------------
+summary_opt <- list(
+  robust_se = FALSE
+)
+
+#-------------------------------------------------------------------------------
 # Define the list of estimation options
 #-------------------------------------------------------------------------------
 estim_opt <- list(
@@ -74,7 +81,7 @@ log_lik <- function(model_opt) {
 #-------------------------------------------------------------------------------
 # Validate the model inputs
 #-------------------------------------------------------------------------------
-opts <- validate(estim_opt, model_opt, save_opt, log_lik)
+opts <- validate(estim_opt, model_opt, save_opt, summary_opt, log_lik)
 
 #-------------------------------------------------------------------------------
 # If we are using parallel estimation, we need to prepare the workers

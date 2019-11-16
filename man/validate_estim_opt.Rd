@@ -2,7 +2,7 @@
 % Please edit documentation in R/validate_estim_opt.R
 \name{validate_estim_opt}
 \alias{validate_estim_opt}
-\title{Set default estimation options}
+\title{Validates and sets default estimation options}
 \usage{
 validate_estim_opt(estim_opt_input)
 }
@@ -14,6 +14,9 @@ Returns a list of options with missing input values replaced by
 default values
 }
 \description{
-The function sets default estimation options for options that are not 
-specified by the user
+The function validates the user supplied list of estimation options and sets 
+defaults for missing options. If these options are essential, an error 
+will occur and the program will stop. If the options are important, a
+warning will be posted to the terminal and a default option will be used, 
+but the program will continue.
 }

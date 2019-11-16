@@ -2,20 +2,23 @@
 % Please edit documentation in R/validate_save_opt.R
 \name{validate_save_opt}
 \alias{validate_save_opt}
-\title{Set default estimation options}
+\title{Validates and sets default estimation options}
 \usage{
 validate_save_opt(save_opt_input)
 }
 \arguments{
-\item{save_opt_input}{A list of user specified estimation options}
+\item{save_opt_input}{A list of user specified save options}
 }
 \value{
 Returns a list of options with missing input values replaced by 
 default values
 }
 \description{
-The function sets default save options for options that are not 
-specified by the user
+The function validates the user supplied list of save options and sets 
+defaults for the missing options. If these options are essential, an error 
+will occur and the program will stop. If the options are important, a
+warning will be posted to the terminal and a default option will be used, 
+but the program will continue.
 }
 \details{
 \describe{
