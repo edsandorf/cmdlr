@@ -4,12 +4,14 @@
 \alias{prepare}
 \title{A function that prepares the data for estimation}
 \usage{
-prepare(opts, db)
+prepare(opts, db, log_lik)
 }
 \arguments{
 \item{opts}{List of \code{estim_opt}, \code{model_opt}, \code{save_opt}.}
 
 \item{db}{Data}
+
+\item{log_lik}{Log likelihood function}
 }
 \value{
 A list with \code{estim_opt}, \code{model_opt}, \code{save_opt},

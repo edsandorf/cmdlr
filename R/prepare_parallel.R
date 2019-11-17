@@ -11,9 +11,6 @@
 
 prepare_parallel <- function(db, estim_opt, model_opt, save_opt, workers) {
 
-  # Split the data
-  db <- split_data(db, estim_opt, model_opt)
-  
   # Save information about what is loaded on the workers
   if (save_opt$save_worker_info) {
     worker_info <- get_worker_info(workers)
