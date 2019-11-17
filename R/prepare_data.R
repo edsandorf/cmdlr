@@ -11,7 +11,7 @@
 #' @param model_opt List of model options
 
 prepare_data <- function(db, estim_opt, model_opt) {
-  cat(black$bold("Checking data ...\n"))
+  cat(black$bold("Preparing data ...\n"))
   
   N <- length(unique(db[[model_opt[["id"]]]]))
   S <- length(unique(db[[model_opt[["ct"]]]]))
@@ -19,23 +19,19 @@ prepare_data <- function(db, estim_opt, model_opt) {
   # Check choice tasks
   if ((N * S) != nrow(db)) {
     cat(yellow$bold("Warning: " %+% reset$silver("Unequal number of choice occasions across individuals. Padding data with NA ... \n")))
-    
-    ct_tmp <- tibble(ct = seq_len(S))
-    db <- lapply(deframe(unique(db[, "id"])), function(i) {
-      db_tmp <- db[db[, "id"] == i, ]
-      if (nrow(db_tmp) != S) {
-        db_tmp <- left_join(ct_tmp, db_tmp, by = "ct") %>%
-          mutate(id = i)
-      }
-      
-      # Return the padded data matrix
-      return(db_tmp)
-    })
-    
-    db <- do.call(rbind, db)
+    db <- pad_data(db, model_opt)
     cat(green$bold("Success: " %+% reset$silver("Data padded successfully.\n")))
   }
   
+  # Split the data if estimating in parallel and return as a matrix
+  if (estim_opt$cores > 1) {
+    db <- split_data(db, estim_opt, model_opt)
+    db <- lapply(db, function(x) as.matrix(x))
+  } else {
+    db <- as.matrix(db)
+  }
+  
   # Return the manipulated and checked data
+  cat(green$bold("Success: " %+% reset$silver("Data preparation complete.\n")))
   return(db)
 }

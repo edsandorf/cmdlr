@@ -20,7 +20,7 @@ split_data <- function(db, estim_opt, model_opt) {
   S <- length(unique(db[[model_opt[["ct"]]]]))
   
   if ((N * S) != nrow(db)) {
-    stop("Unequal number of rows per individual. Run check_data(). \n")
+    stop("Unequal number of rows per individual. Run pad_data(). \n")
   }
   
   # Get the ids and split them across cores
