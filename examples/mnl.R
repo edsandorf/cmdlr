@@ -1,14 +1,17 @@
 #-------------------------------------------------------------------------------
-#Load the packages
+# Tidy the environment prior to loading packages 
+#-------------------------------------------------------------------------------
+cmdlR::tidy(clean = FALSE)
+
+#-------------------------------------------------------------------------------
+# Load the packages
 #-------------------------------------------------------------------------------
 pkgs <- c("cmdlR")
 invisible(lapply(pkgs, require, character.only = TRUE))
 
 #-------------------------------------------------------------------------------
-#Load and manipulate the data
+# Load and manipulate the data
 #-------------------------------------------------------------------------------
-# path <- file.path("data", "data_coral.rda")
-# db <- load(path)
 db <- cmdlR::data_coral
 
 #-------------------------------------------------------------------------------
@@ -26,14 +29,17 @@ save_opt <- list(
 # Define the list of summary options
 #-------------------------------------------------------------------------------
 summary_opt <- list(
-  robust_se = FALSE
+  robust_se = FALSE 
 )
 
 #-------------------------------------------------------------------------------
 # Define the list of estimation options
 #-------------------------------------------------------------------------------
 estim_opt <- list(
-  cores = 1
+  optimizer = "maxLik",
+  method = "BFGS",
+  cores = 1,
+  robust_vcov = TRUE
 )
 
 #-------------------------------------------------------------------------------
@@ -44,23 +50,22 @@ model_opt <- list(
   description = "A simple MNL model to use as an example.",
   id = c("id"),
   ct = c("ct"),
-  alt = c(),
-  choice = c(),
+  choice = db$choice,
   fixed = c(),
-  param = c(
-    b_cost = 0,
-    b_small = 0,
-    b_large = 0,
-    b_oil = 0,
-    b_fish = 0,
-    b_habitat = 0
+  param = list(
+    b_cost = -0.2,
+    b_small = 0.2,
+    b_large = 0.4,
+    b_oil = -0.02,
+    b_fish = 0.1,
+    b_habitat = 0.9
   )
 )
 
 #-------------------------------------------------------------------------------
 # Log likelihood function
 #-------------------------------------------------------------------------------
-log_lik <- function(model_opt) {
+log_lik <- function(param) {
   
   # Define the list of utilities 
   V <- list(
@@ -73,9 +78,10 @@ log_lik <- function(model_opt) {
   probs <- mnl_probs(V)
   
   # Calculate the panel probabilities
+  lik <- panel_probs(probs)
   
   # Return the log-likelihood value
-  return()
+  return(log(lik))
 }
 
 #-------------------------------------------------------------------------------
@@ -84,11 +90,26 @@ log_lik <- function(model_opt) {
 opts <- validate(estim_opt, model_opt, save_opt, summary_opt, log_lik)
 
 #-------------------------------------------------------------------------------
-# If we are using parallel estimation, we need to prepare the workers
+# Prepare for estimation
 #-------------------------------------------------------------------------------
-inputs <- prepare(opts, db)
+inputs <- prepare(opts, db, log_lik)
 
 #-------------------------------------------------------------------------------
 # Estimate the model
 #-------------------------------------------------------------------------------
 model <- estimate(inputs)
+
+#-------------------------------------------------------------------------------
+# Get a summary of the results
+#-------------------------------------------------------------------------------
+summarize(model, summary_opt)
+
+#-------------------------------------------------------------------------------
+# Make predictions
+#-------------------------------------------------------------------------------
+predictions <- predict(model)
+
+#-------------------------------------------------------------------------------
+# Save the results
+#-------------------------------------------------------------------------------
+store()
