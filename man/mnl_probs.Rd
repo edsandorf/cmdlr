@@ -4,9 +4,11 @@
 \alias{mnl_probs}
 \title{Function for calculating the MNL probabilities}
 \usage{
-mnl_probs(model_opt)
+mnl_probs(V, model_opt)
 }
 \arguments{
+\item{V}{A list of the observable part of utility}
+
 \item{model_opt}{List of model options}
 }
 \description{
