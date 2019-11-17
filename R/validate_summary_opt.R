@@ -19,5 +19,8 @@ validate_summary_opt <- function(summary_opt_input) {
   # Replace the non-specified values with default values
   summary_opt[names(summary_opt_input)] <- summary_opt_input
   
+  #-----------------------------------------------------------------------------
+  # Return the validated list of summary options
+  #-----------------------------------------------------------------------------
   return(summary_opt)
 }

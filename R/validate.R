@@ -23,11 +23,11 @@ validate <- function(estim_opt, model_opt, save_opt, summary_opt, log_lik) {
   #-----------------------------------------------------------------------------
   # Set default estimation options
   estim_opt <- validate_estim_opt(estim_opt)
-  cat(green$bold("Success: " %+% reset$silver("estim_opt() validated.")))
+  cat(green$bold("Success: " %+% reset$silver("estim_opt() validated.\n")))
 
   # Set default model options
   model_opt <- validate_model_opt(model_opt)
-  cat(green$bold("Success: " %+% reset$silver("model_opt() validated.")))
+  cat(green$bold("Success: " %+% reset$silver("model_opt() validated.\n")))
   
   # Set default saving options
   save_opt <- validate_save_opt(save_opt)
@@ -35,13 +35,18 @@ validate <- function(estim_opt, model_opt, save_opt, summary_opt, log_lik) {
     cat(blue$bold("Note: " %+% reset$silver(paste0("Outputs are stored in default location: \"",
                                                    file.path(getwd(), "model-01"), "\"\n"))))
   }
-  cat(green$bold("Success: " %+% reset$silver("save_opt() validated.")))
+  cat(green$bold("Success: " %+% reset$silver("save_opt() validated.\n")))
   
   summary_opt <- validate_summary_opt(summary_opt)
-  cat(green$bold("Success: " %+% reset$silver("summary_opt() validated.")))
+  cat(green$bold("Success: " %+% reset$silver("summary_opt() validated.\n")))
   
   #-----------------------------------------------------------------------------
-  # Check parallel options and set up workers
+  # Validate the log likelihood function
+  #-----------------------------------------------------------------------------
+  
+  
+  #-----------------------------------------------------------------------------
+  # Check parallel options
   #-----------------------------------------------------------------------------
   if (estim_opt$cores > 1) {
     cat(black("Checking parallel options ...\n"))
