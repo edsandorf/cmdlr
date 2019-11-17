@@ -6,9 +6,6 @@
 #' 
 #' @param clean If \code{TRUE} deletes all objects from the work space
 #' 
-#' @example 
-#' cmdlR::tidy(clean = FALSE)
-#' 
 #' @export
 
 tidy <- function(clean = FALSE) {
