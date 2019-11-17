@@ -19,7 +19,11 @@ Imports:
   parallel,
   magrittr,
   tibble,
-  dplyr
+  dplyr,
+  MASS,
+  maxLik,
+  numDeriv,
+  nloptr
 Suggests: 
     testthat,
     knitr,
