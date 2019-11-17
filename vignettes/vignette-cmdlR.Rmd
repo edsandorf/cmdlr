@@ -17,3 +17,9 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(cmdlR)
 ```
+
+
+### Estimation options
+The `cmdlR` package gives the user the ability to access the options and settings of the optimizers. This includes specifying the optimizer, optimization routine, precision levels and convergence criteria. 
+
+Note that different optimizers may use different optimization routines. If the user specifies an optimization routine that cannot be used by the specified optimizer, the optimizer option takes precedense and the optimization routine reverts to the default. For both `nloptr` and `maxLik` this is the `bfgs` routine. In this case a warning is printed to the console to make the user aware of this change.
