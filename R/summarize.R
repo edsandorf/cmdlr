@@ -8,6 +8,6 @@
 #' 
 #' @export
 
-summary <- function(model, summary_opt) {
+summarize <- function(model, summary_opt) {
   
 }
