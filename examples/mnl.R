@@ -77,8 +77,11 @@ log_lik <- function(param) {
   # Calculate the probabilities
   probs <- mnl_probs(V)
   
-  # Calculate the panel probabilities
-  lik <- panel_probs(probs)
+  # Calculate the product over the panel
+  pr_seq <- panel_product(probs, S)
+  
+  # Average over draws - shouldn't matter for the MNL (check this)
+  lik <- avg_draws(pr_seq, N)
   
   # Return the log-likelihood value
   return(log(lik))
