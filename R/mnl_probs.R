@@ -19,11 +19,11 @@ mnl_probs <- function(V, model_opt) {
   V <- lapply(V, function(v) v - v_chosen)
   
   # Calculate the exponent and sum of utilities
-  exp_V <- lapply(V, function(v) exp(v))
-  sum_V <- Reduce("+", exp_V)
+  exp_v <- lapply(V, function(v) exp(v))
+  sum_v <- Reduce("+", exp_v)
   
   # Calculate the probability of the chosen alt
-  pr_chosen <- 1 / sum_V
+  pr_chosen <- 1 / sum_v
   
   # Return the probability of the chosen alternative
   return(pr_chosen)
