@@ -14,12 +14,102 @@ knitr::opts_chunk$set(
 )
 ```
 
+# Introduction
+
+Choice modeling has been around for decades ... 
+
+## Why another R package?
+I wrote this package to make my life easier. Over the years, these codes have existed in many different versions.
+
+Every time I began a new project or paper, I would copy my old codes and change them to estimate the particular model I needed. I would often need to extract different information from the estimation routines. 
+
+Over time, this led to a proliferation of code with similar basic functionality, but different extensions stored in different locations on my computer. Keeping track of the most recent version or which code could do what quickly became very difficult.  
+
+As I have learned more about programming in R.
+
+Writing all my code into a R package became a fun way to dive deeper into how R works. It allowed me to develop as a programmer and it has made my life easier since the most recent version of my code is all in one place and can be updated quickly within each project by simply installing the newest version of the package.
+
+Re-writing the code as a package has allowed me to rethink how I solved problems in the past. People familiar with the R package "Apollo" written by Stephane Hess and David Palma, will recognize the modular approach taken in this package. I am truly impressed by the balance that they have struck between ease-of-use and accessibility, and giving the user the power to easily extend the code with their own log-likelihood functions. In this package, I try to emulate and expand on this design philosophy. 
+
+## The name
+`cmdlR` is short for Choice Modeler or Choice Modeling in R, whichever you prefer. To me, these five letters capture both what we are and what we do.
+
+## Installing and loading the package
+The package is not yet on CRAN (I don't know if it will ever be), but it is available to install from my [GitHub repository](https://github.com/edsandorf/cmdlR). The easiest way to access the package is installing it directly using the `install_github()` function from the `devtools` package. 
+
+```{r eval=FALSE}
+devtools::install_github("edsandorf/cmdlR")
+```
+
+Once you have installed the package, go ahead and load it using the `library()` function. You will see a welcome message and the cmdlR logo. 
+
 ```{r setup}
 library(cmdlR)
 ```
 
+## Getting help
+The package does not have its own help forum nor does it have much documentation beyond this vignette (which also serves as a manual) and the examples provided in the folder /examples. However, on the package website ([https://cmdlR.edsandorf.me](https://cmdlR.edsandorf.me)), I will publish small R and package related blog posts as well as links to my research papers using this package.
 
-### Estimation options
+## Reporting a bug 
+All software contain bugs and this R package is no different. I do my best to root them out, but sometimes they can be persistent and difficult to spot. If you do come across one, please report it on the "Issues" page of this package's GitHub repository. Label the issue as a "bug". Please be detailed and if possible include a reproducible example. 
+
+## Requesting a feature
+The normal development cycle of the package depends on the needs of my current projects. I will usually develop new functions and add them to the package as needed. However, if the package is missing an essential feature, please feel free to let me know. To help me track feature requests and allow others to comment on them as well, please use the "Issues" page on this package's Github repository and label the issue as a "feature request". The more detail you add with the request, the easier it will be for me to understand and implement. 
+
+## Contributing to the package
+If you wish to contribute to the package either by fixing a bug or adding a feature, please follow these steps: 
+
+1. Go to Github and create an account if you don't have one.
+2. Fork the project and clone it locally on your computer. Make sure that the repository is synced remotely before you move on to the next step.
+3. Create a new branch for each bug fix or new feature you want to add.
+4. Do the work and write a descriptive commit message. If you have added a new feature, please contribute documentation and tests. Make sure that it does not alter or break other parts of the code. 
+5. Push the changes to your remote repository.
+6. Create a new pull request for each bug fix or new feature added. Do not add multiple bug fixes or features in a single pull request.
+7. Respond to any code review feedback.
+
+This list is based on a great post on [how to contribute](https://akrabat.com/the-beginners-guide-to-contributing-to-a-github-project/) to a github project. 
+
+In order keep everything readable and maintainable, please adhere to the code style. For details, please see the [R chapter](http://r-pkgs.had.co.nz/r.html) of 'R packages' by Hadley Wickham.
+
+## Acknowledgments
+This package is based on years of experience developing and estimating choice models. I have benefited greatly from discussions with Danny Campbell, Mikolaj Czajkowski, David Palma and Stephane Hess. I have benefited greatly from the excellent [Matlab codes](https://github.com/czaj/DCE) written by Mikolaj Czajkowski and the extensive choice modeling software [Apollo](http://www.apollochoicemodelling.com/). The latter has also served as a source of inspiration for the interface and some of the functionality of this package. 
+
+
+
+
+
+# Running your first model
+
+
+Using the package consists of 7 steps packaged in convenient wrapper functions that ensures a logical approach to estimating a choice model. 
+
+## Options
+
+### Estimation options - `estim_opt`
 The `cmdlR` package gives the user the ability to access the options and settings of the optimizers. This includes specifying the optimizer, optimization routine, precision levels and convergence criteria. 
 
 Note that different optimizers may use different optimization routines. If the user specifies an optimization routine that cannot be used by the specified optimizer, the optimizer option takes precedense and the optimization routine reverts to the default. For both `nloptr` and `maxLik` this is the `bfgs` routine. In this case a warning is printed to the console to make the user aware of this change.
+
+### Model options - `model_opt`
+
+### Summary options - `summary_opt`
+
+### Save options - `save_opt`
+
+## The log-likelihood function - `log_lik()`
+
+## Steps to estimate the model
+
+### Step 1: `tidy()` the environment
+
+### Step 2: `validate()` the inputs
+
+### Step 3: `prepare()` the inputs
+
+### Step 4: `estimate()` the model
+
+### Step 5: `summarize()` the results
+
+### Step 6: `store()` the results
+
+### Step 7: `predict()` using the results of the model
