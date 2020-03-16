@@ -15,27 +15,19 @@
 prepare <- function(opts, db, log_lik) {
   cat(black("Preparing data for estimation ... \n"))
   
-  #-----------------------------------------------------------------------------
-  # Extract options
-  #-----------------------------------------------------------------------------
+  # Extract options ----
   estim_opt <- opts[["estim_opt"]]
   model_opt <- opts[["model_opt"]]
   save_opt <- opts[["save_opt"]]
   summary_opt <- opts[["summary_opt"]]
   
-  #-----------------------------------------------------------------------------
-  # Prepare the data
-  #-----------------------------------------------------------------------------
+  # Prepare the data ----
   db <- prepare_data(db, estim_opt, model_opt)
   
-  #-----------------------------------------------------------------------------
-  # Starting values
-  #-----------------------------------------------------------------------------
+  # Starting values ----
   
   
-  #-----------------------------------------------------------------------------
-  # Parallel estimation
-  #-----------------------------------------------------------------------------
+  # Parallel estimation ----
   if (estim_opt$cores > 1) {
     cat(black$bold("Preparing workers for parallel estimation. \n"))
     
@@ -50,19 +42,13 @@ prepare <- function(opts, db, log_lik) {
     workers <- NULL
   }
   
-  #-----------------------------------------------------------------------------
-  # Prepare the log likelihood function
-  #-----------------------------------------------------------------------------
+  # Prepare the log likelihood function ----
   log_lik <- prepare_log_lik()
   
-  #-----------------------------------------------------------------------------
-  # Prepare the numerical gradient
-  #-----------------------------------------------------------------------------
+  # Prepare the numerical gradient ----
   num_grad <- prepare_num_grad()
   
-  #-----------------------------------------------------------------------------
-  # Return the list of inputs, data and workers
-  #-----------------------------------------------------------------------------
+  # Return the list of inputs, data and workers ----
   invisible(gc(verbose = FALSE))
   cat(green$bold("Success: " %+% reset$silver("Data prepared and ready for estimation! \n")))
   

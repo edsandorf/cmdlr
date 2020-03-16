@@ -14,9 +14,7 @@ estimate <- function(inputs) {
   model <- list()
   model[["time_start"]] <- time_start
   
-  #-----------------------------------------------------------------------------
-  # Extract inputs
-  #-----------------------------------------------------------------------------
+  # Extract inputs ----
   estim_opt <- inputs[["estim_opt"]]
   model_opt <- inputs[["model_opt"]]
   save_opt <- inputs[["save_opt"]]
@@ -24,17 +22,13 @@ estimate <- function(inputs) {
   db <- inputs[["db"]]
   workers <- inputs[["workers"]]
   
-  #-----------------------------------------------------------------------------
-  # Attach the variables to enable calling by names
-  #-----------------------------------------------------------------------------
+  # Attach the variables to enable calling by names ----
   attach()
   on.exit(detach(), add = TRUE)
   
   if (estim_opt$cores > 1) on.exit(parallel::stopCluster(workers), add = TRUE)
   
-  #-----------------------------------------------------------------------------
-  # Estimate the model using the specified optimizer
-  #-----------------------------------------------------------------------------
+  # Estimate the model using the specified optimizer ----
   converged <- FALSE
   
   if (estim_opt$optimizer == "maxlik") {
@@ -61,9 +55,7 @@ estimate <- function(inputs) {
     stop("Model failed to converge. Estimation unsuccessful.\n")
   }
   
-  #-----------------------------------------------------------------------------
-  # Calculate the hessian matrix
-  #-----------------------------------------------------------------------------
+  # Calculate the hessian matrix ----
   model[["hessian"]] <- tryCatch({
     cat(reset$silver("Calculating the Hessian matrix. This may take a while. \n"))
     numDeriv::hessian()
@@ -94,9 +86,7 @@ estimate <- function(inputs) {
   
   cat(green$bold("Success: " %+% reset$silver("Hessian calculated successfully.\n")))
   
-  #-----------------------------------------------------------------------------
-  # Calculate the variance-covariance matrix
-  #-----------------------------------------------------------------------------
+  # Calculate the variance-covariance matrix ----
   model[["vcov"]] <- tryCatch({
     MASS::ginv(-model[["hessian"]])
   })
@@ -105,16 +95,12 @@ estimate <- function(inputs) {
     
   }
   
-  #-----------------------------------------------------------------------------
-  # Capture time end and print completion message
-  #-----------------------------------------------------------------------------
+  # Capture time end and print completion message ----
   time_end <- Sys.time()
   cat(green$bold("Success: " %+% reset$silver("Estimation complete",
                                               time_end, "\n")))
   model[["time_end"]] <- time_end
   
-  #-----------------------------------------------------------------------------
-  # Return the model object
-  #-----------------------------------------------------------------------------
+  # Return the model object ----
   return(model)
 }

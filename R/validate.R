@@ -18,18 +18,15 @@
 validate <- function(estim_opt, model_opt, save_opt, summary_opt, log_lik) {
   cat(black("Validating inputs ...\n"))
   
-  #-----------------------------------------------------------------------------
-  # Set the default options
-  #-----------------------------------------------------------------------------
-  # Set default estimation options
+  # Validate estimation options ----
   estim_opt <- validate_estim_opt(estim_opt)
   cat(green$bold("Success: " %+% reset$silver("estim_opt() validated.\n")))
 
-  # Set default model options
+  # Validate model options ----
   model_opt <- validate_model_opt(model_opt)
   cat(green$bold("Success: " %+% reset$silver("model_opt() validated.\n")))
   
-  # Set default saving options
+  # Validate save optioins ----
   save_opt <- validate_save_opt(save_opt)
   if (save_opt$path == file.path(getwd(), "model-01")) {
     cat(blue$bold("Note: " %+% reset$silver(paste0("Outputs are stored in default location: \"",
@@ -40,14 +37,11 @@ validate <- function(estim_opt, model_opt, save_opt, summary_opt, log_lik) {
   summary_opt <- validate_summary_opt(summary_opt)
   cat(green$bold("Success: " %+% reset$silver("summary_opt() validated.\n")))
   
-  #-----------------------------------------------------------------------------
-  # Validate the log likelihood function
-  #-----------------------------------------------------------------------------
+  # Validate the log likelihood function ----
+
   
-  
-  #-----------------------------------------------------------------------------
-  # Check parallel options
-  #-----------------------------------------------------------------------------
+
+  # Check parallel options ----
   if (estim_opt$cores > 1) {
     cat(black("Checking parallel options ...\n"))
     
@@ -60,9 +54,7 @@ validate <- function(estim_opt, model_opt, save_opt, summary_opt, log_lik) {
     }
   }
   
-  #-----------------------------------------------------------------------------
-  # Return the list of inputs
-  #-----------------------------------------------------------------------------
+  # Return the list of inputs ----
   cat(green$bold("Success: " %+% reset$silver("All options validated! \n")))
   
   return(list(

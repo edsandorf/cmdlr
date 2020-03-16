@@ -12,9 +12,7 @@
 #' default values
 
 validate_estim_opt <- function(estim_opt_input) {
-  #-----------------------------------------------------------------------------
   # Set the missing to default values
-  #-----------------------------------------------------------------------------
   estim_opt <- list(
     optimizer = "maxlik",
     method = "bfgs",
@@ -32,9 +30,7 @@ validate_estim_opt <- function(estim_opt_input) {
   # Replace the non-specified values with default values
   estim_opt[names(estim_opt_input)] <- estim_opt_input
   
-  #-----------------------------------------------------------------------------
   # Check the optimizer and optimization routine combinations
-  #-----------------------------------------------------------------------------
   msg <- yellow$bold("Warning: " %+% 
                        reset$silver(paste0("\'", tolower(estim_opt[["method"]]), "\'",
                                            " is not an option in ",
@@ -65,8 +61,6 @@ validate_estim_opt <- function(estim_opt_input) {
     if (tolower(estim_opt[["method"]]) == "sbplx") estim_opt[["method"]] <- "NLOPT_LN_SBPLX"
   }
   
-  #-----------------------------------------------------------------------------
   # Return the validated list of estimation options
-  #-----------------------------------------------------------------------------
-  return(estim_opt)
+  estim_opt
 }

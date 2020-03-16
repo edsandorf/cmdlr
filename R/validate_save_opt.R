@@ -41,8 +41,6 @@ validate_save_opt <- function(save_opt_input) {
   # Replace the non-specified values with default values
   save_opt[names(save_opt_input)] <- save_opt_input
   
-  #-----------------------------------------------------------------------------
   # Return the validated list of saving options
-  #-----------------------------------------------------------------------------
-  return(save_opt)
+  save_opt
 }

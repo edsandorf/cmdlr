@@ -19,8 +19,6 @@ validate_model_opt <- function(model_opt_input) {
   # Replace the non-specified values with default values
   model_opt[names(model_opt_input)] <- model_opt_input
   
-  #-----------------------------------------------------------------------------
   # Return the validated list of model options
-  #-----------------------------------------------------------------------------
-  return(model_opt)
+  model_opt
 }
