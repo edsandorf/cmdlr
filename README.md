@@ -6,7 +6,10 @@
 
 # cmdlR: Choice Modeling in R
 
-The problem of choice is fundamental to economics. Choice models are used to understand how people make choices in markets. cmdlR is an easy to use package for choice modeling in R. It contains several pre-programmed likelihood functions for the most common models and the framework is flexible so that the users can extend the functionality of the package with their own functions. 
+The problem of choice is fundamental to economics. Choice models are used to understand how people make choices in markets. cmdlR is a set of wrapper functions around a user written log-likelihood function. The package also contain several functions to check for local-optima, calculate welfare measures, compare results and make predictions. To get started, the package contains several examples with pre-programmed log-likelihood functions that can be easily tweaked by the user. 
+
+# Release notes v. 0.0.0.9000
+The package is currently not working, but is under development (16.03.2020). 
 
 # How to install cmdlR?
 
@@ -36,6 +39,6 @@ Sandorf, E. D., 2019, cmdlR: Choice Modeling in R, https://github.com/edsandorf/
 # Acknowledgments
 This package is based on years of experience developing and estimating choice
 models. A lot of the inspiration for this has come from existing R packages
-such as [gmnl](https://CRAN.R-project.org/package=gmnl) and [mlogit](https://CRAN.R-project.org/package=mlogit). I have also benefited from the extensive choice modeling software [Apollo](http://www.apollochoicemodelling.com/) and the excellent [Matlab codes](https://github.com/czaj/DCE) written by Mikolaj Czajkowski. I have benefited greatly from discussions with Danny Campbell, Mikolaj Czajkowski, Stephane Hess and David Palma.
+such as [gmnl](https://CRAN.R-project.org/package=gmnl) and [mlogit](https://CRAN.R-project.org/package=mlogit). I have also benefited from the extensive choice modeling software [Apollo](http://www.apollochoicemodelling.com/) and the excellent [Matlab codes](https://github.com/czaj/DCE) written by Mikolaj Czajkowski. I have benefited greatly from discussions with Danny Campbell, Mikolaj Czajkowski, Stephane Hess and David Palma. The package comes with absolutely no warranty and limited support. 
 
 
