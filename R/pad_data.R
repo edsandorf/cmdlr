@@ -24,9 +24,9 @@ pad_data <- function(db, model_opt) {
     }
     
     # Return the padded data matrix
-    return(db_tmp)
+    db_tmp
   })
   
   db <- do.call(rbind, db)
-  return(db)
+  db
 }
