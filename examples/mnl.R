@@ -51,6 +51,8 @@ model_opt <- list(
 # Log likelihood function ----
 log_lik <- function(param, weights) {
   # Attach the parameters and data  ----
+  attach(list(param, weights))
+  on.exit(list(param, weights))
   
   # Define the list of utilities ---- 
   V <- list(

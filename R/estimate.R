@@ -30,6 +30,7 @@ estimate <- function(inputs) {
   
   # Estimate the model using the specified optimizer ----
   converged <- FALSE
+  param <- do.call(c, model_opt$param)
   
   if (estim_opt$optimizer == "maxlik") {
     model_obj <- maxLik::maxLik()
