@@ -41,6 +41,13 @@ validate_save_opt <- function(save_opt_input) {
   # Replace the non-specified values with default values
   save_opt[names(save_opt_input)] <- save_opt_input
   
+  # Check output location
+  if (save_opt$path == file.path(getwd(), "model-01")) {
+    cat(blue$bold(symbol$info) %+% reset$silver(paste0("No output folder specified. Outputs are stored in default location: \"",
+                                                   file.path(getwd(), "model-01"), "\"\n")))
+  }
+  
   # Return the validated list of saving options
+  message(green$bold(symbol$tick) %+% reset$silver("  save_opt().\n"))
   save_opt
 }

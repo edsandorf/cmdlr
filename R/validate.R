@@ -23,18 +23,12 @@ validate <- function(estim_opt, model_opt, save_opt, summary_opt, log_lik) {
   
   # Validate model options ----
   model_opt <- validate_model_opt(model_opt)
-  message(green$bold(symbol$tick) %+% reset$silver("  model_opt() validated.\n"))
   
-  # Validate save optioins ----
+  # Validate save options ----
   save_opt <- validate_save_opt(save_opt)
-  if (save_opt$path == file.path(getwd(), "model-01")) {
-    cat(blue$bold("Note: " %+% reset$silver(paste0("Outputs are stored in default location: \"",
-                                                   file.path(getwd(), "model-01"), "\"\n"))))
-  }
-  message(green$bold(symbol$tick) %+% reset$silver("  save_opt() validated.\n"))
-  
+
+  # Validate summary options ----
   summary_opt <- validate_summary_opt(summary_opt)
-  message(green$bold(symbol$tick) %+% reset$silver("  summary_opt() validated.\n"))
   
   # Validate the log likelihood function ----
 
