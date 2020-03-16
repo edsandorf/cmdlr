@@ -19,12 +19,8 @@ split_data <- function(db, estim_opt, model_opt) {
   N <- length(unique(db[[model_opt[["id"]]]]))
   S <- length(unique(db[[model_opt[["ct"]]]]))
   
-  if ((N * S) != nrow(db)) {
-    stop("Unequal number of rows per individual. Run pad_data(). \n")
-  }
-  
   # Get the ids and split them across cores
-  ids <- deframe(db[, model_opt$id])
+  ids <- db[, model_opt$id]
   id_index <- split(ids, sort(ids %% estim_opt$cores))
   
   # Split the data according to the split id variable
@@ -33,5 +29,5 @@ split_data <- function(db, estim_opt, model_opt) {
   })
   
   # Return the list of data frames
-  return(db)
+  db
 }
