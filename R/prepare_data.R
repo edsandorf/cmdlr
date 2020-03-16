@@ -11,7 +11,6 @@
 #' @param model_opt List of model options
 
 prepare_data <- function(db, estim_opt, model_opt) {
-  cat(black$bold("Preparing data ...\n"))
   
   N <- length(unique(db[[model_opt[["id"]]]]))
   S <- length(unique(db[[model_opt[["ct"]]]]))
@@ -31,6 +30,6 @@ prepare_data <- function(db, estim_opt, model_opt) {
   }
   
   # Return the manipulated and checked data
-  cat(green$bold(symbol$tick) %+% reset$silver("  Data"))
+  cat(green$bold(symbol$tick) %+% reset$silver("  Data\n"))
   db
 }

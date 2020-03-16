@@ -4,9 +4,13 @@
 #' function and ensures that it can be run on a single core or multiple cores
 #' using both the 'maxlik' and 'nloptr' packages.
 #' 
+#' @param log_lik Log likelihood function
+#' @param estim_opt List of estimation options
+#' @param workers A PSOCK cluster of workers 
+#' 
 #' @return A log likelihood wrapper functions
 
-prepare_log_lik <- function() {
+prepare_log_lik <- function(log_lik, estim_opt, workers) {
   
   if (estim_opt$cores > 1) {
     log_lik <- function(param) {
@@ -31,5 +35,6 @@ prepare_log_lik <- function() {
   }
   
   # Return the log likelihood function
+  cat(green$bold(symbol$tick) %+% reset$silver("  Log-likelihood function\n"))
   return(log_lik)
 }

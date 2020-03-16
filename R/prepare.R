@@ -13,7 +13,7 @@
 #' @export
 
 prepare <- function(opts, db, log_lik) {
-  cat(black("Preparing data for estimation ... \n"))
+  cat(black("Preparing for estimation ... \n"))
   
   # Extract options ----
   estim_opt <- opts[["estim_opt"]]
@@ -25,33 +25,22 @@ prepare <- function(opts, db, log_lik) {
   db <- prepare_data(db, estim_opt, model_opt)
   
   # Starting values ----
-  
+  # prepare_starting_values()
   
   # Parallel estimation ----
   if (estim_opt$cores > 1) {
-    cat(black$bold("Preparing workers for parallel estimation. \n"))
-    
-    # Create the cluster of workers
-    workers <- parallel::makeCluster(estim_opt$cores, type = "PSOCK")
-    
-    prepare_parallel(db, estim_opt, model_opt, save_opt, workers)
-    
-    # Print exit message if successful
-    cat(green$bold("Success: " %+% reset$silver("Workers prepared.\n")))
+    workers <- prepare_workers(db, estim_opt, model_opt, save_opt)
   } else {
     workers <- NULL
   }
   
   # Prepare the log likelihood function ----
-  log_lik <- prepare_log_lik()
+  log_lik <- prepare_log_lik(log_lik, estim_opt, workers)
   
   # Prepare the numerical gradient ----
   num_grad <- prepare_num_grad()
   
   # Return the list of inputs, data and workers ----
-  invisible(gc(verbose = FALSE))
-  cat(green$bold("Success: " %+% reset$silver("Data prepared and ready for estimation! \n")))
-  
   return(list(
     estim_opt = estim_opt,
     model_opt = model_opt,
