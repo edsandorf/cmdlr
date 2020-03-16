@@ -18,9 +18,8 @@ prepare_data <- function(db, estim_opt, model_opt) {
 
   # Check choice tasks
   if ((N * S) != nrow(db)) {
-    cat(yellow$bold("Warning: " %+% reset$silver("Unequal number of choice occasions across individuals. Padding data with NA ... \n")))
+    cat(yellow$bold(symbol$warning) %+% reset$silver("  Unequal number of choice occasions across individuals. Padding data with NA ... \n"))
     db <- pad_data(db, model_opt)
-    cat(green$bold("Success: " %+% reset$silver("Data padded successfully.\n")))
   }
   
   # Split the data if estimating in parallel and return as a matrix
@@ -32,6 +31,6 @@ prepare_data <- function(db, estim_opt, model_opt) {
   }
   
   # Return the manipulated and checked data
-  cat(green$bold("Success: " %+% reset$silver("Data preparation complete.\n")))
-  return(db)
+  cat(green$bold(symbol$tick) %+% reset$silver("  Data"))
+  db
 }
