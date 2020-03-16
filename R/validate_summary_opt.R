@@ -20,6 +20,6 @@ validate_summary_opt <- function(summary_opt_input) {
   summary_opt[names(summary_opt_input)] <- summary_opt_input
   
   # Return the validated list of summary options
-  message(green$bold(symbol$tick) %+% reset$silver("  summary_opt().\n"))
+  message(green$bold(symbol$tick) %+% reset$silver("  summary_opt()"))
   summary_opt
 }

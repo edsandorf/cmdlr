@@ -20,6 +20,6 @@ validate_model_opt <- function(model_opt_input) {
   model_opt[names(model_opt_input)] <- model_opt_input
   
   # Return the validated list of model options
-  message(green$bold(symbol$tick) %+% reset$silver("  model_opt().\n"))
+  message(green$bold(symbol$tick) %+% reset$silver("  model_opt()"))
   model_opt
 }

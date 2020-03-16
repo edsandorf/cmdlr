@@ -72,6 +72,6 @@ validate_estim_opt <- function(estim_opt_input) {
   }
   
   # Return the validated list of estimation options
-  message(green$bold(symbol$tick) %+% reset$silver("  estim_opt().\n"))
+  message(green$bold(symbol$tick) %+% reset$silver("  estim_opt()"))
   estim_opt
 }
