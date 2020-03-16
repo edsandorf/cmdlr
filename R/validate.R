@@ -20,11 +20,10 @@ validate <- function(estim_opt, model_opt, save_opt, summary_opt, log_lik) {
   
   # Validate estimation options ----
   estim_opt <- validate_estim_opt(estim_opt)
-  cat(green$bold("Success: " %+% reset$silver("estim_opt() validated.\n")))
-
+  
   # Validate model options ----
   model_opt <- validate_model_opt(model_opt)
-  cat(green$bold("Success: " %+% reset$silver("model_opt() validated.\n")))
+  message(green$bold(symbol$tick) %+% reset$silver("  model_opt() validated.\n"))
   
   # Validate save optioins ----
   save_opt <- validate_save_opt(save_opt)
@@ -32,31 +31,17 @@ validate <- function(estim_opt, model_opt, save_opt, summary_opt, log_lik) {
     cat(blue$bold("Note: " %+% reset$silver(paste0("Outputs are stored in default location: \"",
                                                    file.path(getwd(), "model-01"), "\"\n"))))
   }
-  cat(green$bold("Success: " %+% reset$silver("save_opt() validated.\n")))
+  message(green$bold(symbol$tick) %+% reset$silver("  save_opt() validated.\n"))
   
   summary_opt <- validate_summary_opt(summary_opt)
-  cat(green$bold("Success: " %+% reset$silver("summary_opt() validated.\n")))
+  message(green$bold(symbol$tick) %+% reset$silver("  summary_opt() validated.\n"))
   
   # Validate the log likelihood function ----
 
   
 
-  # Check parallel options ----
-  if (estim_opt$cores > 1) {
-    cat(black("Checking parallel options ...\n"))
-    
-    # Check the number of cores
-    if (estim_opt$cores < parallel::detectCores()) {
-      cat(green$bold("Success: " %+% reset$silver("Number of cores OK.\n")))
-    } else {
-      estim_opt$cores <- max(1L, parallel::detectCores() - 1L)
-      cat(yellow$bold("Warning: " %+% reset$silver("Cores exceed available. Set to max - 1.\n")))
-    }
-  }
   
   # Return the list of inputs ----
-  cat(green$bold("Success: " %+% reset$silver("All options validated! \n")))
-  
   return(list(
     estim_opt = estim_opt,
     model_opt = model_opt,

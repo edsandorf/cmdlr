@@ -15,8 +15,7 @@ default values
 }
 \description{
 The function validates the user supplied list of estimation options and sets 
-defaults for missing options. If these options are essential, an error 
-will occur and the program will stop. If the options are important, a
-warning will be posted to the terminal and a default option will be used, 
-but the program will continue.
+defaults for missing options. The checks are aggressive and will stop
+the estimation and ask the user to respecify incorrect inputs. This is to 
+ensure that the user intends to use these exact options.
 }
