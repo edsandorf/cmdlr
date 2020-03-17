@@ -4,18 +4,17 @@
 #' the \code{cmdlR} functions. It is highly recommended to call the function
 #' directly using the \code{::} notation to avoid having to load packges twice.
 #' 
-#' @param clean If \code{TRUE} deletes all objects from the work space
-#' 
 #' @export
 
-tidy <- function(clean = FALSE) {
+tidy <- function() {
   # Delete all non-essential objects from the work space
-  if (clean) {
-    rm(list = ls(all.names = TRUE))
-  }
+  rm(list = ls(all.names = TRUE), envir = .GlobalEnv)
   
   # Detach all non-essential objects from all environments
-  detach_all()
+  detach_objects(all = TRUE)
+  
+  # Turn off file-writing if connection is open
+  if(sink.number() > 0) sink()
   
   # Run the garbage collector
   invisible(gc(verbose = FALSE))

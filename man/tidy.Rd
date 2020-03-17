@@ -4,10 +4,7 @@
 \alias{tidy}
 \title{Tidying the environment to prepare for estimation}
 \usage{
-tidy(clean = FALSE)
-}
-\arguments{
-\item{clean}{If \code{TRUE} deletes all objects from the work space}
+tidy()
 }
 \description{
 A small function to tidy and prepare the work space and environment to run

@@ -1,5 +1,5 @@
 # Tidy the environment prior to loading packages ----
-cmdlR::tidy(clean = FALSE)
+cmdlR::tidy()
 
 # Load the packages ----
 pkgs <- c("cmdlR")
