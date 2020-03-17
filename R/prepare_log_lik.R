@@ -13,13 +13,13 @@
 prepare_log_lik <- function(log_lik, estim_opt, workers) {
   
   if (estim_opt$cores > 1) {
-    ll_func <- function(param, db, indices) {
+    ll_func <- function(param, db, model_opt) {
       value <- do.call(sum,
                        parallel::clusterCall(cl = workers,
                                              fun = log_lik,
                                              param = param,
                                              db = db,
-                                             indices = indices))
+                                             model_opt = model_opt))
       
       if (tolower(estim_opt[["optimizer"]]) == "nloptr") {
         -value
@@ -28,8 +28,8 @@ prepare_log_lik <- function(log_lik, estim_opt, workers) {
       }
     }
   } else {
-    ll_func <- function(param, db, indices) {
-      value <- sum(log_lik(param, db, indices))
+    ll_func <- function(param, db, model_opt) {
+      value <- sum(log_lik(param, db, model_opt))
       if (tolower(estim_opt[["optimizer"]]) == "nloptr") {
         -value
       } else {

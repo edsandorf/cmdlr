@@ -23,6 +23,7 @@ estimate <- function(inputs) {
   save_opt <- inputs[["save_opt"]]
   summary_opt <- inputs[["summary_opt"]]
   db <- inputs[["db"]]
+  indices <- inputs[["indices"]]
   workers <- inputs[["workers"]]
   ll_func <- inputs[["log_lik"]]
   
@@ -32,14 +33,6 @@ estimate <- function(inputs) {
   
   model[["nobs"]] <- N * S
   
-  # Define the indices passed to the log-likelihood function ----
-  indices <- list(
-    N = N,
-    S = S,
-    J = J,
-    choice_var = db[[model_opt[["choice"]]]]
-  )
-
   # Close the workers if the estimation fails
   if (estim_opt$cores > 1) on.exit(parallel::stopCluster(workers), add = TRUE)
   
@@ -51,7 +44,7 @@ estimate <- function(inputs) {
   if (tolower(estim_opt$optimizer) == "maxlik") {
     model_obj <- maxLik::maxLik(ll_func,
                                 db = db,
-                                indices = indices,
+                                model_opt = model_opt,
                                 start = param,
                                 method = estim_opt$method,
                                 finalHessian = FALSE,
@@ -105,9 +98,9 @@ estimate <- function(inputs) {
   )
 
   # Define the wrapper function
-  ll_func_pb <- function(param, db, indices) {
+  ll_func_pb <- function(param, db, model_opt) {
     pb$tick()
-    ll_func(param, db, indices)
+    ll_func(param, db, model_opt)
   }
   
   # Try and catch if the Hessian cannot be calculated 
@@ -116,7 +109,7 @@ estimate <- function(inputs) {
     numDeriv::hessian(func = ll_func_pb,
                       x = model$coef,
                       db = db,
-                      indices = indices)
+                      model_opt = model_opt)
   }, error = function(e) {
     NA
   })
@@ -140,7 +133,7 @@ estimate <- function(inputs) {
       maxLik::maxLik(ll_func_pb,
                      start = model[["coef"]],
                      db = db,
-                     indices = indices,
+                     model_opt = model_opt,
                      print.level = 0,
                      finalHessian = TRUE, method = estim_opt$method,
                      iterlim = 2)$hessian

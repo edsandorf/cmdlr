@@ -1,12 +1,13 @@
 # Tidy the environment prior to loading packages ----
 cmdlR::tidy()
+rm(list = ls(all = TRUE))
 
 # Load the packages ----
 pkgs <- c("cmdlR")
 invisible(lapply(pkgs, require, character.only = TRUE))
 
 # Load and manipulate the data ----
-db <- cmdlR::data_coral
+data <- cmdlR::data_coral
 
 # Define the list of saving options ----
 save_opt <- list(
@@ -14,7 +15,7 @@ save_opt <- list(
   save_summary = TRUE,
   save_model_object = TRUE,
   save_hessian = FALSE,
-  save_worker_info = FALSE
+  save_worker_info = TRUE
 )
 
 # Define the list of summary options ----
@@ -26,7 +27,7 @@ summary_opt <- list(
 estim_opt <- list(
   optimizer = "maxLik",
   method = "BFGS",
-  cores = 1,
+  cores = 2,
   robust_vcov = TRUE,
   print_level = 2
 )
@@ -51,10 +52,15 @@ model_opt <- list(
 )
 
 # Log likelihood function ----
-log_lik <- function(param, db, indices) {
+log_lik <- function(param, db, model_opt) {
   # Attach the parameters and data  ----
-  attach_objects(list(param, db, indices))
-  on.exit(detach_objects(list(param, db, indices)))
+  attach_objects(list(param, db))
+  on.exit(detach_objects(list(param, db)))
+  
+  # Calculate the indices ----
+  N <- length(unique(get(model_opt$id)))
+  S <- length(unique(get(model_opt$ct)))
+  choice_var <- get(model_opt$choice)
   
   # Define the list of utilities ---- 
   V <- list(
@@ -101,7 +107,7 @@ log_lik <- function(param, db, indices) {
 opts <- validate(estim_opt, model_opt, save_opt, summary_opt, log_lik)
 
 # Prepare for estimation ----
-inputs <- prepare(opts, db, log_lik)
+inputs <- prepare(opts, data, log_lik)
 
 # Estimate the model ----
 model <- estimate(inputs)
