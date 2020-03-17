@@ -13,7 +13,7 @@
 #' @export
 
 prepare <- function(opts, db, log_lik) {
-  cat(black("Preparing for estimation ... \n"))
+  cat("Preparing for estimation \n")
   
   # Extract options ----
   estim_opt <- opts[["estim_opt"]]

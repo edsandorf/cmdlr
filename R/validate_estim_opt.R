@@ -29,7 +29,7 @@ validate_estim_opt <- function(estim_opt_input) {
   
   # Check that the optimizer and method is specified correctly ----
   if (is.null(estim_opt[["optimizer"]]) || is.null(estim_opt[["method"]])) {
-    message(red$bold(symbol$cross) %+% reset$silver("  estim_opt().\n"))
+    message(red$bold(symbol$cross), "  estim_opt().\n")
     stop("You must specify the optimizer and optimization routine to use in estim_opt.")
   }
   
@@ -44,7 +44,7 @@ validate_estim_opt <- function(estim_opt_input) {
         if (tolower(estim_opt[["method"]]) == "bhhh") estim_opt[["method"]] <- "BHHH"
         if (tolower(estim_opt[["method"]]) == "nr") estim_opt[["method"]] <- "NR"
       } else {
-        message(red$bold(symbol$cross) %+% reset$silver("  estim_opt().\n"))
+        message(red$bold(symbol$cross), "  estim_opt().\n")
         stop("The optimization method must be either 'bfgs', 'bhhh' or 'nr' when using 'maxlik'.")
       }
     }
@@ -56,22 +56,22 @@ validate_estim_opt <- function(estim_opt_input) {
         if (tolower(estim_opt[["method"]]) == "slsqp") estim_opt[["method"]] <- "NLOPT_LD_SLSQP"
         if (tolower(estim_opt[["method"]]) == "sbplx") estim_opt[["method"]] <- "NLOPT_LN_SBPLX"
       } else {
-        message(red$bold(symbol$cross) %+% reset$silver("  estim_opt().\n"))
+        message(red$bold(symbol$cross), "  estim_opt().\n")
         stop("The optimization method must be either 'bfgs', 'slsqp' or 'sbplx' when using 'nloptr'.")
       }
     }
   } else {
-    message(red$bold(symbol$cross) %+% reset$silver("  estim_opt().\n"))
+    message(red$bold(symbol$cross), "  estim_opt().\n")
     stop("The optimizer is either 'maxlik' or 'nloptr'. See package documentation for more details.")
   }
 
   # Check that enough cores are available ----
   if (estim_opt$cores > parallel::detectCores()) {
-    message(red$bold(symbol$cross) %+% reset$silver("  estim_opt().\n"))
+    message(red$bold(symbol$cross), "  estim_opt().\n")
     stop(paste0("The number of specified cores exceed the number of cores available. You have ", parallel::detectCores(), " cores available (including hyperthreading). It is advised to use less than this in estimation.\n"))
   }
   
   # Return the validated list of estimation options
-  message(green$bold(symbol$tick) %+% reset$silver("  estim_opt()"))
+  cat(green$bold(symbol$tick), "  estim_opt()\n")
   estim_opt
 }

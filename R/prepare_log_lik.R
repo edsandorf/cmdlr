@@ -39,6 +39,6 @@ prepare_log_lik <- function(log_lik, estim_opt, workers) {
   }
   
   # Return the log likelihood function
-  cat(green$bold(symbol$tick) %+% reset$silver("  Log-likelihood function\n"))
+  cat(green$bold(symbol$tick), "  Log-likelihood function\n")
   ll_func
 }

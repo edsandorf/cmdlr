@@ -93,7 +93,7 @@ estimate <- function(inputs) {
   
   # Try and catch if the Hessian cannot be calculated 
   model[["hessian"]] <- tryCatch({
-    cat(reset$silver("Calculating the Hessian matrix. This may take a while. \n"))
+    cat(blue$bold(symbol$info), "  Calculating the Hessian matrix. This may take a while. \n")
     numDeriv::hessian(func = ll_func_pb,
                       x = model$coef,
                       db = db,
@@ -104,8 +104,9 @@ estimate <- function(inputs) {
   
   # If the Hessian calculation failed, try calculating it using the maxLik package
   if (is.na(model[["hessian"]]) || anyNA(model[["hessian"]])) {
-    cat(red$bold("Failed: " %+% reset$silver("Hessian calculation using the \'numDeriv\' package.\n")))
-    cat(reset$silver("Attempting to calculate Hessian using the \'maxLik\' package.\n"))
+    # Print messages to console
+    cat(red$bold(symbol$cross), "  Hessian calculation using the \'numDeriv\' package.\n")
+    cat(blue$bold(symbol$info), "  Trying to calculate Hessian using the \'maxLik\' package.\n")
     
     # Reset the progress bar
     pb <- progress::progress_bar$new(
@@ -131,13 +132,13 @@ estimate <- function(inputs) {
   
   # If the Hessian still cannot be calculated end and return the model object
   if (is.na(model[["hessian"]]) || anyNA(model[["hessian"]])) {
-    cat(red$bold("Failed: " %+% reset$silver("Hessian calculation failed or contains NA. Returning only some model information.\n")))
+    cat(red$bold(symbol$cross), "  Hessian calculation failed or contains NA. Returning only some model information.\n")
     time_end <- Sys.time()
     model[["time_end"]]
     return(model)
   }
   
-  cat(green$bold("Success: " %+% reset$silver("Hessian calculated successfully.\n")))
+  cat(green$bold(symbol$tick), "  Hessian calculated successfully.\n")
   
   # Calculate the variance-covariance matrix ----
   model[["vcov"]] <- tryCatch({
@@ -150,8 +151,7 @@ estimate <- function(inputs) {
   
   # Capture time end and print completion message ----
   time_end <- Sys.time()
-  cat(green$bold("Success: " %+% reset$silver("Estimation complete",
-                                              time_end, "\n")))
+  cat(green$bold(symbol$tick), paste0("  Estimation completed on ", time_end, "\n"))
   model[["time_end"]] <- time_end
   
   # Return the model object ----

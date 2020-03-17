@@ -17,7 +17,7 @@ prepare_data <- function(db, estim_opt, model_opt) {
 
   # Check choice tasks
   if ((N * S) != nrow(db)) {
-    cat(yellow$bold(symbol$warning) %+% reset$silver("  Unequal number of choice occasions across individuals. Padding data with NA ... \n"))
+    cat(yellow$bold(symbol$warning), "  Unequal number of choice occasions across individuals. Padding the data with NA.  \n")
     db <- pad_data(db, model_opt)
   }
   
@@ -27,6 +27,6 @@ prepare_data <- function(db, estim_opt, model_opt) {
   } 
   
   # Return the manipulated and checked data
-  cat(green$bold(symbol$tick) %+% reset$silver("  Data\n"))
+  cat(green$bold(symbol$tick), "  Data\n")
   db
 }

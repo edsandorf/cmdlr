@@ -21,11 +21,11 @@ prepare_workers <- function(db, estim_opt, model_opt, save_opt) {
     worker_info <- get_worker_info(workers)
     summary_worker_info(worker_info)
     save_path <- paste0(save_opt$path, "-worker-info.txt")
-    cat(blue$bold(symbol$info) %+% reset$silver(paste0("Worker information written to \"",
-                                                   save_path, "\"\n")))
+    cat(blue$bold(symbol$info), paste0("Worker information written to \"",
+                                                   save_path, "\"\n"))
   }
   
   # Return the workers
-  cat(green$bold(symbol$tick) %+% reset$silver("  Workers"))
+  cat(green$bold(symbol$tick), "  Workers")
   workers
 }
