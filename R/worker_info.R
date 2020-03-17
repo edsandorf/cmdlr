@@ -14,8 +14,8 @@ get_worker_info <- function(workers) {
             pryr::object_size(x, envir = .GlobalEnv),
             class(get(x, envir = .GlobalEnv)))
     })
-    info <- Reduce(rbind, info)
-    colnames(info) <- c("Object", "Size (bytes)", "Class")
+    worker_info <- Reduce(rbind, worker_info)
+    colnames(worker_info) <- c("Object", "Size (bytes)", "Class")
     
     # Get the packages loaded on the workers
     worker_pkgs <- search()
@@ -35,5 +35,5 @@ get_worker_info <- function(workers) {
 #' 
 #' @param worker_info A worker information object from get_worker_info()
 summary_worker_info <- function(worker_info) {
-  
+  print(worker_info)
 }
