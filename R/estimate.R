@@ -12,6 +12,9 @@ estimate <- function(inputs) {
   time_start <- Sys.time()
   cat(paste0("Estimation started: ", time_start, "\n"))
   model <- list()
+  model[["name"]] <- model_opt$name
+  model[["description"]] <- model_opt$description
+  model[["cores"]] <- estim_opt$cores
   model[["time_start"]] <- time_start
   
   # Extract inputs ----
@@ -23,11 +26,17 @@ estimate <- function(inputs) {
   workers <- inputs[["workers"]]
   ll_func <- inputs[["log_lik"]]
   
+  N <- length(unique(db[[model_opt[["id"]]]]))
+  S <- length(unique(db[[model_opt[["ct"]]]]))
+  J <- length(unique(db[[model_opt[["alt"]]]]))
+  
+  model[["nobs"]] <- N * S
+  
   # Define the indices passed to the log-likelihood function ----
   indices <- list(
-    N = length(unique(db[[model_opt[["id"]]]])),
-    S = length(unique(db[[model_opt[["ct"]]]])),
-    J = length(unique(db[[model_opt[["alt"]]]])),
+    N = N,
+    S = S,
+    J = J,
     choice_var = db[[model_opt[["choice"]]]]
   )
 
@@ -38,6 +47,7 @@ estimate <- function(inputs) {
   converged <- FALSE
   param <- do.call(c, model_opt$param)
   
+  # maxLik package
   if (tolower(estim_opt$optimizer) == "maxlik") {
     model_obj <- maxLik::maxLik(ll_func,
                                 db = db,
@@ -56,12 +66,14 @@ estimate <- function(inputs) {
     model[["iterations"]] <- model_obj$iterations
     model[["gradient"]] <- model_obj$gradient
     model[["gradient_obs"]] <- model_obj$gradientObs
-    
+    model[["message"]] <- model_obj$message
+
     if (tolower(estim_opt$method) == "bfgs" && model_obj$code %in% c(0)) converged <- TRUE 
     if (tolower(estim_opt$method) == "bhhh" && model_obj$code %in% c(2, 8)) converged <- TRUE 
     if (tolower(estim_opt$method) == "nr" && model_obj$code %in% c(0, 1, 2)) converged <- TRUE 
   }
   
+  # NLOPTR package
   if (tolower(estim_opt$optimizer) == "nloptr") {
     model_obj <- nloptr::nloptr()
     
@@ -71,9 +83,16 @@ estimate <- function(inputs) {
     if (model_obj$status %in% c(0)) converged <- TRUE
   }
   
+  # Add information about the optimizer and method
+  model[["method"]] <- tolower(estim_opt$method)
+  model[["optimizer"]] <- tolower(estim_opt$optimizer)
+  
   if (!converged) {
     stop("Model failed to converge. Estimation unsuccessful.\n")
   }
+  
+  # Add converged boolean to model object
+  model[["converged"]] <- converged
   
   # Calculate the hessian matrix ----
   # Define the progress bar
@@ -145,6 +164,25 @@ estimate <- function(inputs) {
     MASS::ginv(-model[["hessian"]])
   })
   
+  # Calculate the and model diagnostics ----
+  model[["convergence_criteria"]] <- t(model$gradient) %*% model$vcov %*% model$gradient
+  
+  ll <- model[["ll"]]
+  nobs <- model[["nobs"]]
+  ll_0 <- log(1 / J) * nobs
+
+  model[["adj_rho_sqrd"]] <- (1L - ((ll - K) / (ll_0)))
+  model[["aic"]] <- ((-2L * ll) + (2L * K) )
+  model[["aic3"]] <- ((-2L * ll) + (3L * K))
+  model[["caic"]] <- ((-2L * ll) + (K * (log(nobs) + 1L)))
+  model[["caic_star"]] <- ((-2L * ll) + (K * (log((nobs + 2L) / 24L) + 1L )))
+  model[["ht_aic"]] <- ((-2L * ll) + (2L * K) + (((2L * (K + 1L)) * (K + 2L))/(nobs - K - 2L)))
+  model[["bic"]] <- ((-2L * ll) + (K * log(nobs)))
+  model[["bic_star"]] <- ((-2L * ll) + (K * (log((nobs + 2L) / 24L))))
+  model[["dbic"]] <- ((-2L * ll) + (K * (log(nobs) - log(2L * pi))))
+  model[["hqic"]] <- ((-2L * ll) + (2L * (K * (log(log(nobs))))))
+  
+  # Check if we are estimating a robust variance-covariance matrix
   if (estim_opt$robust_vcov && !is.null(model[["vcov"]])) {
     
   }
