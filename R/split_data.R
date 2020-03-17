@@ -15,12 +15,8 @@
 #' @return A list of data matrices with length equal to \code{cores}.
 
 split_data <- function(db, estim_opt, model_opt) {
-  # Check if the data is balanced
-  N <- length(unique(db[[model_opt[["id"]]]]))
-  S <- length(unique(db[[model_opt[["ct"]]]]))
-  
   # Get the ids and split them across cores
-  ids <- db[, model_opt$id]
+  ids <- db[, model_opt[["id"]]]
   id_index <- split(ids, sort(ids %% estim_opt$cores))
   
   # Split the data according to the split id variable
