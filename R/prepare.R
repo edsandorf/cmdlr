@@ -23,10 +23,7 @@ prepare <- function(opts, db, log_lik) {
   
   # Prepare the data ----
   db <- prepare_data(db, estim_opt, model_opt)
-  
-  # Starting values ----
-  # prepare_starting_values()
-  
+
   # Parallel estimation ----
   if (estim_opt$cores > 1) {
     workers <- prepare_workers(db, estim_opt, model_opt, save_opt)
@@ -39,6 +36,9 @@ prepare <- function(opts, db, log_lik) {
   
   # Prepare the numerical gradient ----
   num_grad <- prepare_num_grad()
+  
+  # Starting values ----
+  # prepare_starting_values()
   
   # Return the list of inputs, data and workers ----
   return(list(
