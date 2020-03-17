@@ -13,7 +13,4 @@
 #' @importFrom stats runif
 #' @import crayon
 #' @import cli
-#' @import magrittr
-#' @import tibble
-#' @import dplyr
 NULL
