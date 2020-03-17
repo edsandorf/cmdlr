@@ -27,16 +27,18 @@ estim_opt <- list(
   optimizer = "maxLik",
   method = "BFGS",
   cores = 1,
-  robust_vcov = TRUE
+  robust_vcov = TRUE,
+  print_level = 2
 )
 
 # Define the list of model options ----
 model_opt <- list(
   name = "MNL model",
   description = "A simple MNL model to use as an example.",
-  id = c("id"),
-  ct = c("ct"),
-  choice = db$choice,
+  id = "id",
+  ct = "ct",
+  alt = "alt",
+  choice = "choice",
   fixed = c(),
   param = list(
     b_cost = -0.2,
@@ -49,10 +51,10 @@ model_opt <- list(
 )
 
 # Log likelihood function ----
-log_lik <- function(param, weights) {
+log_lik <- function(param, db, indices) {
   # Attach the parameters and data  ----
-  attach(list(param, weights))
-  on.exit(list(param, weights))
+  attach_objects(list(param, db, indices))
+  on.exit(detach_objects(list(param, db, indices)))
   
   # Define the list of utilities ---- 
   V <- list(
@@ -64,7 +66,7 @@ log_lik <- function(param, weights) {
   # Calculate the probabilities ----
   # Get the utility of the chosen alternative and subtract it from all utilities
   v_chosen <- Reduce("+", lapply(seq_along(V), function(j) {
-    V[[j]] * (model_opt$choice == j)
+    V[[j]] * (choice_var == j) 
   }))
   
   V <- lapply(V, function(v) v - v_chosen)
@@ -92,7 +94,7 @@ log_lik <- function(param, weights) {
   lik <- Rfast::rowmeans(pr_seq)
   
   # Return the log-likelihood value
-  log(lik) * weights
+  log(lik)
 }
 
 # Validate the model inputs ----

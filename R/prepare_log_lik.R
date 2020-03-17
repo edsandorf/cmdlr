@@ -13,28 +13,32 @@
 prepare_log_lik <- function(log_lik, estim_opt, workers) {
   
   if (estim_opt$cores > 1) {
-    log_lik <- function(param) {
+    ll_func <- function(param, db, indices) {
       value <- do.call(sum,
-                       parallel::clusterCall(cl = workers, fun = log_lik, param = param))
+                       parallel::clusterCall(cl = workers,
+                                             fun = log_lik,
+                                             param = param,
+                                             db = db,
+                                             indices = indices))
       
-      if (estim_opt[["optimizer"]] == "nloptr") {
-        return(-value)
+      if (tolower(estim_opt[["optimizer"]]) == "nloptr") {
+        -value
       } else {
-        return(value)
+        value
       }
     }
   } else {
-    log_lik <- function(param) {
-      value <- sum(log_lik(param))
-      if (estim_opt[["optimizer"]] == "nloptr") {
-        return(-value)
+    ll_func <- function(param, db, indices) {
+      value <- sum(log_lik(param, db, indices))
+      if (tolower(estim_opt[["optimizer"]]) == "nloptr") {
+        -value
       } else {
-        return(value)
+        value
       }
     }
   }
   
   # Return the log likelihood function
   cat(green$bold(symbol$tick) %+% reset$silver("  Log-likelihood function\n"))
-  return(log_lik)
+  ll_func
 }

@@ -10,7 +10,7 @@
 
 estimate <- function(inputs) {
   time_start <- Sys.time()
-  cat(black("Estimation started:", time_start, "\n"))
+  cat(paste0("Estimation started: ", time_start, "\n"))
   model <- list()
   model[["time_start"]] <- time_start
   
@@ -21,29 +21,48 @@ estimate <- function(inputs) {
   summary_opt <- inputs[["summary_opt"]]
   db <- inputs[["db"]]
   workers <- inputs[["workers"]]
+  ll_func <- inputs[["log_lik"]]
   
-  # Attach the variables to enable calling by names ----
-  attach()
-  on.exit(detach(), add = TRUE)
-  
+  # Define the indices passed to the log-likelihood function ----
+  indices <- list(
+    N = length(unique(db[[model_opt[["id"]]]])),
+    S = length(unique(db[[model_opt[["ct"]]]])),
+    J = length(unique(db[[model_opt[["alt"]]]])),
+    choice_var = db[[model_opt[["choice"]]]]
+  )
+
+  # Close the workers if the estimation fails
   if (estim_opt$cores > 1) on.exit(parallel::stopCluster(workers), add = TRUE)
   
   # Estimate the model using the specified optimizer ----
   converged <- FALSE
   param <- do.call(c, model_opt$param)
   
-  if (estim_opt$optimizer == "maxlik") {
-    model_obj <- maxLik::maxLik()
+  if (tolower(estim_opt$optimizer) == "maxlik") {
+    model_obj <- maxLik::maxLik(ll_func,
+                                db = db,
+                                indices = indices,
+                                start = param,
+                                method = estim_opt$method,
+                                finalHessian = FALSE,
+                                tol = estim_opt$tol, gradtol = estim_opt$gradtol,
+                                reltol = estim_opt$reltol, 
+                                steptol = estim_opt$steptol,
+                                print.level = estim_opt$print_level, 
+                                iterlim = estim_opt$iterlim)
     
-    model[["ll"]] <- model_obj$i
-    model[["coef"]] <- model_obj$coef
-    model[["iterations"]] <- model_obj$nIter
-    if (estim_opt$method == "bfgs" && model_obj$code %in% c(0)) converged <- TRUE 
-    if (estim_opt$method == "bhhh" && model_obj$code %in% c(2, 8)) converged <- TRUE 
-    if (estim_opt$method == "nr" && model_obj$code %in% c(0, 1, 2)) converged <- TRUE 
+    model[["ll"]] <- model_obj$maximum
+    model[["coef"]] <- model_obj$estimate
+    model[["iterations"]] <- model_obj$iterations
+    model[["gradient"]] <- model_obj$gradient
+    model[["gradient_obs"]] <- model_obj$gradientObs
+    
+    if (tolower(estim_opt$method) == "bfgs" && model_obj$code %in% c(0)) converged <- TRUE 
+    if (tolower(estim_opt$method) == "bhhh" && model_obj$code %in% c(2, 8)) converged <- TRUE 
+    if (tolower(estim_opt$method) == "nr" && model_obj$code %in% c(0, 1, 2)) converged <- TRUE 
   }
   
-  if (estim_opt$optimizer == "nloptr") {
+  if (tolower(estim_opt$optimizer) == "nloptr") {
     model_obj <- nloptr::nloptr()
     
     model[["ll"]] <- model_obj$objective
@@ -57,21 +76,54 @@ estimate <- function(inputs) {
   }
   
   # Calculate the hessian matrix ----
+  # Define the progress bar
+  K <- length(model$coef)
+  pb <- progress::progress_bar$new(
+    format = "[:bar] :percent :elapsed",
+    total = 2 + 8 * (K * (K + 1) / 2),
+    clear = FALSE, 
+    width = 60
+  )
+
+  # Define the wrapper function
+  ll_func_pb <- function(param, db, indices) {
+    pb$tick()
+    ll_func(param, db, indices)
+  }
+  
+  # Try and catch if the Hessian cannot be calculated 
   model[["hessian"]] <- tryCatch({
     cat(reset$silver("Calculating the Hessian matrix. This may take a while. \n"))
-    numDeriv::hessian()
+    numDeriv::hessian(func = ll_func_pb,
+                      x = model$coef,
+                      db = db,
+                      indices = indices)
   }, error = function(e) {
     NA
   })
   
+  # If the Hessian calculation failed, try calculating it using the maxLik package
   if (is.na(model[["hessian"]]) || anyNA(model[["hessian"]])) {
     cat(red$bold("Failed: " %+% reset$silver("Hessian calculation using the \'numDeriv\' package.\n")))
     cat(reset$silver("Attempting to calculate Hessian using the \'maxLik\' package.\n"))
+    
+    # Reset the progress bar
+    pb <- progress::progress_bar$new(
+      format = "[:bar] :percent :elapsed",
+      total = 2 + 8 * (K * (K + 1) / 2),
+      clear = FALSE, 
+      width = 60
+    )
+    
+    # Try calculating the hessian using the maxLik package
     model[["hessian"]] <- tryCatch({
-      maxLik::maxLik(start = model[["coef"]], print.level = 0,
+      maxLik::maxLik(ll_func_pb,
+                     start = model[["coef"]],
+                     db = db,
+                     indices = indices,
+                     print.level = 0,
                      finalHessian = TRUE, method = estim_opt$method,
-                     iterlime = 2, countIter = FALSE,
-                     writeIter = FALSE, sumLL = FALSE)$hessian
+                     iterlim = 2)$hessian
     }, error = function(e) {
       NA
     })
@@ -103,5 +155,5 @@ estimate <- function(inputs) {
   model[["time_end"]] <- time_end
   
   # Return the model object ----
-  return(model)
+  model
 }
