@@ -38,7 +38,7 @@ model_opt <- list(
   description = "A simple MNL model to use as an example.",
   id = "id",
   ct = "ct",
-  alt = "alt",
+  alt = 3L,
   choice = "choice",
   fixed = c(),
   param = list(

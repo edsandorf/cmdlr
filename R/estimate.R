@@ -29,7 +29,7 @@ estimate <- function(inputs) {
   
   N <- length(unique(db[[model_opt[["id"]]]]))
   S <- length(unique(db[[model_opt[["ct"]]]]))
-  J <- length(unique(db[[model_opt[["alt"]]]]))
+  J <- model_opt[["alt"]]
   
   model[["nobs"]] <- N * S
   
@@ -163,7 +163,7 @@ estimate <- function(inputs) {
   ll <- model[["ll"]]
   nobs <- model[["nobs"]]
   ll_0 <- log(1 / J) * nobs
-
+  model[["ll_0"]] <- ll_0
   model[["adj_rho_sqrd"]] <- (1L - ((ll - K) / (ll_0)))
   model[["aic"]] <- ((-2L * ll) + (2L * K) )
   model[["aic3"]] <- ((-2L * ll) + (3L * K))
