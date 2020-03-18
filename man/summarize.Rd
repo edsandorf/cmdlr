@@ -10,8 +10,6 @@ summarize(model, summary_opt)
 \item{model}{A model opbject returned by \code{estimate}}
 
 \item{summary_opt}{A list of summary options}
-
-\item{model_opt}{A list of model options}
 }
 \description{
 This function is a wrapper for several small summary functions that provide

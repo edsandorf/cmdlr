@@ -9,14 +9,6 @@
 #' @export
 
 estimate <- function(inputs) {
-  time_start <- Sys.time()
-  cat(paste0("Estimation started: ", time_start, "\n"))
-  model <- list()
-  model[["name"]] <- model_opt$name
-  model[["description"]] <- model_opt$description
-  model[["cores"]] <- estim_opt$cores
-  model[["time_start"]] <- time_start
-  
   # Extract inputs ----
   estim_opt <- inputs[["estim_opt"]]
   model_opt <- inputs[["model_opt"]]
@@ -25,16 +17,25 @@ estimate <- function(inputs) {
   db <- inputs[["db"]]
   indices <- inputs[["indices"]]
   workers <- inputs[["workers"]]
-  ll_func <- inputs[["log_lik"]]
-  
-  N <- length(unique(db[[model_opt[["id"]]]]))
-  S <- length(unique(db[[model_opt[["ct"]]]]))
-  J <- model_opt[["alt"]]
-  
-  model[["nobs"]] <- N * S
+  ll_func <- inputs[["ll_func"]]
   
   # Close the workers if the estimation fails
   if (estim_opt$cores > 1) on.exit(parallel::stopCluster(workers), add = TRUE)
+  
+  # Create the model object ----
+  time_start <- Sys.time()
+  cat(paste0("Estimation started: ", time_start, "\n"))
+  model <- list()
+  model[["name"]] <- model_opt$name
+  model[["description"]] <- model_opt$description
+  model[["cores"]] <- estim_opt$cores
+  model[["time_start"]] <- time_start
+  
+  N <- model_opt$N
+  S <- model_opt$S
+  J <- model_opt$J
+  
+  model[["nobs"]] <- N * S
   
   # Estimate the model using the specified optimizer ----
   converged <- FALSE
@@ -43,8 +44,6 @@ estimate <- function(inputs) {
   # maxLik package
   if (tolower(estim_opt$optimizer) == "maxlik") {
     model_obj <- maxLik::maxLik(ll_func,
-                                db = db,
-                                model_opt = model_opt,
                                 start = param,
                                 method = estim_opt$method,
                                 finalHessian = FALSE,
@@ -98,18 +97,15 @@ estimate <- function(inputs) {
   )
 
   # Define the wrapper function
-  ll_func_pb <- function(param, db, model_opt) {
+  ll_func_pb <- function(param) {
     pb$tick()
-    ll_func(param, db, model_opt)
+    ll_func(param)
   }
   
   # Try and catch if the Hessian cannot be calculated 
   model[["hessian"]] <- tryCatch({
     cat(blue$bold(symbol$info), "  Calculating the Hessian matrix. This may take a while. \n")
-    numDeriv::hessian(func = ll_func_pb,
-                      x = model$coef,
-                      db = db,
-                      model_opt = model_opt)
+    numDeriv::hessian(func = ll_func_pb, x = model$coef)
   }, error = function(e) {
     NA
   })
@@ -132,8 +128,8 @@ estimate <- function(inputs) {
     model[["hessian"]] <- tryCatch({
       maxLik::maxLik(ll_func_pb,
                      start = model[["coef"]],
-                     db = db,
-                     model_opt = model_opt,
+                     # db = db,
+                     # model_opt = model_opt,
                      print.level = 0,
                      finalHessian = TRUE, method = estim_opt$method,
                      iterlim = 2)$hessian

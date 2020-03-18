@@ -6,34 +6,39 @@
 #' 
 #' @param log_lik Log likelihood function
 #' @param estim_opt List of estimation options
+#' @param model_opt List of model options
 #' @param workers A PSOCK cluster of workers 
 #' 
 #' @return A log likelihood wrapper functions
 
-prepare_log_lik <- function(log_lik, estim_opt, workers) {
+prepare_log_lik <- function(log_lik, estim_opt, model_opt, workers) {
   
   if (estim_opt$cores > 1) {
-    ll_func <- function(param, db, model_opt) {
-      value <- do.call(sum,
+    # Define the parallell log-lik wrapper and assign to parent environment
+    par_log_lik <- function(param) {
+      log_lik(param, inputs)
+    }
+    environment(par_log_lik) <- new.env(parent = parent.env(environment(par_log_lik)))
+    
+    ll_func <- function(param) {
+      ll <- do.call(sum,
                        parallel::clusterCall(cl = workers,
-                                             fun = log_lik,
-                                             param = param,
-                                             db = db,
-                                             model_opt = model_opt))
+                                             fun = par_log_lik,
+                                             param = param))
       
       if (tolower(estim_opt[["optimizer"]]) == "nloptr") {
-        -value
+        -ll
       } else {
-        value
+        ll
       }
     }
   } else {
-    ll_func <- function(param, db, model_opt) {
-      value <- sum(log_lik(param, db, model_opt))
+    ll_func <- function(param) {
+      ll <- sum(log_lik(param, inputs))
       if (tolower(estim_opt[["optimizer"]]) == "nloptr") {
-        -value
+        -ll
       } else {
-        value
+        ll
       }
     }
   }

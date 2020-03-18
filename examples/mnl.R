@@ -7,7 +7,7 @@ pkgs <- c("cmdlR")
 invisible(lapply(pkgs, require, character.only = TRUE))
 
 # Load and manipulate the data ----
-data <- cmdlR::data_coral
+db <- cmdlR::data_coral
 
 # Define the list of saving options ----
 save_opt <- list(
@@ -15,7 +15,7 @@ save_opt <- list(
   save_summary = TRUE,
   save_model_object = TRUE,
   save_hessian = FALSE,
-  save_worker_info = TRUE
+  save_worker_info = FALSE
 )
 
 # Define the list of summary options ----
@@ -38,7 +38,9 @@ model_opt <- list(
   description = "A simple MNL model to use as an example.",
   id = "id",
   ct = "ct",
-  alt = 3L,
+  N = length(unique(db[["id"]])),
+  S = length(unique(db[["ct"]])),
+  J = 3L,
   choice = "choice",
   fixed = c(),
   param = list(
@@ -52,15 +54,20 @@ model_opt <- list(
 )
 
 # Log likelihood function ----
-log_lik <- function(param, db, model_opt) {
+log_lik <- function(param, inputs) {
   # Attach the parameters and data  ----
-  attach_objects(list(param, db))
-  on.exit(detach_objects(list(param, db)))
-  
+  if (inputs$estim_opt$cores > 1) {
+    attach_objects(list(param, db))
+    on.exit(detach_objects(list(param, db)), add = TRUE)
+  } else {
+    attach_objects(list(param, inputs$db))
+    on.exit(detach_objects(list(param, inputs$db)), add = TRUE)
+  }
+
   # Calculate the indices ----
-  N <- length(unique(get(model_opt$id)))
-  S <- length(unique(get(model_opt$ct)))
-  choice_var <- get(model_opt$choice)
+  N <- length(unique(get(inputs$model_opt$id)))
+  S <- length(unique(get(inputs$model_opt$ct)))
+  choice_var <- get(inputs$model_opt$choice)
   
   # Define the list of utilities ---- 
   V <- list(
@@ -107,7 +114,7 @@ log_lik <- function(param, db, model_opt) {
 validate(log_lik, estim_opt, model_opt, save_opt, summary_opt)
 
 # Prepare for estimation ----
-inputs <- prepare(data, log_lik, estim_opt, model_opt, save_opt, summary_opt)
+inputs <- prepare(db, log_lik, estim_opt, model_opt, save_opt, summary_opt)
 
 # Estimate the model ----
 model <- estimate(inputs)

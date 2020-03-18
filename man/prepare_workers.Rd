@@ -4,16 +4,14 @@
 \alias{prepare_workers}
 \title{Function to prepare the workers for parallel estimation}
 \usage{
-prepare_workers(db, estim_opt, model_opt, save_opt)
+prepare_workers(db, inputs, workers)
 }
 \arguments{
 \item{db}{Data}
 
-\item{estim_opt}{List of estimation options}
+\item{inputs}{A list containing options and data to be passed to the worker}
 
-\item{model_opt}{List of model options}
-
-\item{save_opt}{List of options for saving outputs}
+\item{workers}{A cluster of workers}
 }
 \value{
 A cluster of workers

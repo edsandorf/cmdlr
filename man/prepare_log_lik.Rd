@@ -4,12 +4,14 @@
 \alias{prepare_log_lik}
 \title{Prepares the log likelihood function}
 \usage{
-prepare_log_lik(log_lik, estim_opt, workers)
+prepare_log_lik(log_lik, estim_opt, model_opt, workers)
 }
 \arguments{
 \item{log_lik}{Log likelihood function}
 
 \item{estim_opt}{List of estimation options}
+
+\item{model_opt}{List of model options}
 
 \item{workers}{A PSOCK cluster of workers}
 }

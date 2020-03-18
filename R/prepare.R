@@ -24,15 +24,27 @@ prepare <- function(db, log_lik, estim_opt, model_opt, save_opt, summary_opt) {
   # Prepare draws ----
   # draws <- prepare_draws()
   
+  # Create list of inputs prior to creating the worker ----
+  inputs <- list(
+    estim_opt = estim_opt,
+    model_opt = model_opt,
+    save_opt = save_opt,
+    summary_opt = summary_opt,
+    db = db
+  )
+  
   # Parallel estimation ----
   if (estim_opt$cores > 1) {
-    workers <- prepare_workers(db, estim_opt, model_opt, save_opt)
+    # Create the cluster of workers
+    workers <- parallel::makeCluster(inputs$estim_opt$cores, type = "PSOCK")
+    prepare_workers(db, inputs, workers)
+    inputs$workers <- workers
   } else {
-    workers <- NULL
+    inputs$workers <- NULL
   }
   
   # Prepare the log likelihood function ----
-  ll_func <- prepare_log_lik(log_lik, estim_opt, workers)
+  ll_func <- prepare_log_lik(log_lik, estim_opt, model_opt, workers)
   
   # Prepare the numerical gradient ----
   num_grad <- prepare_num_grad()
@@ -40,15 +52,10 @@ prepare <- function(db, log_lik, estim_opt, model_opt, save_opt, summary_opt) {
   # Starting values ----
   # prepare_starting_values()
   
-  # Create the list of inputs ----
-  inputs <- list(
-    estim_opt = estim_opt,
-    model_opt = model_opt,
-    save_opt = save_opt,
-    summary_opt = summary_opt,
-    db = db, 
-    workers = workers,
-    log_lik = ll_func,
+  # Ammend the list of inputs ----
+  inputs <- c(
+    inputs,
+    ll_func = ll_func,
     num_grad = num_grad
   )
   
