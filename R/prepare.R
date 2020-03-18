@@ -3,27 +3,27 @@
 #' The function is a wrapper for several cmdlR functions aimed at preparing the
 #' data for estimation. 
 #'
-#' @param db Data
-#' @param opts List of \code{estim_opt}, \code{model_opt}, \code{save_opt}.
+#' @param db Data¨
 #' @param log_lik Log likelihood function
+#' @param estim_opt List of estimation options
+#' @param model_opt List of model options
+#' @param save_opt List of options for saving outputs
+#' @param summary_opt List of options for summary statistics
 #' 
 #' @return A list with \code{estim_opt}, \code{model_opt}, \code{save_opt},
 #' \code{db} and \code{workers}. 
 #' 
 #' @export
 
-prepare <- function(opts, db, log_lik) {
+prepare <- function(db, log_lik, estim_opt, model_opt, save_opt, summary_opt) {
   cat("Preparing for estimation \n")
-  
-  # Extract options ----
-  estim_opt <- opts[["estim_opt"]]
-  model_opt <- opts[["model_opt"]]
-  save_opt <- opts[["save_opt"]]
-  summary_opt <- opts[["summary_opt"]]
   
   # Prepare the data ----
   db <- prepare_data(db, estim_opt, model_opt)
 
+  # Prepare draws ----
+  # draws <- prepare_draws()
+  
   # Parallel estimation ----
   if (estim_opt$cores > 1) {
     workers <- prepare_workers(db, estim_opt, model_opt, save_opt)
@@ -40,8 +40,8 @@ prepare <- function(opts, db, log_lik) {
   # Starting values ----
   # prepare_starting_values()
   
-  # Return the list of inputs, data and workers ----
-  return(list(
+  # Create the list of inputs ----
+  inputs <- list(
     estim_opt = estim_opt,
     model_opt = model_opt,
     save_opt = save_opt,
@@ -50,5 +50,11 @@ prepare <- function(opts, db, log_lik) {
     workers = workers,
     log_lik = ll_func,
     num_grad = num_grad
-  ))
+  )
+  
+  # Clean up global environment
+  rm(estim_opt, model_opt, save_opt, summary_opt, envir = .GlobalEnv)
+  
+  # Return the inputs
+  inputs
 }

@@ -104,10 +104,10 @@ log_lik <- function(param, db, model_opt) {
 }
 
 # Validate the model inputs ----
-opts <- validate(estim_opt, model_opt, save_opt, summary_opt, log_lik)
+validate(log_lik, estim_opt, model_opt, save_opt, summary_opt)
 
 # Prepare for estimation ----
-inputs <- prepare(opts, data, log_lik)
+inputs <- prepare(data, log_lik, estim_opt, model_opt, save_opt, summary_opt)
 
 # Estimate the model ----
 model <- estimate(inputs)

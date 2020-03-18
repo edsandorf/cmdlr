@@ -4,9 +4,11 @@
 \alias{validate}
 \title{Validates inputs}
 \usage{
-validate(estim_opt, model_opt, save_opt, summary_opt, log_lik)
+validate(log_lik, estim_opt, model_opt, save_opt, summary_opt)
 }
 \arguments{
+\item{log_lik}{Log likelihood function}
+
 \item{estim_opt}{List of estimation options}
 
 \item{model_opt}{List of model options}
@@ -14,8 +16,6 @@ validate(estim_opt, model_opt, save_opt, summary_opt, log_lik)
 \item{save_opt}{List of options for saving outputs}
 
 \item{summary_opt}{List of options for summary statistics}
-
-\item{log_lik}{Log likelihood function}
 }
 \value{
 A list with updated and validated \code{estim_opt}, \code{model_opt},
