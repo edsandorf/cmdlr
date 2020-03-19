@@ -4,10 +4,12 @@
 \alias{prepare_workers}
 \title{Function to prepare the workers for parallel estimation}
 \usage{
-prepare_workers(db, inputs, workers)
+prepare_workers(db, draws, inputs, workers)
 }
 \arguments{
 \item{db}{Data}
+
+\item{draws}{A list of random draws used in simulation}
 
 \item{inputs}{A list containing options and data to be passed to the worker}
 

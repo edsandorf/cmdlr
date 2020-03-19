@@ -4,12 +4,13 @@
 #' objects and functions to the workers.
 #' 
 #' @param db Data
+#' @param draws A list of random draws used in simulation
 #' @param inputs A list containing options and data to be passed to the worker
 #' @param workers A cluster of workers
 #' 
 #' @return A cluster of workers
 
-prepare_workers <- function(db, inputs, workers) {
+prepare_workers <- function(db, draws, inputs, workers) {
   
   # Export packages to the worker
   pkgs <- c("maxLik", "numDeriv")
@@ -26,6 +27,12 @@ prepare_workers <- function(db, inputs, workers) {
   # Export data to the workers 
   parallel::parLapply(workers, db, function(x) {
     assign("db", x, envir = globalenv())
+    NULL
+  })
+  
+  # Export the draws to the workers
+  parallel::parLapply(workers, draws, function(x) {
+    assign("draws", x, envir = globalenv())
     NULL
   })
   

@@ -22,7 +22,7 @@ prepare <- function(db, log_lik, estim_opt, model_opt, save_opt, summary_opt) {
   db <- prepare_data(db, estim_opt, model_opt)
 
   # Prepare draws ----
-  # draws <- prepare_draws()
+  draws <- prepare_draws(db, estim_opt, model_opt)
   
   # Create list of inputs prior to creating the worker ----
   inputs <- list(
@@ -30,14 +30,21 @@ prepare <- function(db, log_lik, estim_opt, model_opt, save_opt, summary_opt) {
     model_opt = model_opt,
     save_opt = save_opt,
     summary_opt = summary_opt,
-    db = db
+    db = db,
+    draws = draws
   )
   
   # Parallel estimation ----
   if (estim_opt$cores > 1) {
     # Create the cluster of workers
     workers <- parallel::makeCluster(inputs$estim_opt$cores, type = "PSOCK")
-    prepare_workers(db, inputs, workers)
+    
+    # Set the data and draws to NULL to reduce memory use
+    inputs$draws <- NULL
+    inputs$db <- NULL
+    
+    # Prepare the workers¨
+    prepare_workers(db, draws, inputs, workers)
     inputs$workers <- workers
   } else {
     inputs$workers <- NULL
