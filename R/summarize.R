@@ -10,25 +10,30 @@
 
 summarize <- function(model, summary_opt) {
   # Print model information ----
+  cat("---- Information about the model ----\n")
   cat("Model name:           ", model$name, "\n")
   cat("Model description:    ", model$description, "\n")
   cat("Optimization package: ", model$optimizer, "\n")
   cat("Optimization method:  ", model$method, "\n")
   cat("Number of cores used: ", model$cores, "\n")
+  cat("Number of draws used: ", model$R, "\n")
+  cat("Type of draws used:   ", model$draws_type, "\n")
   cat("Convergence message:  ", model$message, "\n")
   cat("Convergence criteria: ", model$convergence_criteria, "\n")
+  cat(paste0("Estimation started:    ", model$time_start, "\n"))
+  cat(paste0("Estimation completed:  ", model$time_end, "\n"))
   cat("\n\n")
   
   # Print the final gradient ----
-  k <- length(model$gradient)
-  d <- 5
-  x <- c(model$gradient, rep(0, ((d * ceiling(k / d)) - k)))
-  cat("Final gradient \n")
-  print(matrix(x, ncol = d, byrow = TRUE))
+  K <- length(model$gradient)
+  D <- 5
+  x <- c(model$gradient, rep(0, ((D * ceiling(K / D)) - K)))
+  cat("---- Final gradient ----\n")
+  print(matrix(x, ncol = D, byrow = TRUE))
   cat("\n\n")
   
   # Print model summary statistics ----
-  cat("Model diagnostics and fit\n")
+  cat("---- Model diagnostics and fit ----\n")
   cat("LL:          ", model[["ll"]], "\n")
   cat("LL(0):       ", model[["ll_0"]], "\n")
   cat("N:           ", model[["nobs"]], "\n")
@@ -45,6 +50,17 @@ summarize <- function(model, summary_opt) {
   cat("HQIC:        ", model[["hqic"]], "\n")
   cat("\n\n")
   
-  
+  cat("---- Parameter estimates ----\n")
+  output <- matrix(0, nrow = K, ncol = 6L)
+  output[, 1] <- model[["coef"]]
+  output[, 2] <- sqrt(diag(model[["vcov"]]))
+  output[, 3] <- output[, 1]/output[, 2]
+  output[, 4] <- 2 * stats::pt(-abs(output[, 3]), df = model[["nobs"]])
+  output[, 5] <- (1 - output[, 1])/output[, 2]
+  output[, 6] <- 2 * stats::pt(-abs(output[, 5]), df = model[["nobs"]])
+  rownames(output) <- names(model[["coef"]])
+  colnames(output) <- c("Est.", "S.E.", "T0", "P0", "T1", "P1")
+  print(output)
+  cat("\n\n")
 }
 

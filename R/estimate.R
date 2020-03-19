@@ -9,6 +9,9 @@
 #' @export
 
 estimate <- function(inputs) {
+  time_start <- Sys.time()
+  cat(paste0("Estimation started: ", time_start, "\n"))
+  
   # Extract inputs ----
   estim_opt <- inputs[["estim_opt"]]
   model_opt <- inputs[["model_opt"]]
@@ -23,12 +26,14 @@ estimate <- function(inputs) {
   if (estim_opt$cores > 1) on.exit(parallel::stopCluster(workers), add = TRUE)
   
   # Create the model object ----
-  time_start <- Sys.time()
-  cat(paste0("Estimation started: ", time_start, "\n"))
   model <- list()
   model[["name"]] <- model_opt$name
   model[["description"]] <- model_opt$description
+  model[["method"]] <- tolower(estim_opt$method)
+  model[["optimizer"]] <- tolower(estim_opt$optimizer)
   model[["cores"]] <- estim_opt$cores
+  model[["R"]] <- model_opt$R
+  model[["draws_type"]] <- model_opt$draws_type
   model[["time_start"]] <- time_start
   
   N <- model_opt$N
@@ -74,11 +79,7 @@ estimate <- function(inputs) {
     model[["iterations"]] <- model_obj$iterations
     if (model_obj$status %in% c(0)) converged <- TRUE
   }
-  
-  # Add information about the optimizer and method
-  model[["method"]] <- tolower(estim_opt$method)
-  model[["optimizer"]] <- tolower(estim_opt$optimizer)
-  
+
   if (!converged) {
     stop("Model failed to converge. Estimation unsuccessful.\n")
   }
