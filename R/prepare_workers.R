@@ -41,10 +41,12 @@ prepare_workers <- function(db, draws, inputs, workers) {
   # Save information about what is loaded on the workers
   if (inputs$save_opt$save_worker_info) {
     worker_info <- get_worker_info(workers)
+    file_path <- file.path(getwd(), inputs$save_opt$path, paste0(make_model_name(inputs$model_opt$name), "-worker-info.txt"))
+    sink(file_path)
     summary_worker_info(worker_info)
-    save_path <- paste0(inputs$save_opt$path, "-worker-info.txt")
-    cat(blue$bold(symbol$info), paste0("  Worker information written to \"",
-                                                   save_path, "\"\n"))
+    sink()
+    cat(blue$bold(symbol$info), paste0("  Worker information saved to \"",
+                                                   file_path, "\"\n"))
   }
   
   # Return the workers
