@@ -53,7 +53,7 @@ prepare <- function(db, lik, estim_opt, model_opt, save_opt, summary_opt) {
   }
   
   # Prepare the log likelihood function ----
-  ll_func <- prepare_log_lik(lik, estim_opt, model_opt, workers)
+  ll_func <- prepare_log_lik(lik, inputs, workers)
   
   # Prepare the numerical gradient ----
   num_grad <- prepare_num_grad()

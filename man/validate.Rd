@@ -4,10 +4,10 @@
 \alias{validate}
 \title{Validates inputs}
 \usage{
-validate(log_lik, estim_opt, model_opt, save_opt, summary_opt)
+validate(lik, estim_opt, model_opt, save_opt, summary_opt)
 }
 \arguments{
-\item{log_lik}{Log likelihood function}
+\item{lik}{Likelihood function}
 
 \item{estim_opt}{List of estimation options}
 

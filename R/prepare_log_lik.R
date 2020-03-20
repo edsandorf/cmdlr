@@ -5,15 +5,14 @@
 #' using both the 'maxlik' and 'nloptr' packages.
 #' 
 #' @param lik Likelihood function
-#' @param estim_opt List of estimation options
-#' @param model_opt List of model options
+#' @param inputs List of inputs
 #' @param workers A PSOCK cluster of workers 
 #' 
 #' @return A log likelihood wrapper functions
 
-prepare_log_lik <- function(lik, estim_opt, model_opt, workers) {
+prepare_log_lik <- function(lik, inputs, workers) {
   
-  if (estim_opt$cores > 1) {
+  if (inputs$estim_opt$cores > 1) {
     # Define the parallell log-lik wrapper and assign to parent environment
     par_log_lik <- function(param) {
       log(lik(param, inputs))
@@ -26,7 +25,7 @@ prepare_log_lik <- function(lik, estim_opt, model_opt, workers) {
                                              fun = par_log_lik,
                                              param = param))
       
-      if (tolower(estim_opt[["optimizer"]]) == "nloptr") {
+      if (tolower(inputs$estim_opt[["optimizer"]]) == "nloptr") {
         -ll
       } else {
         ll
@@ -35,7 +34,7 @@ prepare_log_lik <- function(lik, estim_opt, model_opt, workers) {
   } else {
     ll_func <- function(param) {
       ll <- sum(log(lik(param, inputs)))
-      if (tolower(estim_opt[["optimizer"]]) == "nloptr") {
+      if (tolower(inputs$estim_opt[["optimizer"]]) == "nloptr") {
         -ll
       } else {
         ll

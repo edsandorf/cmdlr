@@ -4,12 +4,12 @@
 \alias{prepare}
 \title{A function that prepares the data for estimation}
 \usage{
-prepare(db, log_lik, estim_opt, model_opt, save_opt, summary_opt)
+prepare(db, lik, estim_opt, model_opt, save_opt, summary_opt)
 }
 \arguments{
 \item{db}{Data¨}
 
-\item{log_lik}{Log likelihood function}
+\item{lik}{Likelihood function}
 
 \item{estim_opt}{List of estimation options}
 

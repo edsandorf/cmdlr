@@ -31,7 +31,7 @@ prepare_workers <- function(db, draws, inputs, workers) {
   })
   
   # Export the draws to the workers
-  if (isTRUE(model_opt$mixing)) {
+  if (isTRUE(inputs$model_opt$mixing)) {
     parallel::parLapply(workers, draws, function(x) {
       assign("draws", x, envir = globalenv())
       NULL
