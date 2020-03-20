@@ -11,11 +11,9 @@ db <- cmdlR::data_coral
 
 # Define the list of saving options ----
 save_opt <- list(
-  path = file.path("outputs", "mnl-01"),
-  save_summary = TRUE,
-  save_model_object = TRUE,
-  save_hessian = FALSE,
-  save_worker_info = FALSE
+  path = file.path("outputs"),
+  save_summary = FALSE,
+  save_model_object = FALSE
 )
 
 # Define the list of summary options ----
@@ -124,4 +122,4 @@ summarize(model, summary_opt)
 predictions <- predict(model)
 
 # Save the results ----
-# store()
+store(model, inputs)
