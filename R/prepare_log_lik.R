@@ -27,7 +27,7 @@ prepare_log_lik <- function(lik, inputs, workers) {
                               param = param)
       )
       
-      if (tolower(inputs$estim_opt[["optimizer"]]) == "nloptr") {
+      if (tolower(inputs$estim_opt[["optimizer"]]) %in% c("nloptr", "ucminf")) {
         -ll
       } else {
         ll
@@ -37,7 +37,7 @@ prepare_log_lik <- function(lik, inputs, workers) {
     ll_func <- function(param) {
       ll <- sum(log(lik(param, inputs)))
       
-      if (tolower(inputs$estim_opt[["optimizer"]]) == "nloptr") {
+      if (tolower(inputs$estim_opt[["optimizer"]]) %in% c("nloptr", "ucminf")) {
         -ll
       } else {
         ll

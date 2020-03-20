@@ -23,7 +23,7 @@ summary_opt <- list(
 
 # Define the list of estimation options ----
 estim_opt <- list(
-  optimizer = "maxLik",
+  optimizer = "maxlik",
   method = "BFGS",
   cores = 1,
   robust_vcov = TRUE,
@@ -54,6 +54,10 @@ model_opt <- list(
 # Log likelihood function ----
 lik <- function(param, inputs) {
   # Attach the parameters and data  ----
+  if (inputs$estim_opt$optimizer %in% c("nloptr")) {
+    names(param) <- names(inputs$model_opt$param)
+  }
+  
   if (inputs$estim_opt$cores > 1) {
     attach_objects(list(param, db))
     on.exit(detach_objects(list(param, db)), add = TRUE)

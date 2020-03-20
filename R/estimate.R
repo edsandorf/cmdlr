@@ -46,7 +46,7 @@ estimate <- function(inputs) {
   converged <- FALSE
   param <- do.call(c, model_opt$param)
   
-  # maxLik package
+  # maxLik package ----
   if (tolower(estim_opt$optimizer) == "maxlik") {
     model_obj <- maxLik::maxLik(ll_func,
                                 start = param,
@@ -70,16 +70,35 @@ estimate <- function(inputs) {
     if (tolower(estim_opt$method) == "nr" && model_obj$code %in% c(0, 1, 2)) converged <- TRUE 
   }
   
-  # NLOPTR package
+  # ucminf package ----
+  if (tolower(estim_opt$optimizer) == "ucminf") {
+    model_obj <- ucminf::ucminf(par = param,
+                                fn = ll_func,
+                                hessian = 0)
+    
+    model[["ll"]] <- model_obj$value
+    model[["coef"]] <- model_obj$par
+    model[["message"]] <- model_obj$message
+    model[["gradient"]] <- numDeriv::grad(ll_func, model$coef)
+    
+    if (model_obj$convergence %in% c(1, 2, 3, 4)) converged <- TRUE
+  }
+  
+  # NLOPTR package ----
   if (tolower(estim_opt$optimizer) == "nloptr") {
-    model_obj <- nloptr::nloptr()
+    model_obj <- nloptr::nloptr(param, ll_func, num_grad,
+                                opts = list(
+                                  algorithm = estim_opt$method,
+                                  print_level = estim_opt$print_level
+                                ))
     
     model[["ll"]] <- model_obj$objective
     model[["coef"]] <- model_obj$solution
     model[["iterations"]] <- model_obj$iterations
+    
     if (model_obj$status %in% c(0)) converged <- TRUE
   }
-
+  
   if (!converged) {
     stop("Model failed to converge. Estimation unsuccessful.\n")
   }
@@ -129,8 +148,6 @@ estimate <- function(inputs) {
     model[["hessian"]] <- tryCatch({
       maxLik::maxLik(ll_func_pb,
                      start = model[["coef"]],
-                     # db = db,
-                     # model_opt = model_opt,
                      print.level = 0,
                      finalHessian = TRUE, method = estim_opt$method,
                      iterlim = 2)$hessian
@@ -151,7 +168,11 @@ estimate <- function(inputs) {
   
   # Calculate the variance-covariance matrix ----
   model[["vcov"]] <- tryCatch({
-    MASS::ginv(-model[["hessian"]])
+    if (inputs$estim_opt$optimizer == "ucminf") {
+      MASS::ginv(model[["hessian"]])
+    } else {
+      MASS::ginv(-model[["hessian"]])
+    }
   })
   
   # Calculate the and model diagnostics ----
@@ -159,7 +180,7 @@ estimate <- function(inputs) {
   
   ll <- model[["ll"]]
   nobs <- model[["nobs"]]
-  ll_0 <- log(1 / J) * nobs
+  ll_0 <- ifelse(inputs$estim_opt$optimizer == "ucminf", -log(1 / J) * nobs, log(1 / J) * nobs)
   model[["ll_0"]] <- ll_0
   model[["adj_rho_sqrd"]] <- (1L - ((ll - K) / (ll_0)))
   model[["aic"]] <- ((-2L * ll) + (2L * K) )

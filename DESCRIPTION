@@ -22,7 +22,8 @@ Imports:
   MASS,
   maxLik,
   numDeriv,
-  nloptr
+  nloptr,
+  ucminf
 Suggests: 
     testthat,
     knitr,

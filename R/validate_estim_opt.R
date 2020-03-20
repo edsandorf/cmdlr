@@ -34,9 +34,9 @@ validate_estim_opt <- function(estim_opt_input) {
   }
   
   # Check whether the optimizer can use the specified method
-  if (tolower(estim_opt[["optimizer"]]) %in% c("maxlik", "nloptr")) {
+  if (tolower(estim_opt[["optimizer"]]) %in% c("maxlik", "nloptr", "ucminf")) {
     
-    # Check maxlik methods
+    # Check maxlik methods ----
     if (tolower(estim_opt[["optimizer"]]) == "maxlik") {
       if (tolower(estim_opt[["method"]]) %in% c("bfgs", "bhhh", "nr")) {
         # Set the correct call to the optimizer
@@ -45,11 +45,11 @@ validate_estim_opt <- function(estim_opt_input) {
         if (tolower(estim_opt[["method"]]) == "nr") estim_opt[["method"]] <- "NR"
       } else {
         cat(red$bold(symbol$cross), "  estim_opt().\n")
-        stop("The optimization method must be either 'bfgs', 'bhhh' or 'nr' when using 'maxlik'.")
+        stop("The optimization method must be either 'bfgs', 'bhhh' or 'nr' when using 'maxlik'. See ?maxLik")
       }
     }
     
-    # Check nloptr options
+    # Check nloptr options ----
     if (tolower(estim_opt[["optimizer"]]) == "nloptr") {
       if (tolower(estim_opt[["method"]]) %in% c("bfgs", "slsqp", "sbplx")) {
         if (tolower(estim_opt[["method"]]) == "bfgs") estim_opt[["method"]] <- "NLOPT_LD_LBFGS"
@@ -57,14 +57,25 @@ validate_estim_opt <- function(estim_opt_input) {
         if (tolower(estim_opt[["method"]]) == "sbplx") estim_opt[["method"]] <- "NLOPT_LN_SBPLX"
       } else {
         cat(red$bold(symbol$cross), "  estim_opt().\n")
-        stop("The optimization method must be either 'bfgs', 'slsqp' or 'sbplx' when using 'nloptr'.")
+        stop("The optimization method must be either 'bfgs', 'slsqp' or 'sbplx' when using 'nloptr'. See ?nloptr")
+      }
+    }
+    
+    # Check ucminf methods ----
+    if (tolower(estim_opt[["optimizer"]]) == "ucminf") {
+      if (tolower(estim_opt[["method"]]) %in% c("bfgs")) {
+        # Set the correct call to the optimizer
+        if (tolower(estim_opt[["method"]]) == "bfgs") estim_opt[["method"]] <- "BFGS"
+      } else {
+        cat(red$bold(symbol$cross), "  estim_opt().\n")
+        stop("The optimization method must be 'bfgs' when using 'ucminf'. See ?ucminf")
       }
     }
   } else {
     cat(red$bold(symbol$cross), "  estim_opt().\n")
-    stop("The optimizer is either 'maxlik' or 'nloptr'. See package documentation for more details.")
+    stop("The optimizer is either 'maxlik', 'nloptr' or 'ucminf'. See package documentation for more details.")
   }
-
+  
   # Check that enough cores are available ----
   if (estim_opt$cores > parallel::detectCores()) {
     cat(red$bold(symbol$cross), "  estim_opt().\n")
