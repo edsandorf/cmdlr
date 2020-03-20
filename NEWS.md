@@ -1,4 +1,5 @@
 ## cmdlR v0.0.1
+* Added convenient function store() governed by the list save_opt() to save results and model objects
 * Added working LC example
 * Added working MIXL example
 * Added working MNL example
