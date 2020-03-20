@@ -27,7 +27,7 @@
   estim_opt <- list(
     optimizer = "maxLik",
     method = "BFGS",
-    cores = 5,
+    cores = 10,
     robust_vcov = TRUE,
     print_level = 2
   )
@@ -44,7 +44,7 @@
     J = 3L,
     mixing = TRUE,
     draws_type = "scrambled_sobol",
-    R = 50, 
+    R = 5000, 
     fixed = c(),
     param = list(
       b_alt1 = 0,
