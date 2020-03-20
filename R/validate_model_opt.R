@@ -19,8 +19,8 @@ validate_model_opt <- function(model_opt_input) {
     id = NULL,
     ct = NULL,
     choice = NULL,
-    N = length(unique(db[["id"]])),
-    S = length(unique(db[["ct"]])),
+    N = NULL,
+    S = NULL,
     J = NULL,
     mixing = FALSE,
     draws_type = "scrambled_sobol",
@@ -39,9 +39,9 @@ validate_model_opt <- function(model_opt_input) {
     stop("You must specify the id, ct and choice variables in model_opt.")
   }
   
-  if (is.null(model_opt$J)) {
+  if (is.null(model_opt$N) || is.null(model_opt$S) || is.null(model_opt$J)) {
     cat(red$bold(symbol$cross), "  model_opt().\n")
-    stop("You must specify the maximum number of alternatives faced by a given respondent 'J'.")
+    stop("You must specify the number of respondents 'N', maximum number of choice occasions 'S' and the maximum number of alternatives 'J'. These can be functions of your data.")
   }
   
   # Check mixing options ----
