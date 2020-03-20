@@ -20,10 +20,12 @@ prepare_log_lik <- function(lik, inputs, workers) {
     environment(par_log_lik) <- new.env(parent = parent.env(environment(par_log_lik)))
     
     ll_func <- function(param) {
-      ll <- do.call(sum,
-                       parallel::clusterCall(cl = workers,
-                                             fun = par_log_lik,
-                                             param = param))
+      ll <- do.call(
+        sum,
+        parallel::clusterCall(cl = workers,
+                              fun = par_log_lik,
+                              param = param)
+      )
       
       if (tolower(inputs$estim_opt[["optimizer"]]) == "nloptr") {
         -ll
@@ -34,6 +36,7 @@ prepare_log_lik <- function(lik, inputs, workers) {
   } else {
     ll_func <- function(param) {
       ll <- sum(log(lik(param, inputs)))
+      
       if (tolower(inputs$estim_opt[["optimizer"]]) == "nloptr") {
         -ll
       } else {
