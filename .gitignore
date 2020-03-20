@@ -37,5 +37,5 @@ rsconnect/
 inst/doc
 
 # The Outputs folder from testing
-/Outputs/
+/outputs/
 
