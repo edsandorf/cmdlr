@@ -21,7 +21,7 @@ prepare_workers <- function(db, draws, inputs, workers) {
   
   # Export functions and indices to the workers
   parallel::clusterExport(workers,
-                          c("log_lik", "attach_objects", "detach_objects", "inputs"),
+                          c("lik", "attach_objects", "detach_objects", "inputs"),
                           envir = environment())
   
   # Export data to the workers 
@@ -31,10 +31,12 @@ prepare_workers <- function(db, draws, inputs, workers) {
   })
   
   # Export the draws to the workers
-  parallel::parLapply(workers, draws, function(x) {
-    assign("draws", x, envir = globalenv())
-    NULL
-  })
+  if (isTRUE(model_opt$mixing)) {
+    parallel::parLapply(workers, draws, function(x) {
+      assign("draws", x, envir = globalenv())
+      NULL
+    })
+  }
   
   # Save information about what is loaded on the workers
   if (inputs$save_opt$save_worker_info) {
