@@ -27,7 +27,7 @@ summary_opt <- list(
 estim_opt <- list(
   optimizer = "maxLik",
   method = "BFGS",
-  cores = 2,
+  cores = 1,
   robust_vcov = TRUE,
   print_level = 2
 )
