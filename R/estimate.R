@@ -21,6 +21,7 @@ estimate <- function(inputs) {
   indices <- inputs[["indices"]]
   workers <- inputs[["workers"]]
   ll_func <- inputs[["ll_func"]]
+  num_grad <- inputs[["num_grad"]]
   
   # Close the workers if the estimation fails
   if (estim_opt$cores > 1) on.exit(parallel::stopCluster(workers), add = TRUE)

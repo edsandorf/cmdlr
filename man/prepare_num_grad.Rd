@@ -4,7 +4,14 @@
 \alias{prepare_num_grad}
 \title{Prepares the numerical gradient}
 \usage{
-prepare_num_grad()
+prepare_num_grad(lik, inputs, workers)
+}
+\arguments{
+\item{lik}{Likelihood function}
+
+\item{inputs}{List of inputs}
+
+\item{workers}{A PSOCK cluster of workers}
 }
 \value{
 A numerical gradient wrapper function

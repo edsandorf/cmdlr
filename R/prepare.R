@@ -56,7 +56,7 @@ prepare <- function(db, lik, estim_opt, model_opt, save_opt, summary_opt) {
   ll_func <- prepare_log_lik(lik, inputs, workers)
   
   # Prepare the numerical gradient ----
-  num_grad <- prepare_num_grad()
+  num_grad <- prepare_num_grad(lik, inputs, workers)
   
   # Starting values ----
   # prepare_starting_values()
