@@ -18,21 +18,23 @@
 prepare <- function(db, log_lik, estim_opt, model_opt, save_opt, summary_opt) {
   cat("Preparing for estimation \n")
   
-  # Prepare the data ----
-  db <- prepare_data(db, estim_opt, model_opt)
-
-  # Prepare draws ----
-  draws <- prepare_draws(db, estim_opt, model_opt)
-  
-  # Create list of inputs prior to creating the worker ----
+  # Create list of inputs
   inputs <- list(
     estim_opt = estim_opt,
     model_opt = model_opt,
     save_opt = save_opt,
-    summary_opt = summary_opt,
-    db = db,
-    draws = draws
+    summary_opt = summary_opt
   )
+  
+  # Prepare the data ----
+  db <- prepare_data(db, estim_opt, model_opt)
+  inputs$db <- db
+
+  # Prepare draws ----
+  if (isTRUE(model_opt$mixing)) {
+    draws <- prepare_draws(db, estim_opt, model_opt)
+    inputs$draws <- draws
+  }
   
   # Parallel estimation ----
   if (estim_opt$cores > 1) {
