@@ -4,7 +4,7 @@
 #' data for estimation. 
 #'
 #' @param db Data¨
-#' @param log_lik Log likelihood function
+#' @param lik Likelihood function
 #' @param estim_opt List of estimation options
 #' @param model_opt List of model options
 #' @param save_opt List of options for saving outputs
@@ -15,7 +15,7 @@
 #' 
 #' @export
 
-prepare <- function(db, log_lik, estim_opt, model_opt, save_opt, summary_opt) {
+prepare <- function(db, lik, estim_opt, model_opt, save_opt, summary_opt) {
   cat("Preparing for estimation \n")
   
   # Create list of inputs
@@ -53,7 +53,7 @@ prepare <- function(db, log_lik, estim_opt, model_opt, save_opt, summary_opt) {
   }
   
   # Prepare the log likelihood function ----
-  ll_func <- prepare_log_lik(log_lik, estim_opt, model_opt, workers)
+  ll_func <- prepare_log_lik(lik, estim_opt, model_opt, workers)
   
   # Prepare the numerical gradient ----
   num_grad <- prepare_num_grad()

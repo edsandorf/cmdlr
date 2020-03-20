@@ -61,7 +61,7 @@
   )
   
   # Log likelihood function ----
-  log_lik <- function(param, inputs) {
+  lik <- function(param, inputs) {
     # Attach the parameters and data  ----
     if (inputs$estim_opt$cores > 1) {
       attach_objects(list(param, db, draws))
@@ -112,21 +112,19 @@
     # Calculate the probability of the sequence
     pr_seq <- Rfast::colprods(pr_chosen)
     
-    # Reshape the matrix such that each row is an individual.
+    # Reshape the matrix such that each row is an individual and average over draws
     pr_seq <- matrix(pr_seq, nrow = N)
+    pr_seq <- Rfast::rowmeans(pr_seq)
     
-    # Average over draws
-    lik <- Rfast::rowmeans(pr_seq)
-    
-    # Return the log-likelihood value
-    log(lik)
+    # Return the likelihood value
+    pr_seq
   }
   
   # Validate the model inputs ----
-  validate(log_lik, estim_opt, model_opt, save_opt, summary_opt)
+  validate(lik, estim_opt, model_opt, save_opt, summary_opt)
   
   # Prepare for estimation ----
-  inputs <- prepare(db, log_lik, estim_opt, model_opt, save_opt, summary_opt)
+  inputs <- prepare(db, lik, estim_opt, model_opt, save_opt, summary_opt)
   
   # Estimate the model ----
   model <- estimate(inputs)

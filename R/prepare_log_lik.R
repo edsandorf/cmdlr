@@ -4,19 +4,19 @@
 #' function and ensures that it can be run on a single core or multiple cores
 #' using both the 'maxlik' and 'nloptr' packages.
 #' 
-#' @param log_lik Log likelihood function
+#' @param lik Likelihood function
 #' @param estim_opt List of estimation options
 #' @param model_opt List of model options
 #' @param workers A PSOCK cluster of workers 
 #' 
 #' @return A log likelihood wrapper functions
 
-prepare_log_lik <- function(log_lik, estim_opt, model_opt, workers) {
+prepare_log_lik <- function(lik, estim_opt, model_opt, workers) {
   
   if (estim_opt$cores > 1) {
     # Define the parallell log-lik wrapper and assign to parent environment
     par_log_lik <- function(param) {
-      log_lik(param, inputs)
+      log(lik(param, inputs))
     }
     environment(par_log_lik) <- new.env(parent = parent.env(environment(par_log_lik)))
     
@@ -34,7 +34,7 @@ prepare_log_lik <- function(log_lik, estim_opt, model_opt, workers) {
     }
   } else {
     ll_func <- function(param) {
-      ll <- sum(log_lik(param, inputs))
+      ll <- sum(log(lik(param, inputs)))
       if (tolower(estim_opt[["optimizer"]]) == "nloptr") {
         -ll
       } else {

@@ -4,7 +4,7 @@
 #' inputs. The purpose is to ensure correct specification of the model and that
 #' all information is available. 
 #'
-#' @param log_lik Log likelihood function
+#' @param lik Likelihood function
 #' @param estim_opt List of estimation options
 #' @param model_opt List of model options
 #' @param save_opt List of options for saving outputs
@@ -15,7 +15,7 @@
 #' 
 #' @export
 
-validate <- function(log_lik, estim_opt, model_opt, save_opt, summary_opt) {
+validate <- function(lik, estim_opt, model_opt, save_opt, summary_opt) {
   cat("Validating inputs\n")
   
   # Validate estimation options ----
