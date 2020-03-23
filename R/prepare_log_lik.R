@@ -12,36 +12,33 @@
 
 prepare_log_lik <- function(lik, inputs, workers) {
   
-  if (inputs$estim_opt$cores > 1) {
-    # Define the parallell log-lik wrapper and assign to parent environment
-    par_log_lik <- function(param) {
-      log(lik(param, inputs))
+  # Define the log_lik function (the inner part is the same for both parallel and serial)
+  log_lik <- function(param) {
+    log(lik(param, inputs))
+  }
+  environment(log_lik) <- new.env(parent = parent.env(environment(log_lik)))
+  
+  # Define the ll_func
+  ll_func <- function(param, converged) {
+    if (inputs$estim_opt$cores > 1) {
+      ll <- do.call(sum,
+                    parallel::clusterCall(cl = workers,
+                                          fun = log_lik,
+                                          param = param))
+    } else {
+      ll <- sum(log_lik(param))
     }
-    environment(par_log_lik) <- new.env(parent = parent.env(environment(par_log_lik)))
     
-    ll_func <- function(param) {
-      ll <- do.call(
-        sum,
-        parallel::clusterCall(cl = workers,
-                              fun = par_log_lik,
-                              param = param)
-      )
+    # Check which optimizer is used
+    if (tolower(inputs$estim_opt[["optimizer"]]) %in% c("nloptr", "ucminf")) {
+      # Print iterations if the model hasn't converged
+      #if (!converged) {
+      #  cat("Function value: ", -ll, "\n")  
+      #}
       
-      if (tolower(inputs$estim_opt[["optimizer"]]) %in% c("nloptr", "ucminf")) {
-        -ll
-      } else {
-        ll
-      }
-    }
-  } else {
-    ll_func <- function(param) {
-      ll <- sum(log(lik(param, inputs)))
-      
-      if (tolower(inputs$estim_opt[["optimizer"]]) %in% c("nloptr", "ucminf")) {
-        -ll
-      } else {
-        ll
-      }
+      -ll
+    } else {
+      ll
     }
   }
   

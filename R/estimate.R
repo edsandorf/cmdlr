@@ -51,6 +51,7 @@ estimate <- function(inputs) {
   if (tolower(estim_opt$optimizer) == "maxlik") {
     model_obj <- maxLik::maxLik(ll_func,
                                 start = param,
+                                converged = FALSE,
                                 method = estim_opt$method,
                                 finalHessian = FALSE,
                                 tol = estim_opt$tol, gradtol = estim_opt$gradtol,
@@ -75,12 +76,13 @@ estimate <- function(inputs) {
   if (tolower(estim_opt$optimizer) == "ucminf") {
     model_obj <- ucminf::ucminf(par = param,
                                 fn = ll_func,
-                                hessian = 0)
+                                hessian = 0,
+                                converged = FALSE)
     
     model[["ll"]] <- model_obj$value
     model[["coef"]] <- model_obj$par
     model[["message"]] <- model_obj$message
-    model[["gradient"]] <- numDeriv::grad(ll_func, model$coef)
+    model[["gradient"]] <- numDeriv::grad(ll_func, model$coef, converged = FALSE)
     
     if (model_obj$convergence %in% c(1, 2, 3, 4)) converged <- TRUE
   }
@@ -120,7 +122,7 @@ estimate <- function(inputs) {
   # Define the wrapper function
   ll_func_pb <- function(param) {
     pb$tick()
-    ll_func(param)
+    ll_func(param, converged = TRUE)
   }
   
   # Try and catch if the Hessian cannot be calculated 
