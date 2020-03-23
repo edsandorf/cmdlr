@@ -47,10 +47,14 @@ estimate <- function(inputs) {
   converged <- FALSE
   param <- do.call(c, model_opt$param)
   
+  # If we have fixed parameters, we drop the fixed parameters from the vector of parameters - this implementation is heavily inspired by the 'apollo' package
+  param_est <- param[!(names(param) %in% model_opt$fixed)]
+  param_fixed <- param[model_opt$fixed]
+    
   # maxLik package ----
   if (tolower(estim_opt$optimizer) == "maxlik") {
     model_obj <- maxLik::maxLik(ll_func,
-                                start = param,
+                                start = param_est,
                                 converged = FALSE,
                                 method = estim_opt$method,
                                 finalHessian = FALSE,
@@ -74,7 +78,7 @@ estimate <- function(inputs) {
   
   # ucminf package ----
   if (tolower(estim_opt$optimizer) == "ucminf") {
-    model_obj <- ucminf::ucminf(par = param,
+    model_obj <- ucminf::ucminf(par = param_est,
                                 fn = ll_func,
                                 hessian = 0,
                                 converged = FALSE)
@@ -128,7 +132,10 @@ estimate <- function(inputs) {
   # Try and catch if the Hessian cannot be calculated 
   model[["hessian"]] <- tryCatch({
     cat(blue$bold(symbol$info), "  Calculating the Hessian matrix. This may take a while. \n")
-    numDeriv::hessian(func = ll_func_pb, x = model$coef)
+    hessian <- numDeriv::hessian(func = ll_func_pb, x = model$coef)
+    colnames(hessian) <- names(model$coef)
+    rownames(hessian) <- names(model$coef)
+    hessian
   }, error = function(e) {
     NA
   })
@@ -149,11 +156,14 @@ estimate <- function(inputs) {
     
     # Try calculating the hessian using the maxLik package
     model[["hessian"]] <- tryCatch({
-      maxLik::maxLik(ll_func_pb,
+      hessian <- maxLik::maxLik(ll_func_pb,
                      start = model[["coef"]],
                      print.level = 0,
                      finalHessian = TRUE, method = estim_opt$method,
                      iterlim = 2)$hessian
+      colnames(hessian) <- names(model$coef)
+      rownames(hessian) <- names(model$coef)
+      hessian
     }, error = function(e) {
       NA
     })
@@ -172,10 +182,13 @@ estimate <- function(inputs) {
   # Calculate the variance-covariance matrix ----
   model[["vcov"]] <- tryCatch({
     if (inputs$estim_opt$optimizer == "ucminf") {
-      MASS::ginv(model[["hessian"]])
+      vcov <- MASS::ginv(model[["hessian"]])
     } else {
-      MASS::ginv(-model[["hessian"]])
+      vcov <- MASS::ginv(-model[["hessian"]])
     }
+    colnames(vcov) <- names(model$coef)
+    rownames(vcov) <- names(model$coef)
+    vcov
   })
   
   # Calculate the and model diagnostics ----

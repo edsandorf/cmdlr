@@ -11,6 +11,8 @@
 #' @return A log likelihood wrapper functions
 
 prepare_log_lik <- function(lik, inputs, workers) {
+  # Get the fixed parameters
+  param_fixed <- unlist(inputs$model_opt$param[inputs$model_opt$fixed])
   
   # Define the log_lik function (the inner part is the same for both parallel and serial)
   log_lik <- function(param) {
@@ -19,7 +21,10 @@ prepare_log_lik <- function(lik, inputs, workers) {
   environment(log_lik) <- new.env(parent = parent.env(environment(log_lik)))
   
   # Define the ll_func
-  ll_func <- function(param, converged) {
+  ll_func <- function(param_est, converged) {
+    # Combine estimated and fixed parameters into one vector - this implementation is strongly influenced by the 'apollo' package
+    param <- c(param_est, param_fixed)
+    
     if (inputs$estim_opt$cores > 1) {
       ll <- do.call(sum,
                     parallel::clusterCall(cl = workers,

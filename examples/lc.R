@@ -41,9 +41,10 @@ model_opt <- list(
   N = length(unique(db[["ID"]])),
   S = length(unique(db[["ct"]])),
   J = 3L,
-  fixed = c(),
+  fixed = c("b_asc_2", "g_const_2"),
   param = list(
     b_asc_1 = 0,
+    b_asc_2 = 0, 
     b_tt_1 = 0,
     b_tc_1 = 0,
     b_hw_1 = -0.0396, 
@@ -52,7 +53,8 @@ model_opt <- list(
     b_tc_2 = 0,
     b_hw_2 = -0.0479, 
     b_ch_2 = -2.1725, 
-    g_const_1 = 0.0329
+    g_const_1 = 0.0329,
+    g_const_2 = 0
   )
 )
 
@@ -75,19 +77,19 @@ lik <- function(param, inputs) {
   # Define the class probability functions ----
   P <- list(
     class1 = g_const_1,
-    class2 = 0
+    class2 = g_const_2
   )
   
   # Define the list of utilities ---- 
   V <- list(
     V1 = list(
       alt1 = b_asc_1 + b_tc_1 * tc1 + b_tt_1 * tt1 + b_hw_1 * hw1 + b_ch_1 * ch1,
-      alt2 =           b_tc_1 * tc2 + b_tt_1 * tt2 + b_hw_1 * hw2 + b_ch_1 * ch2
+      alt2 = b_asc_2 + b_tc_1 * tc2 + b_tt_1 * tt2 + b_hw_1 * hw2 + b_ch_1 * ch2
       
     ),
     V2 = list(
       alt1 = b_asc_1 + b_tc_2 * tc1 + b_tt_2 * tt1 + b_hw_2 * hw1 + b_ch_2 * ch1,
-      alt2 =           b_tc_2 * tc2 + b_tt_2 * tt2 + b_hw_2 * hw2 + b_ch_2 * ch2
+      alt2 = b_asc_2 + b_tc_2 * tc2 + b_tt_2 * tt2 + b_hw_2 * hw2 + b_ch_2 * ch2
     )
   )
   
@@ -155,7 +157,7 @@ inputs <- prepare(db, lik, estim_opt, model_opt, save_opt, summary_opt)
 model <- estimate(inputs)
 
 # Get a summary of the results ----
-summarize(model, summary_opt)
+summarize(model, inputs)
 
 # Collate results to a single file ----
 #collate() 

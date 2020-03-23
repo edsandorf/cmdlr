@@ -4,11 +4,13 @@
 #' key summary statistics to help interpret the results of your model. 
 #'
 #' @param model A model opbject returned by \code{estimate}
-#' @param summary_opt A list of summary options
+#' @param inputs A list of summary options
 #' 
 #' @export
 
-summarize <- function(model, summary_opt) {
+summarize <- function(model, inputs) {
+  summary_opt <- inputs$summary_opt
+  
   # Print model information ----
   cat("---- Information about the model ----\n")
   cat("Model name:           ", model$name, "\n")
@@ -51,15 +53,19 @@ summarize <- function(model, summary_opt) {
   cat("\n\n")
   
   cat("---- Parameter estimates ----\n")
-  output <- matrix(0, nrow = K, ncol = 6L)
-  output[, 1] <- model[["coef"]]
-  output[, 2] <- sqrt(diag(model[["vcov"]]))
-  output[, 3] <- output[, 1]/output[, 2]
-  output[, 4] <- 2 * stats::pt(-abs(output[, 3]), df = model[["nobs"]])
-  output[, 5] <- (1 - output[, 1])/output[, 2]
-  output[, 6] <- 2 * stats::pt(-abs(output[, 5]), df = model[["nobs"]])
-  rownames(output) <- names(model[["coef"]])
+  output <- matrix(NA, nrow = length(inputs$model_opt$param), ncol = 6L)
+  rownames(output) <- names(inputs$model_opt$param)
   colnames(output) <- c("Est.", "S.E.", "T0", "P0", "T1", "P1")
+  names_est <- names(model[["coef"]])
+  names_fixed <- rownames(output) %in% inputs$model_opt$fixed
+  output[names_est, 1] <- model[["coef"]]
+  output[names_fixed] <- unlist(inputs$model_opt$param)[names_fixed]
+  output[names_est, 2] <- sqrt(diag(model[["vcov"]]))
+  output[names_est, 3] <- output[names_est, 1]/output[names_est, 2]
+  output[names_est, 4] <- 2 * stats::pt(-abs(output[names_est, 3]), df = model[["nobs"]])
+  output[names_est, 5] <- (1 - output[names_est, 1])/output[names_est, 2]
+  output[names_est, 6] <- 2 * stats::pt(-abs(output[names_est, 5]), df = model[["nobs"]])
+  output[names_fixed,  c("S.E.", "T0", "P0", "T1", "P1")] <- NA
   print(output)
   cat("\n\n")
 }
