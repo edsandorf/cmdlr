@@ -7,7 +7,8 @@ pkgs <- c("cmdlR")
 invisible(lapply(pkgs, require, character.only = TRUE))
 
 # Load and manipulate the data ----
-db <- cmdlR::data_coral
+db <- apollo::apollo_swissRouteChoiceData
+db$ct <- rep(1:9, times = 388)
 
 # Define the list of saving options ----
 save_opt <- list(
@@ -23,7 +24,7 @@ summary_opt <- list(
 
 # Define the list of estimation options ----
 estim_opt <- list(
-  optimizer = "maxLik",
+  optimizer = "ucminf",
   method = "BFGS",
   cores = 1,
   robust_vcov = TRUE,
@@ -34,27 +35,24 @@ estim_opt <- list(
 model_opt <- list(
   name = "LC model",
   description = "A simple LC model with 2 classes",
-  id = "id",
+  id = "ID",
   ct = "ct",
   choice = "choice",
-  N = length(unique(db[["id"]])),
+  N = length(unique(db[["ID"]])),
   S = length(unique(db[["ct"]])),
   J = 3L,
   fixed = c(),
   param = list(
-    b_cost_1 = -0.2,
-    b_small_1 = 0.2,
-    b_large_1 = 0.4,
-    b_oil_1 = -0.02,
-    b_fish_1 = 0.1,
-    b_habitat_1 = 0.9,
-    b_cost_2 = -0.2,
-    b_small_2 = 0.2,
-    b_large_2 = 0.4,
-    b_oil_2 = -0.02,
-    b_fish_2 = 0.1,
-    b_habitat_2 = 0.9,
-    g_const_1 = 0.4
+    b_asc_1 = 0,
+    b_tt_1 = 0,
+    b_tc_1 = 0,
+    b_hw_1 = -0.0396, 
+    b_ch_1 = -0.7624, 
+    b_tt_2 = 0,
+    b_tc_2 = 0,
+    b_hw_2 = -0.0479, 
+    b_ch_2 = -2.1725, 
+    g_const_1 = 0.0329
   )
 )
 
@@ -83,14 +81,13 @@ lik <- function(param, inputs) {
   # Define the list of utilities ---- 
   V <- list(
     V1 = list(
-      alt1 = b_cost_1 * cost_1 + b_small_1 * small_1 + b_large_1 * large_1 + b_oil_1 * oil_1 + b_fish_1 * fish_1 + b_habitat_1 + habitat_1,
-      alt2 = b_cost_1 * cost_2 + b_small_1 * small_2 + b_large_1 * large_2 + b_oil_1 * oil_2 + b_fish_1 * fish_2 + b_habitat_1 + habitat_2,
-      alt3 = b_cost_1 * cost_3 + b_small_1 * small_3 + b_large_1 * large_3 + b_oil_1 * oil_3 + b_fish_1 * fish_3 + b_habitat_1 + habitat_3
+      alt1 = b_asc_1 + b_tc_1 * tc1 + b_tt_1 * tt1 + b_hw_1 * hw1 + b_ch_1 * ch1,
+      alt2 =           b_tc_1 * tc2 + b_tt_1 * tt2 + b_hw_1 * hw2 + b_ch_1 * ch2
+      
     ),
     V2 = list(
-      alt1 = b_cost_2 * cost_1 + b_small_2 * small_1 + b_large_2 * large_1 + b_oil_2 * oil_1 + b_fish_2 * fish_1 + b_habitat_2 + habitat_1,
-      alt2 = b_cost_2 * cost_2 + b_small_2 * small_2 + b_large_2 * large_2 + b_oil_2 * oil_2 + b_fish_2 * fish_2 + b_habitat_2 + habitat_2,
-      alt3 = b_cost_2 * cost_3 + b_small_2 * small_3 + b_large_2 * large_3 + b_oil_2 * oil_3 + b_fish_2 * fish_3 + b_habitat_2 + habitat_3
+      alt1 = b_asc_1 + b_tc_2 * tc1 + b_tt_2 * tt1 + b_hw_2 * hw1 + b_ch_2 * ch1,
+      alt2 =           b_tc_2 * tc2 + b_tt_2 * tt2 + b_hw_2 * hw2 + b_ch_2 * ch2
     )
   )
   
@@ -143,7 +140,7 @@ lik <- function(param, inputs) {
     cls_pr <- matrix(cls_pr, nrow = S)
     cls_pr <- matrix(matrixStats::colMeans2(cls_pr, na.rm = TRUE), ncol = length(P))
   }
-
+  
   # Return the probability of the sequence ----
   Rfast::rowsums(cls_pr * pr_seq)
 }
@@ -164,7 +161,7 @@ summarize(model, summary_opt)
 #collate() 
 
 # Make predictions ----
-predictions <- predict(model)
+# predictions <- predict(model)
 
 # Save the results ----
 store(model, inputs)
