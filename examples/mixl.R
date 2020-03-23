@@ -58,7 +58,7 @@ model_opt <- list(
   )
 )
 
-# Log likelihood function ----
+# Likelihood function - returns the probability of the sequence of choices ----
 lik <- function(param, inputs) {
   # Attach the parameters and data  ----
   if (inputs$estim_opt$optimizer %in% c("nloptr")) {
