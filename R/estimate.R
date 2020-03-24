@@ -83,7 +83,8 @@ estimate <- function(inputs) {
                                 hessian = 0,
                                 converged = FALSE)
     
-    model[["ll"]] <- model_obj$value
+    # Added a minus to make the fit calculations correct
+    model[["ll"]] <- -model_obj$value
     model[["coef"]] <- model_obj$par
     model[["message"]] <- model_obj$message
     model[["gradient"]] <- numDeriv::grad(ll_func, model$coef, converged = FALSE)
@@ -99,7 +100,8 @@ estimate <- function(inputs) {
                                   print_level = estim_opt$print_level
                                 ))
     
-    model[["ll"]] <- model_obj$objective
+    # Added a minus to make the fit calculations correct
+    model[["ll"]] <- -model_obj$objective
     model[["coef"]] <- model_obj$solution
     model[["iterations"]] <- model_obj$iterations
     
