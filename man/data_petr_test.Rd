@@ -4,7 +4,8 @@
 \name{data_petr_test}
 \alias{data_petr_test}
 \title{A simulated dataset to use for speed comparison between software}
-\format{A simulated stated preference data set in "wide" format. 200 
+\format{
+A simulated stated preference data set in "wide" format. 200 
 respondents making 5 choices between 3 alternatives. 
 
 \describe{
@@ -19,7 +20,8 @@ respondents making 5 choices between 3 alternatives.
   \item{choice_3}{A choice indicator}
   \item{attr1_3}{Attribute 1}
   \item{attr2_3}{Attribute 2}
-}}
+}
+}
 \source{
 Petr Mariel
 }

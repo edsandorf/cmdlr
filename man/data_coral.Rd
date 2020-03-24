@@ -4,7 +4,8 @@
 \name{data_coral}
 \alias{data_coral}
 \title{A stated choice experiment on cold-water coral protection in Norway}
-\format{A dataframe in the "wide" format with 4439 choice observations and 31
+\format{
+A dataframe in the "wide" format with 4439 choice observations and 31
 variables. Each respondent answered up to 12 choice tasks described by
 2 experimentally designed alternatives and the SQ. 
 
@@ -40,7 +41,8 @@ variables. Each respondent answered up to 12 choice tasks described by
  \item{hh_income}{An interval variable for houshold income. 1 = Below NOK 200K, 2 = NOK 200 - 400K, 3 = NOK 400 - 600K, 4 = NOK 600 - 800K, 5 = NOK 800 - 1000K, 6 = NOK 1.0 - 1.2 Million, 7 = NOK 1.2 - 1.5 Million, 8 = Above NOK 1.5 Million}
  \item{adults}{Number of people above 18 in the household}
  \item{children}{Number of people below 18 in the household}
-}}
+}
+}
 \source{
 \url{https://doi.org/10.18710/Q39V7O}
 }
