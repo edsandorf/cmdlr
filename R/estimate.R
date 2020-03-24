@@ -122,7 +122,7 @@ estimate <- function(inputs) {
     format = "[:bar] :percent :elapsed",
     total = 2 + 8 * (K * (K + 1) / 2),
     clear = FALSE, 
-    width = 60
+    width = 80
   )
 
   # Define the wrapper function
@@ -153,7 +153,7 @@ estimate <- function(inputs) {
       format = "[:bar] :percent :elapsed",
       total = 2 + 8 * (K * (K + 1) / 2),
       clear = FALSE, 
-      width = 60
+      width = 80
     )
     
     # Try calculating the hessian using the maxLik package
