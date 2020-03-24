@@ -18,8 +18,9 @@ prepare_num_grad <- function(lik, inputs, workers) {
   
   environment(inner_num_grad) <- new.env(parent = parent.env(environment(inner_num_grad)))
   
-  if (inputs$estim_opt$cores > 1) {
-    num_grad <- function(param) {
+  # Define the numerical gradient
+  num_grad <- function(param, converged) {
+    if (inputs$estim_opt$cores > 1) {
       grad_val <- do.call(
         rbind,
         parallel::clusterCall(
@@ -31,10 +32,7 @@ prepare_num_grad <- function(lik, inputs, workers) {
         )
       )
       Rfast::colsums(grad_val)
-    }
-
-  } else {
-    num_grad <- function(param) {
+    } else {
       numDeriv::grad(inner_num_grad, param, method = "Richardson")
     }
   }

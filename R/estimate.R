@@ -94,7 +94,7 @@ estimate <- function(inputs) {
   
   # NLOPTR package ----
   if (tolower(estim_opt$optimizer) == "nloptr") {
-    model_obj <- nloptr::nloptr(param, ll_func, num_grad,
+    model_obj <- nloptr::nloptr(param_est, ll_func, num_grad, converged = FALSE,
                                 opts = list(
                                   algorithm = estim_opt$method,
                                   print_level = estim_opt$print_level
