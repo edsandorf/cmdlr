@@ -10,7 +10,7 @@
 
 estimate <- function(inputs) {
   time_start <- Sys.time()
-  cat(paste0("Estimation started: ", time_start, "\n"))
+  cat(blue$bold(symbol$info), bold(paste0("  Estimation started: ", time_start, "\n")))
   
   # Extract inputs ----
   estim_opt <- inputs[["estim_opt"]]

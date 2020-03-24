@@ -16,7 +16,7 @@
 #' @export
 
 prepare <- function(db, lik, estim_opt, model_opt, save_opt, summary_opt) {
-  cat("Preparing for estimation \n")
+  cat(blue$bold(symbol$info), bold("  Preparing for estimation \n"))
   
   # Create list of inputs
   inputs <- list(

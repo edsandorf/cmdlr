@@ -16,7 +16,7 @@
 #' @export
 
 validate <- function(lik, estim_opt, model_opt, save_opt, summary_opt) {
-  cat("Validating inputs\n")
+  cat(blue$bold(symbol$info), bold("  Validating inputs\n"))
   
   # Validate estimation options ----
   estim_opt <- validate_estim_opt(estim_opt)
