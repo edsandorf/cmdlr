@@ -194,9 +194,20 @@ estimate <- function(inputs) {
   # Calculate the and model diagnostics ----
   model[["convergence_criteria"]] <- t(model$gradient) %*% model$vcov %*% model$gradient
   
+  ll_0 <- tryCatch({
+    ll_0_tmp <- ll_func((model$coef * 0), TRUE)
+    if (tolower(estim_opt$optimizer) %in% c("nloptr", "ucminf")) {
+      -ll_0_tmp
+    } else {
+      ll_0_tmp
+    }
+  }, error = function(e) {
+    cat(red$bold(symbol$cross), "  Failed to calculate 'll_0'. Replacing with NA.\n")
+    return(NA)
+  })
+  
   ll <- model[["ll"]]
   nobs <- model[["nobs"]]
-  ll_0 <- ifelse(inputs$estim_opt$optimizer == "ucminf", -log(1 / J) * nobs, log(1 / J) * nobs)
   model[["ll_0"]] <- ll_0
   model[["adj_rho_sqrd"]] <- (1L - ((ll - K) / (ll_0)))
   model[["aic"]] <- ((-2L * ll) + (2L * K) )
