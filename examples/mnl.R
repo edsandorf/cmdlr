@@ -7,7 +7,9 @@ pkgs <- c("cmdlR")
 invisible(lapply(pkgs, require, character.only = TRUE))
 
 # Load and manipulate the data ----
-db <- cmdlR::data_coral
+db <- apollo::apollo_modeChoiceData
+db <- db[db$SP == 1, ]
+db$ct <- rep(1:14, times = 500)
 
 # Define the list of saving options ----
 save_opt <- list(
@@ -33,21 +35,28 @@ estim_opt <- list(
 # Define the list of model options ----
 model_opt <- list(
   name = "MNL model",
-  description = "A simple MNL model to use as an example.",
-  id = "id",
+  description = "A simple MNL model using the Apollo dataset 'mode choice'.",
+  id = "ID",
   ct = "ct",
   choice = "choice",
-  N = length(unique(db[["id"]])),
+  N = length(unique(db[["ID"]])),
   S = length(unique(db[["ct"]])),
-  J = 3L,
-  fixed = c(),
+  J = 4L,
+  fixed = c("asc_car", "b_no_frills"),
   param = list(
-    b_cost = -0.2,
-    b_small = 0.2,
-    b_large = 0.4,
-    b_oil = -0.02,
-    b_fish = 0.1,
-    b_habitat = 0.9
+    asc_car = 0,
+    asc_bus = 0,
+    asc_air = 0,
+    asc_rail = 0,
+    b_tt_car = 0,
+    b_tt_bus = 0, 
+    b_tt_air = 0,
+    b_tt_rail = 0,
+    b_access = 0,
+    b_cost = 0,
+    b_no_frills = 0,
+    b_wifi = 0,
+    b_food = 0
   )
 )
 
@@ -65,17 +74,29 @@ lik <- function(param, inputs) {
     attach_objects(list(param, inputs$db))
     on.exit(detach_objects(list(param, inputs$db)), add = TRUE)
   }
-
-  # Calculate the indices ----
+  
+  # Define useful variables ----
+  # Indices
   N <- length(unique(get(inputs$model_opt$id)))
   S <- length(unique(get(inputs$model_opt$ct)))
+  
+  # Choice variable
   choice_var <- get(inputs$model_opt$choice)
   
   # Define the list of utilities ---- 
   V <- list(
-    alt1 = b_cost * cost_1 + b_small * small_1 + b_large * large_1 + b_oil * oil_1 + b_fish * fish_1 + b_habitat + habitat_1,
-    alt2 = b_cost * cost_2 + b_small * small_2 + b_large * large_2 + b_oil * oil_2 + b_fish * fish_2 + b_habitat + habitat_2,
-    alt3 = b_cost * cost_3 + b_small * small_3 + b_large * large_3 + b_oil * oil_3 + b_fish * fish_3 + b_habitat + habitat_3
+    alt1 = asc_car  + b_tt_car  * time_car                           + b_cost * cost_car,
+    alt2 = asc_bus  + b_tt_bus  * time_bus  + b_access * access_bus  + b_cost * cost_bus,
+    alt3 = asc_air  + b_tt_air  * time_air  + b_access * access_air  + b_cost * cost_air  + b_no_frills * (service_air == 1)  + b_wifi * (service_air == 2)  + b_food * (service_air == 3),
+    alt4 = asc_rail + b_tt_rail * time_rail + b_access * access_rail + b_cost * cost_rail + b_no_frills * (service_rail == 1) + b_wifi * (service_rail == 2) + b_food * (service_rail == 3)
+  )
+  
+  # Alternative availability
+  alt_availability <- list(
+    alt1 = av_car,
+    alt2 = av_bus,
+    alt3 = av_air, 
+    alt4 = av_rail
   )
   
   # Calculate the probabilities ----
@@ -88,10 +109,16 @@ lik <- function(param, inputs) {
   
   # Calculate the exponent and sum of utilities
   exp_v <- lapply(V, function(v) exp(v))
+  # Restrict the utility of unavailable alternatives to 0
+  exp_v <- mapply("*", exp_v, alt_availability, SIMPLIFY = FALSE)
   sum_v <- Reduce("+", exp_v)
   
   # Calculate the probability of the chosen alt
-  pr_chosen <- 1 / sum_v
+  # Returns zero if a non-available alternative is chosen
+  chosen_alt_available <- Reduce("+", lapply(seq_along(V), function(j) {
+    (choice_var == j) * alt_availability[[j]]
+  }))
+  pr_chosen <- chosen_alt_available / sum_v
   
   # Calculate the product over the panel by reshaping to have rows equal to S
   pr_chosen <- matrix(pr_chosen, nrow = S)
@@ -117,13 +144,13 @@ inputs <- prepare(db, lik, estim_opt, model_opt, save_opt, summary_opt)
 model <- estimate(inputs)
 
 # Get a summary of the results ----
-summarize(model, summary_opt)
+summarize(model, inputs)
 
 # Collate results to a single file ----
 #collate() 
 
 # Make predictions ----
-predictions <- predict(model)
+# predictions <- predict(model)
 
 # Save the results ----
-store(model, inputs)
+# store(model, inputs)
