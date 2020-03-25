@@ -5,7 +5,7 @@ test_that("split_data() doesn't split the same individual on multiple cores", {
   model_opt <- list(id = "id",
                     ct = "ct")
   estim_opt <- list(cores = 1)
-  db <- cmdlR::data_coral
+  db <- cmdlR::data_petr_test
   db <- pad_data(db, model_opt)
   
   estim_opt <- list(cores = 3)
