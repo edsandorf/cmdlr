@@ -26,14 +26,19 @@ summarize <- function(model, inputs) {
   cat(paste0("Estimation completed:  ", model$time_end, "\n"))
   cat("\n\n")
   
-  # Print the final gradient ----
-  K <- length(model$gradient)
-  D <- 5
-  x <- c(model$gradient, rep(0, ((D * ceiling(K / D)) - K)))
-  cat("---- Final gradient ----\n")
-  print(matrix(x, ncol = D, byrow = TRUE))
+  # Print the starting values ----
+  cat("---- Parameter information ----\n")
+  output <- matrix(0, nrow = length(inputs$model_opt$param), ncol = 4)
+  rownames(output) <- names(inputs$model_opt$param)
+  colnames(output) <- c("Start", "Final", "Diff", "Grad")
+  coef_est_names <- names(model$coef)
+  output[coef_est_names, 1] <- model$coef_start
+  output[coef_est_names, 2] <- model$coef
+  output[, 3] <- output[, 2] - output[, 1]
+  output[coef_est_names, 4] <- model$gradient 
+  print(round(output, digits = 4))
   cat("\n\n")
-  
+
   # Print model summary statistics ----
   cat("---- Model diagnostics and fit ----\n")
   cat("LL:          ", model[["ll"]], "\n")
@@ -66,7 +71,7 @@ summarize <- function(model, inputs) {
   output[names_est, 5] <- (1 - output[names_est, 1])/output[names_est, 2]
   output[names_est, 6] <- 2 * stats::pt(-abs(output[names_est, 5]), df = model[["nobs"]])
   output[names_fixed,  c("S.E.", "T0", "P0", "T1", "P1")] <- NA
-  print(output)
+  print(round(output, digits = 4))
   cat("\n\n")
 }
 
