@@ -53,21 +53,11 @@ prepare <- function(db, lik, estim_opt, model_opt, save_opt, summary_opt) {
   }
   
   # Prepare the log likelihood function ----
-  ll_func <- prepare_log_lik(lik, inputs, workers)
+  inputs$ll_func <- prepare_log_lik(lik, inputs, workers)
   
   # Prepare the numerical gradient ----
-  num_grad <- prepare_num_grad(lik, inputs, workers)
-  
-  # Starting values ----
-  # prepare_starting_values()
-  
-  # Ammend the list of inputs ----
-  inputs <- c(
-    inputs,
-    ll_func = ll_func,
-    num_grad = num_grad
-  )
-  
+  inputs$num_grad <- prepare_num_grad(lik, inputs, workers)
+
   # Clean up global environment
   rm(estim_opt, model_opt, save_opt, summary_opt, envir = .GlobalEnv)
   
