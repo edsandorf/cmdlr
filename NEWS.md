@@ -1,3 +1,6 @@
+## cmdlR v0.0.2
+*
+
 ## cmdlR v0.0.1
 * Added a simple search for starting values function
 * Added functions to calculate the standard errors of variances, covariances, correlations and standard deviations of variance-covariance matrix of random parameters in a MIXL model
