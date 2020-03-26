@@ -140,6 +140,9 @@ validate(lik, estim_opt, model_opt, save_opt, summary_opt)
 # Prepare for estimation ----
 inputs <- prepare(db, lik, estim_opt, model_opt, save_opt, summary_opt)
 
+# Search for starting values ----
+# inputs$model_opt$param <- search_start_values(inputs)
+
 # Estimate the model ----
 model <- estimate(inputs)
 

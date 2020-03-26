@@ -27,11 +27,17 @@ validate_model_opt <- function(model_opt_input) {
     R = 10,
     fixed = c(""),
     param = NULL,
-    rpar = NULL
+    rpar = NULL,
+    search_start_options = list(
+      simple_search = TRUE,
+      candidates = 100,
+      multiplier = 1
+    )
   )
   
   # Replace the non-specified values with default values
   model_opt[names(model_opt_input)] <- model_opt_input
+  model_opt$search_start_options[names(model_opt_input$search_start_options)] <- model_opt_input$search_start_options
   
   # Check general model options ----
   if (is.null(model_opt$id) || is.null(model_opt$ct) || is.null(model_opt$choice)) {
