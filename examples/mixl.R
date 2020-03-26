@@ -132,7 +132,7 @@ inputs <- prepare(db, lik, estim_opt, model_opt, save_opt, summary_opt)
 model <- estimate(inputs)
 
 # Get a summary of the results ----
-summarize(model, summary_opt)
+summarize(model, inputs)
 
 # Collate results to a single file ----
 #collate() 
