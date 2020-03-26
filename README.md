@@ -8,8 +8,20 @@
 
 The problem of choice is fundamental to economics. Choice models are used to understand how people make choices in markets. cmdlR is a set of wrapper functions around a user written log-likelihood function. The package also contain several functions to check for local-optima, calculate welfare measures, compare results and make predictions. To get started, the package contains several examples with pre-programmed log-likelihood functions that can be easily tweaked by the user. 
 
-# Release notes v. 0.0.0.9000
-The package is currently not working, but is under development (16.03.2020). 
+# Release notes cmdlR v0.0.1
+This is the first working version of the package. The package is still rough around the edges and has missing functionality. Formal tests of inputs and documentation is lacking, but will be added in future releases. 
+
+* Added a simple search for starting values function
+* Added functions to calculate the standard errors of variances, covariances, correlations and standard deviations of variance-covariance matrix of random parameters in a MIXL model
+* Can specify paramters to stay fixed at the starting values using model_opt$fixed
+* Added convenient function store() governed by the list save_opt() to save results and model objects
+* Added working LC example
+* Added working MIXL example
+* Added working MNL example
+* Added functions to create random draws and a convenient wrapper function
+make_random_draws()
+* Added the test datasets data_coral.rds and data_petr_test.rds
+ 
 
 # How to install cmdlR?
 
