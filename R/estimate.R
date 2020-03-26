@@ -45,7 +45,8 @@ estimate <- function(inputs) {
   
   # Estimate the model using the specified optimizer ----
   converged <- FALSE
-  param <- do.call(c, model_opt$param)
+  param <- unlist(model_opt$param)
+  model[["coef_start"]] <- param[!(names(param) %in% model_opt$fixed)]
   
   # If we have fixed parameters, we drop the fixed parameters from the vector of parameters - this implementation is heavily inspired by the 'apollo' package
   param_est <- param[!(names(param) %in% model_opt$fixed)]
