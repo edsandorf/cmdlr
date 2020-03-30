@@ -41,7 +41,7 @@ store <- function(model, inputs) {
   if (isTRUE(save_opt$save_summary)) {
     file_path <- paste0(path, "-summary.txt")
     sink(file_path)
-    summarize(model, inputs$summary_opt)
+    summarize(model, inputs)
     sink()
     cat(blue$bold(symbol$info), paste0("  Model summary saved to: \"", file_path, "\"\n"))
   }
