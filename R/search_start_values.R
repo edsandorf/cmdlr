@@ -34,10 +34,17 @@ search_start_values <- function(inputs) {
   N <- search_options$candidates
   
   # Prepare the log-likelihood function locally
-  # ll_func <- prepare_log_lik(lik, inputs, workers)
   ll_func <- inputs$ll_func
   
   if (search_options$simple_search) {
+    # Define the progressbar
+    pb <- progress::progress_bar$new(
+      format = "[:bar] :percent :elapsed",
+      total = N,
+      clear = FALSE, 
+      width = 80
+    )
+    
     # Create a matrix of potential parameters
     start_values <- matrix(rep(param_est, times = N), ncol = K, byrow = TRUE) + 0.1
     
@@ -59,6 +66,7 @@ search_start_values <- function(inputs) {
     
     # Evaluate ll_func at each value
     ll <- lapply(start_values_list, function(param) {
+      pb$tick()
       ll_func(param, TRUE)
     })
     
