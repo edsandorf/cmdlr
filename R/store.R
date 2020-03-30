@@ -30,9 +30,16 @@ store <- function(model, inputs) {
     stop("Files already exist in the specified output folder with the current model name. Either delete the files OR choose a new model name. This is to avoid over-writing results you want to keep. You can change the name directly using 'inputs$model_opt$name' and do not have to re-run any models.")
   }
   
+  # Create the partial path 
+  if (is.null(save_opt$path)) {
+    path <- file.path(getwd(), model_name)
+  } else {
+    path <- file.path(getwd(), save_opt$path, model_name)
+  }
+  
   # Save model summary to .txt ----
   if (isTRUE(save_opt$save_summary)) {
-    file_path <- file.path(getwd(), save_opt$path, paste0(model_name, "-summary.txt"))
+    file_path <- paste0(path, "-summary.txt")
     sink(file_path)
     summarize(model, inputs$summary_opt)
     sink()
@@ -41,28 +48,28 @@ store <- function(model, inputs) {
   
   # Save model object to .rds ----
   if (isTRUE(save_opt$save_model_object)) {
-    file_path <- file.path(getwd(), save_opt$path, paste0(model_name, "-model-object.rds"))
+    file_path <- paste0(path, "-model-object.rds")
     saveRDS(model, file_path)
     cat(blue$bold(symbol$info), paste0("  Model object saved to: \"", file_path, "\"\n"))
   }
   
   # Save hessian to a .csv file ----
   if (isTRUE(save_opt$save_hessian)) {
-    file_path <- file.path(getwd(), save_opt$path, paste0(model_name, "-hessian.csv"))
+    file_path <- paste0(path, "-hessian.csv")
     utils::write.csv(model$hessian, file_path)
     cat(blue$bold(symbol$info), paste0("  Hessian matrix saved to: \"", file_path, "\"\n"))  
   }
   
   # Save variance-covariance matrix to .csv file ----
   if (isTRUE(save_opt$save_vcov)) {
-    file_path <- file.path(getwd(), save_opt$path, paste0(model_name, "-vcov.csv"))
+    file_path <- paste0(path, "-vcov.csv")
     utils::write.csv(model$vcov, file_path)
     cat(blue$bold(symbol$info), paste0("  Variance-covariance matrix saved to: \"", file_path, "\"\n"))  
   }
   
   # Save parameters to a .csv file ----
   if (isTRUE(save_opt$save_param)) {
-    file_path <- file.path(getwd(), save_opt$path, paste0(model_name, "-param.csv"))
+    file_path <- paste0(path, "-param.csv")
     utils::write.csv(model$coef, file_path)
     cat(blue$bold(symbol$info), paste0("  Final parameters saved to: \"", file_path, "\"\n"))  
   }
