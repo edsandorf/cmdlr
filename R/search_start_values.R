@@ -19,6 +19,8 @@
 #' 
 #' @export
 search_start_values <- function(inputs) {
+  cat(blue$bold(symbol$info), bold("  Searching for starting values\n"))
+  
   # Get the search options 
   search_options <- inputs$model_opt$search_start_options
   
@@ -63,10 +65,12 @@ search_start_values <- function(inputs) {
     start_values <- cbind(start_values, Reduce(rbind, ll))
     start_values <- start_values[order(start_values[, ncol(start_values)], decreasing = TRUE), ]
     start_values <- start_values[1, , drop = TRUE][-ncol(start_values)]
-    as.list(start_values)
     
   } else {
     cat("Not implemented yet. Moving on ... \n")
   }
   
+  # Print complete message and return the starting values as a named list
+  cat(green$bold(symbol$tick), "  Starting values\n")
+  as.list(start_values)
 }
