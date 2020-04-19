@@ -1,5 +1,5 @@
 ## cmdlR v0.0.2
-*
+* Took dependence on 'rlang' to make work with environments and expression evaluation easier.
 
 ## cmdlR v0.0.1
 * Added a simple search for starting values function
