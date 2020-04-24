@@ -1,5 +1,5 @@
 ## cmdlR v0.0.2
-*
+* Fixed a bug where `ids` in `split_data()` was not always a vector, which caused `sort()` to fail.
 
 ## cmdlR v0.0.1
 * Added a simple search for starting values function
