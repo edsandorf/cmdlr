@@ -16,7 +16,7 @@
 
 split_data <- function(db, estim_opt, model_opt) {
   # Get the ids and split them across cores
-  ids <- db[, model_opt[["id"]]]
+  ids <- db[[model_opt[["id"]]]]
   id_index <- split(ids, sort(ids %% estim_opt$cores))
   
   # Split the data according to the split id variable
