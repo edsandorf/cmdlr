@@ -22,10 +22,17 @@ estimate <- function(inputs) {
   workers <- inputs[["workers"]]
   ll_func <- inputs[["ll_func"]]
   num_grad <- inputs[["num_grad"]]
+  draws <- inputs[["draws"]]
   
+  # Set up serial/parallel estimation handlers ----
   # Close the workers if the estimation fails
-  if (estim_opt$cores > 1) on.exit(parallel::stopCluster(workers), add = TRUE)
-  
+  if (estim_opt$cores > 1) {
+    on.exit(parallel::stopCluster(workers), add = TRUE)
+  } else {
+    attach_objects(list(db, draws))
+    on.exit(detach_objects(list(db, draws)), add = TRUE)
+  }
+
   # Create the model object ----
   model <- list()
   model[["name"]] <- model_opt$name

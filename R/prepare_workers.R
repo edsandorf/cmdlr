@@ -30,12 +30,16 @@ prepare_workers <- function(db, draws, inputs, workers) {
     NULL
   })
   
+  # Attach data globally on worker
+  parallel::clusterEvalQ(workers, attach(db))
+  
   # Export the draws to the workers
   if (isTRUE(inputs$model_opt$mixing)) {
     parallel::parLapply(workers, draws, function(x) {
       assign("draws", x, envir = globalenv())
       NULL
     })
+    parallel::clusterEvalQ(workers, attach(draws))
   }
   
   # Save information about what is loaded on the workers

@@ -65,13 +65,8 @@ lik <- function(param, inputs) {
     names(param) <- names(inputs$model_opt$param)
   }
   
-  if (inputs$estim_opt$cores > 1) {
-    attach_objects(list(param, db, draws))
-    on.exit(detach_objects(list(param, db, draws)), add = TRUE)
-  } else {
-    attach_objects(list(param, inputs$db, inputs$draws))
-    on.exit(detach_objects(list(param, inputs$db, inputs$draws)), add = TRUE)
-  }
+  attach_objects(list(param))
+  on.exit(detach_objects(list(param)), add = TRUE)
   
   # Calculate the indices ----
   N <- length(unique(get(inputs$model_opt$id)))
@@ -141,4 +136,4 @@ summarize(model, inputs)
 # predictions <- predict(model)
 
 # Save the results ----
-store(model, inputs)
+# store(model, inputs)
