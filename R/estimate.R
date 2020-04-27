@@ -29,8 +29,12 @@ estimate <- function(inputs) {
   if (estim_opt$cores > 1) {
     on.exit(parallel::stopCluster(workers), add = TRUE)
   } else {
-    attach_objects(list(db, draws))
-    on.exit(detach_objects(list(db, draws)), add = TRUE)
+    attach(db)
+    on.exit(detach(db), add = TRUE)
+    if (model_opt$mixing) {
+      attach(draws)
+      on.exit(detach(draws), add = TRUE)
+    }
   }
 
   # Create the model object ----
