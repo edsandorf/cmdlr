@@ -13,5 +13,4 @@
 #' @importFrom stats runif
 #' @import crayon
 #' @import cli
-#' @import rlang
 NULL
