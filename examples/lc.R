@@ -61,13 +61,12 @@ model_opt <- list(
 # Likelihood function - returns the probability of the sequence of choices ----
 lik <- function(param, inputs) {
   # Attach the parameters and data  ----
-  if (inputs$estim_opt$cores > 1) {
-    attach_objects(list(param, db))
-    on.exit(detach_objects(list(param, db)), add = TRUE)
-  } else {
-    attach_objects(list(param, inputs$db))
-    on.exit(detach_objects(list(param, inputs$db)), add = TRUE)
+  if (inputs$estim_opt$optimizer %in% c("nloptr")) {
+    names(param) <- names(inputs$model_opt$param)
   }
+  
+  attach_objects(list(param))
+  on.exit(detach_objects(list(param)), add = TRUE)
   
   # Calculate the indices ----
   N <- length(unique(get(inputs$model_opt$id)))
