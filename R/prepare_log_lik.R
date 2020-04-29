@@ -16,34 +16,28 @@ prepare_log_lik <- function(lik, inputs, workers) {
   
   # Define the log_lik function (the inner part is the same for both parallel and serial)
   log_lik <- function(param) {
-    log(lik(param, inputs))
+    lik(param, inputs)
   }
   environment(log_lik) <- new.env(parent = parent.env(environment(log_lik)))
   
   # Define the ll_func
-  ll_func <- function(param_est, converged) {
+  ll_func <- function(param_est) {
     # Combine estimated and fixed parameters into one vector - this implementation is strongly influenced by the 'apollo' package
     param <- c(param_est, param_fixed)
     
+    # Check if we are running the model in parallel
     if (inputs$estim_opt$cores > 1) {
-      ll <- do.call(sum,
-                    parallel::clusterCall(cl = workers,
-                                          fun = log_lik,
-                                          param = param))
-    } else {
-      ll <- sum(log_lik(param))
-    }
-    
-    # Check which optimizer is used
-    if (tolower(inputs$estim_opt[["optimizer"]]) %in% c("nloptr", "ucminf")) {
-      # Print iterations if the model hasn't converged
-      #if (!converged) {
-      #  cat("Function value: ", -ll, "\n")  
-      #}
+      ls_ll <- parallel::clusterCall(cl = workers,
+                                     fun = log_lik,
+                                     param = param)
       
-      -ll
-    } else {
+      # Get the attributes and pass them along with ll
+      attrbts <- lapply(ls_ll, function(x) attributes(x))
+      ll <- Reduce(c, ls_ll)
+      attributes(ll) <- list(attrbts = attrbts)
       ll
+    } else {
+      log_lik(param)
     }
   }
   

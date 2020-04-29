@@ -13,7 +13,7 @@
 prepare_num_grad <- function(lik, inputs, workers) {
   # Define the inner part (basically ll_func for single core)
   inner_num_grad <- function(param) {
-    sum(log(lik(param, inputs)))
+    sum(lik(param, inputs))
   }
   
   environment(inner_num_grad) <- new.env(parent = parent.env(environment(inner_num_grad)))

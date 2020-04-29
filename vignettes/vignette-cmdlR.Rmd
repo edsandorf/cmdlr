@@ -97,6 +97,7 @@ Note that different optimizers may use different optimization routines. If the u
 ### Save options - `save_opt`
 
 ## The log-likelihood function - `log_lik()`
+The log-likelihood function must return the log-likelihood value. It is up to the user to specify whether this value should be positive or negative depending on whether the optimizer is minimizing or maximizing the function. It is possible to pass data from within the function to the model object by specifying the data to be passed along as an attribute to the vector of log-likelihood values. These can then be accessed through the model object after estimation. This functionality facilitates easy calculation of conditional estimates without having to re-run the model. However, passing information along as an attribute does come with a (small) computational overhead. 
 
 ## Steps to estimate the model
 

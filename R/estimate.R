@@ -67,7 +67,6 @@ estimate <- function(inputs) {
   if (tolower(estim_opt$optimizer) == "maxlik") {
     model_obj <- maxLik::maxLik(ll_func,
                                 start = param_est,
-                                converged = FALSE,
                                 method = estim_opt$method,
                                 finalHessian = FALSE,
                                 tol = estim_opt$tol, gradtol = estim_opt$gradtol,
@@ -90,16 +89,20 @@ estimate <- function(inputs) {
   
   # ucminf package ----
   if (tolower(estim_opt$optimizer) == "ucminf") {
+    # Add the sum to the ll
+    ll_func_sum <- function(param) {
+      sum(ll_func(param))
+    }
+    
     model_obj <- ucminf::ucminf(par = param_est,
-                                fn = ll_func,
-                                hessian = 0,
-                                converged = FALSE)
+                                fn = ll_func_sum,
+                                hessian = 0)
     
     # Added a minus to make the fit calculations correct
     model[["ll"]] <- -model_obj$value
     model[["coef"]] <- model_obj$par
     model[["message"]] <- model_obj$message
-    model[["gradient"]] <- numDeriv::grad(ll_func, model$coef, converged = FALSE)
+    model[["gradient"]] <- numDeriv::grad(ll_func_sum, model$coef)
     
     if (model_obj$convergence %in% c(1, 2, 3, 4)) converged <- TRUE
   }
@@ -127,6 +130,9 @@ estimate <- function(inputs) {
   # Add converged boolean to model object
   model[["converged"]] <- converged
   
+  # Add the log-likelihood values and attributes to the model object ----
+  model[["ll_values"]] <- ll_func(model$coef)
+  
   # Calculate the hessian matrix ----
   # Define the progress bar
   K <- length(model$coef)
@@ -140,7 +146,7 @@ estimate <- function(inputs) {
   # Define the wrapper function
   ll_func_pb <- function(param) {
     pb$tick()
-    ll_func(param, converged = TRUE)
+    sum(ll_func(param))
   }
   
   # Try and catch if the Hessian cannot be calculated 
@@ -209,7 +215,7 @@ estimate <- function(inputs) {
   model[["convergence_criteria"]] <- t(model$gradient) %*% model$vcov %*% model$gradient
   
   ll_0 <- tryCatch({
-    ll_0_tmp <- ll_func((model$coef * 0), TRUE)
+    ll_0_tmp <- sum(ll_func(model$coef * 0))
     if (tolower(estim_opt$optimizer) %in% c("nloptr", "ucminf")) {
       -ll_0_tmp
     } else {

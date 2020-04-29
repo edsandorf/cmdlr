@@ -143,7 +143,14 @@ lik <- function(param, inputs) {
   }
   
   # Return the probability of the sequence ----
-  Rfast::rowsums(cls_pr * pr_seq)
+  lik <- Rfast::rowsums(cls_pr * pr_seq)
+  
+  # Return the likelihood value
+  ll <- log(lik)
+  attributes(ll) <- list(
+    pr_seq = pr_seq
+  )
+  -ll
 }
 
 # Validate the model inputs ----

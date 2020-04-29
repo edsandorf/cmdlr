@@ -114,7 +114,8 @@ lik <- function(param, inputs) {
   pr_seq <- Rfast::rowmeans(pr_seq)
   
   # Return the likelihood value
-  pr_seq
+  ll <- log(pr_seq)
+  -ll
 }
 
 # Validate the model inputs ----

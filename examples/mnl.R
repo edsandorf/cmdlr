@@ -126,7 +126,11 @@ lik <- function(param, inputs) {
   pr_seq <- Rfast::colprods(pr_chosen)
   
   # Return the likelihood value
-  pr_seq
+  ll <- log(pr_seq)
+  attributes(ll) <- list(
+    pr_chosen = pr_chosen
+  )
+  ll
 }
 
 # Validate the model inputs ----
