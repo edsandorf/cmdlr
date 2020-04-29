@@ -64,6 +64,14 @@ search_start_values <- function(inputs) {
     })
     start_values <- Reduce(rbind, start_values_list)
     
+    # Attache the data and draws 
+    attach(inputs$db)
+    on.exit(detach(inputs$db), add = TRUE)
+    if (inputs$model_opt$mixing) {
+      attach(inputs$draws)
+      on.exit(detach(inputs$draws), add = TRUE)
+    }
+    
     # Evaluate ll_func at each value
     ll <- lapply(start_values_list, function(param) {
       pb$tick()
