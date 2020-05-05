@@ -3,6 +3,7 @@
 * `attach()` data and draws is no longer necessary inside of the log-likelihood function.
 * Took dependence on 'rlang' to make work with environments and expression evaluation easier.
 * Fixed a bug where `ids` in `split_data()` was not always a vector, which caused `sort()` to fail.
+* Various minor bug fixes
 
 
 ## cmdlR v0.0.1

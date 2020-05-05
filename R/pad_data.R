@@ -16,7 +16,7 @@ pad_data <- function(db, model_opt) {
   
   names(ct_tmp) <- model_opt[["ct"]]
   
-  db <- lapply(unique(db[, model_opt[["id"]]]), function(i) {
+  db <- lapply(unique(db[[model_opt[["id"]]]]), function(i) {
     db_tmp <- db[db[, model_opt[["id"]]] == i, ]
     if (nrow(db_tmp) != S) {
       db_tmp <- merge(ct_tmp, db_tmp, by = model_opt[["ct"]], all.x = TRUE)
