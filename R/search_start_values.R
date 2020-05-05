@@ -75,7 +75,7 @@ search_start_values <- function(inputs) {
     # Evaluate ll_func at each value
     ll <- lapply(start_values_list, function(param) {
       pb$tick()
-      ll_func(param, TRUE)
+      sum(ll_func(param))
     })
     
     start_values <- cbind(start_values, Reduce(rbind, ll))
