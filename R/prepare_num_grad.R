@@ -1,26 +1,38 @@
 #' Prepares the numerical gradient
 #'
-#' 'nloptr' and 'trustOptim' requires a gradient. This function is a wrapper
-#' for numDeriv::grad() and prepares a high-precision numerical gradient to
-#' use with 'nloptr' and 'trustOptim'.
+#' The optimization routines 'ucminf', 'nloptr' and 'trustOptim' requires the
+#' user to supply a gradient. Writing an analytical gradient can be quite
+#' cumbersome for very complex likelihood expressions. This function is a simple
+#' wrapper around \code{numDeriv::grad()} and prepares a high-precision numerical
+#' gradient that can be supplied directly to the optimizers that require one. 
+#' Note that a numerical gradient is slower in calculation and less precise than 
+#' an analytical gradient.
 #' 
-#' @param lik Likelihood function
-#' @param inputs List of inputs
-#' @param workers A PSOCK cluster of workers
+#' The function is meant for internal use only. 
 #' 
-#' @return A numerical gradient wrapper function
+#' @inheritParams prepare_log_lik
+#' 
+#' @return A high precision numerical gradient function
 
-prepare_num_grad <- function(lik, inputs, workers) {
-  # Define the inner part (basically ll_func for single core)
+prepare_num_grad <- function(ll, estim_env, workers) {
+  # Define the eval() wrapper for the numerical gradient
   inner_num_grad <- function(param) {
-    sum(lik(param, inputs))
+    invisible(
+      lapply(seq_along(param), function(i) {
+        assign(names(param[i]), param[[i]], envir = estim_env)
+      })
+    )
+    sum(eval(body(ll), estim_env))
   }
   
-  environment(inner_num_grad) <- new.env(parent = parent.env(environment(inner_num_grad)))
+  # environment(inner_num_grad) <- new.env(parent = parent.env(environment(inner_num_grad)))
+  environment(inner_num_grad) <- environment(prepare_num_grad)
   
   # Define the numerical gradient
   num_grad <- function(param, converged) {
-    if (inputs$estim_opt$cores > 1) {
+    if (is.null(workers)) {
+      numDeriv::grad(inner_num_grad, param, method = "Richardson")
+    } else {
       grad_val <- do.call(
         rbind,
         parallel::clusterCall(
@@ -32,12 +44,10 @@ prepare_num_grad <- function(lik, inputs, workers) {
         )
       )
       Rfast::colsums(grad_val)
-    } else {
-      numDeriv::grad(inner_num_grad, param, method = "Richardson")
     }
   }
   
   # Return the numerical gradient
-  cat(green$bold(symbol$tick), "  Numerical gradient\n")
+  message(green$bold(symbol$tick), "  Numerical gradient")
   num_grad
 }

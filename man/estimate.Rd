@@ -2,15 +2,55 @@
 % Please edit documentation in R/estimate.R
 \name{estimate}
 \alias{estimate}
-\title{Estimates the model}
+\title{Function to estimate a choice model using cmdlR}
 \usage{
-estimate(inputs)
+estimate(ll, db, estim_opt, model_opt, save_opt, debug = FALSE)
 }
 \arguments{
-\item{inputs}{List of inputs to the estimation. The result of running
-\code{prepare}.}
+\item{ll}{A log likelihood function. If \code{estim_opt$optimizer = 'ucminf'},
+then the log likelihood function should return the negative log likelihood
+value.}
+
+\item{db}{A \code{data.frame()} or \code{tibble()} with the data to be used in
+estimation.}
+
+\item{estim_opt}{A list of options for the estimation procedure such as 
+type of optimizer, approximation routines, tolerance levels etc.}
+
+\item{model_opt}{A list of model options including random parameters, draws,
+fixed and non-fixed parameters during estimation, starting value search 
+procedures etc.}
+
+\item{save_opt}{List of options for storing the outputs including which
+model outputs to store, how to store them and where to store them.}
+
+\item{debug}{A boolean indicating whether the code is run in debug mode. If
+TRUE, the code will not estimate the models, but set the number of cores to 1
+and return the estimation environment. Defaults to FALSE.}
+}
+\value{
+Returns a cmdlR model object. This is a list containing the following 
+elements:
 }
 \description{
-The function is a wrapper for several cmdlR functions that sets up parallel
-processes and estimates the data.
+This is the main function used to estimate choice models. The function runs
+a set of validation tests to check that all options are correctly specified. 
+A correctly specified option only means that the model will run, it does not 
+mean that the model specification is correct or that the combination of 
+options are correct from a statistical point of view.
+}
+\details{
+If all checks are passed, the function will set up the estimation environment
+and define correct and useful wrapper functions. This includes creating and
+preparing workers in the context of parallel estimation.
+
+Once the estimation environment is set up, the model will be estimated using
+the options specified in \code{estim_opt()}.
+}
+\examples{
+\dontrun{
+  # See /examples for how to use
+  estimate(ll, db, estim_opt, model_opt, save_opt, debug = FALSE)
+}
+
 }
