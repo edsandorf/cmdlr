@@ -13,14 +13,11 @@ db$ct <- rep(1:14, times = 500)
 
 # Define the list of saving options ----
 save_opt <- list(
+  name = "MNL model",
+  description = "A simple MNL model using the Apollo dataset 'mode choice'.",
   path = file.path("outputs"),
   save_summary = FALSE,
   save_model_object = FALSE
-)
-
-# Define the list of summary options ----
-summary_opt <- list(
-  robust_se = FALSE 
 )
 
 # Define the list of estimation options ----
@@ -29,19 +26,24 @@ estim_opt <- list(
   method = "BFGS",
   cores = 1,
   robust_vcov = TRUE,
-  print_level = 2
+  print_level = 2,
+  search_start = TRUE,
+  search_start_options = list(
+    simple_search = TRUE,
+    candidates = 100,
+    multiplier = 1
+  )
 )
 
 # Define the list of model options ----
 model_opt <- list(
-  name = "MNL model",
-  description = "A simple MNL model using the Apollo dataset 'mode choice'.",
   id = "ID",
   ct = "ct",
   choice = "choice",
   N = length(unique(db[["ID"]])),
   S = length(unique(db[["ct"]])),
   J = 4L,
+  nobs = nrow(db),
   fixed = c("asc_car", "b_no_frills"),
   param = list(
     asc_car = 0,
@@ -61,23 +63,7 @@ model_opt <- list(
 )
 
 # Likelihood function - returns the probability of the sequence of choices ----
-lik <- function(param, inputs) {
-  # Attach the parameters ----
-  if (inputs$estim_opt$optimizer %in% c("nloptr")) {
-    names(param) <- names(inputs$model_opt$param)
-  }
-  
-  attach_objects(list(param))
-  on.exit(detach_objects(list(param)), add = TRUE)
-
-  # Define useful variables ----
-  # Indices
-  N <- length(unique(get(inputs$model_opt$id)))
-  S <- length(unique(get(inputs$model_opt$ct)))
-  
-  # Choice variable
-  choice_var <- get(inputs$model_opt$choice)
-  
+ll <- function(param) {
   # Define the list of utilities ---- 
   V <- list(
     alt1 = asc_car  + b_tt_car  * time_car                           + b_cost * cost_car,
@@ -133,26 +119,14 @@ lik <- function(param, inputs) {
   ll
 }
 
-# Validate the model inputs ----
-validate(lik, estim_opt, model_opt, save_opt, summary_opt)
-
-# Prepare for estimation ----
-inputs <- prepare(db, lik, estim_opt, model_opt, save_opt, summary_opt)
-
-# Search for starting values ----
-# inputs$model_opt$param <- search_start_values(inputs)
-
 # Estimate the model ----
-model <- estimate(inputs)
+model <- estimate(ll, db, estim_opt, model_opt, save_opt)
 
 # Get a summary of the results ----
-summarize(model, inputs)
+summarize(model)
 
 # Collate results to a single file ----
 #collate() 
 
-# Make predictions ----
-# predictions <- predict(model)
-
 # Save the results ----
-# store(model, inputs)
+# store(model, save_opt)
