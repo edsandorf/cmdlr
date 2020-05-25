@@ -5,6 +5,8 @@
 #' the estimation and ask the user to respecify incorrect inputs. This is to 
 #' ensure that the user intends to use these exact options.
 #'
+#' The function is intended for internal use only. 
+#' 
 #' @param estim_opt_input A list of user specified estimation options
 #'
 #' @return Returns a list of options with missing input values replaced by 
@@ -44,7 +46,7 @@ validate_estim_opt <- function(estim_opt_input) {
         if (tolower(estim_opt[["method"]]) == "bhhh") estim_opt[["method"]] <- "BHHH"
         if (tolower(estim_opt[["method"]]) == "nr") estim_opt[["method"]] <- "NR"
       } else {
-        cat(red$bold(symbol$cross), "  estim_opt().\n")
+        message(red$bold(symbol$cross), "  estim_opt().\n")
         stop("The optimization method must be either 'bfgs', 'bhhh' or 'nr' when using 'maxlik'. See ?maxLik")
       }
     }
@@ -56,7 +58,7 @@ validate_estim_opt <- function(estim_opt_input) {
         if (tolower(estim_opt[["method"]]) == "slsqp") estim_opt[["method"]] <- "NLOPT_LD_SLSQP"
         if (tolower(estim_opt[["method"]]) == "sbplx") estim_opt[["method"]] <- "NLOPT_LN_SBPLX"
       } else {
-        cat(red$bold(symbol$cross), "  estim_opt().\n")
+        message(red$bold(symbol$cross), "  estim_opt().\n")
         stop("The optimization method must be either 'bfgs', 'slsqp' or 'sbplx' when using 'nloptr'. See ?nloptr")
       }
     }
@@ -67,22 +69,22 @@ validate_estim_opt <- function(estim_opt_input) {
         # Set the correct call to the optimizer
         if (tolower(estim_opt[["method"]]) == "bfgs") estim_opt[["method"]] <- "BFGS"
       } else {
-        cat(red$bold(symbol$cross), "  estim_opt().\n")
+        message(red$bold(symbol$cross), "  estim_opt().\n")
         stop("The optimization method must be 'bfgs' when using 'ucminf'. See ?ucminf")
       }
     }
   } else {
-    cat(red$bold(symbol$cross), "  estim_opt().\n")
+    message(red$bold(symbol$cross), "  estim_opt().\n")
     stop("The optimizer is either 'maxlik', 'nloptr' or 'ucminf'. See package documentation for more details.")
   }
   
   # Check that enough cores are available ----
   if (estim_opt$cores > parallel::detectCores()) {
-    cat(red$bold(symbol$cross), "  estim_opt().\n")
+    message(red$bold(symbol$cross), "  estim_opt().\n")
     stop(paste0("The number of specified cores exceed the number of cores available. You have ", parallel::detectCores(), " cores available (including hyperthreading). It is advised to use less than this in estimation.\n"))
   }
   
   # Return the validated list of estimation options
-  cat(green$bold(symbol$tick), "  estim_opt()\n")
+  message(green$bold(symbol$tick), "  estim_opt()")
   estim_opt
 }

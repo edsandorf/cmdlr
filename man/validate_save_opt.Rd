@@ -37,4 +37,6 @@ but the program will continue.
   .txt file specified in \code{path}. Only valid if \code{cores > 1}.
    Default is \code{FALSE}.}
 }
+
+The function is intended for internal use only.
 }

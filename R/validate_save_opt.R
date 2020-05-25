@@ -23,6 +23,8 @@
 #'    Default is \code{FALSE}.}
 #' }
 #' 
+#' The function is intended for internal use only.
+#'  
 #' @param save_opt_input A list of user specified save options
 #' 
 #' @return Returns a list of options with missing input values replaced by 
@@ -44,11 +46,11 @@ validate_save_opt <- function(save_opt_input) {
   
   # Check output location
   if (is.null(save_opt$path)) {
-    cat(blue$bold(symbol$info), paste0("  No output folder specified. Outputs are stored in the root of the current working directory: \"",
-                                                   file.path(getwd()), "\"\n"))
+    message(blue$bold(symbol$info), paste0("  No output folder specified. Outputs are stored in the root of the current working directory: \"",
+                                                   file.path(getwd()), "\""))
   }
 
   # Return the validated list of saving options
-  cat(green$bold(symbol$tick), "  save_opt()\n")
+  message(green$bold(symbol$tick), "  save_opt()")
   save_opt
 }

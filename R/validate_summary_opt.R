@@ -6,6 +6,8 @@
 #' warning will be posted to the terminal and a default option will be used, 
 #' but the program will continue.
 #'
+#' The function is intended for internal use only.
+#' 
 #' @param summary_opt_input A list of user specified summary options
 #'
 #' @return Returns a list of options with missing input values replaced by 
@@ -20,6 +22,6 @@ validate_summary_opt <- function(summary_opt_input) {
   summary_opt[names(summary_opt_input)] <- summary_opt_input
   
   # Return the validated list of summary options
-  cat(green$bold(symbol$tick), "  summary_opt()\n")
+  message(green$bold(symbol$tick), "  summary_opt()")
   summary_opt
 }

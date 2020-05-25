@@ -1,11 +1,27 @@
 #' Prepares the draws
 #' 
-#' A function that will create and prepare the draws for estimation
+#' In a model using simulation, we need to prepare a set of random draws to 
+#' use when simulating/approximating the distributions/integrals. The function
+#' is a convenient wrapper around the function \code{\link{make_random_draws}}.
+#' Depending on the model options, the function will transform the supplied
+#' uniform draws to either standard uniform, standard normal or standard
+#' triangular. It is up to the user to specify the correct distributions in the
+#' log-likelihood function.
 #' 
-#' @param db Data
-#' @param estim_opt List of estimation options
-#' @param model_opt List of model options
+#' If we are estimating the model using multiple cores, then the function splits
+#' the draws correctly based on the number of rows in \code{db}. Preparing the
+#' draws for parallel processing without first having prepared the data, will 
+#' cause the estimation to fail. This is because splitting the draws relies on 
+#' the dimensions of the split data to ensure that the correct draws are assigned
+#' to the correct individual.
 #' 
+#' The function is meant for internal use only.
+#' 
+#' @inheritParams estimate
+#' 
+#' @return A list of draws where each list element correspond to one dimension
+#' or if we are using multiple cores, a list of lists where the top-level list
+#' corresponds to the cores and the lower-level list corresponds to the draws. 
 
 prepare_draws <- function(db, estim_opt, model_opt) {
   # Extract the relevant information from model_opt() ----
@@ -62,6 +78,6 @@ prepare_draws <- function(db, estim_opt, model_opt) {
   }
   
   # Return the list of draws
-  cat(green$bold(symbol$tick), "  Draws\n")
+  message(green$bold(symbol$tick), "  Draws")
   draws
 }

@@ -4,11 +4,11 @@
 #' necessary steps to balance the data. If it is unable to do so, the code will
 #' return suggestions for how to set up the data. 
 #' 
-#' @return A list of conditions
+#' This function is intended for internal use only.
 #' 
-#' @param db Data
-#' @param estim_opt List of estimation options
-#' @param model_opt List of model options
+#' @inheritParams estimate
+#' 
+#' @return A list of conditions
 
 prepare_data <- function(db, estim_opt, model_opt) {
   
@@ -17,7 +17,7 @@ prepare_data <- function(db, estim_opt, model_opt) {
 
   # Check choice tasks
   if ((N * S) != nrow(db)) {
-    cat(yellow$bold(symbol$warning), "  Unequal number of choice occasions across individuals. Padding the data with NA.  \n")
+    message(yellow$bold(symbol$warning), "  Unequal number of choice occasions across individuals. Padding the data with NA.")
     db <- pad_data(db, model_opt)
   }
   
@@ -27,6 +27,6 @@ prepare_data <- function(db, estim_opt, model_opt) {
   } 
   
   # Return the manipulated and checked data
-  cat(green$bold(symbol$tick), "  Data\n")
+  message(green$bold(symbol$tick), "  Data")
   db
 }

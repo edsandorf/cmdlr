@@ -20,3 +20,6 @@ will occur and the program will stop. If the options are important, a
 warning will be posted to the terminal and a default option will be used, 
 but the program will continue.
 }
+\details{
+The function is intended for internal use only.
+}

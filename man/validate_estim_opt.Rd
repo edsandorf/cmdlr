@@ -19,3 +19,6 @@ defaults for missing options. The checks are aggressive and will stop
 the estimation and ask the user to respecify incorrect inputs. This is to 
 ensure that the user intends to use these exact options.
 }
+\details{
+The function is intended for internal use only.
+}
