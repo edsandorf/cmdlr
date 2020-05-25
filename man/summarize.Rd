@@ -4,12 +4,10 @@
 \alias{summarize}
 \title{Summarizes outputs}
 \usage{
-summarize(model, inputs)
+summarize(model)
 }
 \arguments{
-\item{model}{A model opbject returned by \code{estimate}}
-
-\item{inputs}{A list of summary options}
+\item{model}{A model object returned by \code{estimate}}
 }
 \description{
 This function is a wrapper for several small summary functions that provide

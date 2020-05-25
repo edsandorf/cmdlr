@@ -3,14 +3,11 @@
 #' This function is a wrapper for several small summary functions that provide
 #' key summary statistics to help interpret the results of your model.
 #'
-#' @param model A model opbject returned by \code{estimate}
-#' @param inputs A list of summary options
+#' @param model A model object returned by \code{estimate}
 #'
 #' @export
 
-summarize <- function(model, inputs) {
-  summary_opt <- inputs$summary_opt
-
+summarize <- function(model) {
   # Print model information ----
   cat("---- Information about the model ----\n")
   cat("Model name            ", model$name, "\n")
@@ -26,16 +23,21 @@ summarize <- function(model, inputs) {
   cat(paste0("Estimation completed  ", model$time_end, "\n"))
   cat("\n\n")
 
+  # Define some helpful variables
+  names_free <- names(model[["param_final"]])
+  names_fixed <- names(model[["param_fixed"]])
+  names_all <- names(model[["param_start"]])
+  K <- length(model[["param_start"]])
+  
   # Print the starting values ----
   cat("---- Parameter information ----\n")
-  output <- matrix(0, nrow = length(inputs$model_opt$param), ncol = 4)
-  rownames(output) <- names(inputs$model_opt$param)
+  output <- matrix(0, nrow = K, ncol = 4)
+  rownames(output) <- names_all
   colnames(output) <- c("Start", "Final", "Diff", "Grad")
-  coef_est_names <- names(model$coef)
-  output[coef_est_names, 1] <- model$coef_start
-  output[coef_est_names, 2] <- model$coef
+  output[, 1] <- model[["param_start"]]
+  output[names_free, 2] <- model[["param_final"]]
   output[, 3] <- output[, 2] - output[, 1]
-  output[coef_est_names, 4] <- model$gradient
+  output[names_free, 4] <- model[["gradient"]]
   print(round(output, digits = 4))
   cat("\n\n")
 
@@ -44,7 +46,7 @@ summarize <- function(model, inputs) {
   cat("LL           ", model[["ll"]], "\n")
   cat("LL(0)        ", model[["ll_0"]], "\n")
   cat("N            ", model[["nobs"]], "\n")
-  cat("K            ", length(model[["coef"]]), "\n")
+  cat("K            ", length(model[["param_final"]]), "\n")
   cat("Adj. Rho^2   ", model[["adj_rho_sqrd"]], "\n")
   cat("AIC          ", model[["aic"]], "\n")
   cat("AIC3         ", model[["aic3"]], "\n")
@@ -58,18 +60,16 @@ summarize <- function(model, inputs) {
   cat("\n\n")
 
   cat("---- Parameter estimates ----\n")
-  output <- matrix(NA, nrow = length(inputs$model_opt$param), ncol = 6L)
-  rownames(output) <- names(inputs$model_opt$param)
+  output <- matrix(NA, nrow = K, ncol = 6L)
+  rownames(output) <- names_all
   colnames(output) <- c("Est.", "S.E.", "T0", "P0", "T1", "P1")
-  names_est <- names(model[["coef"]])
-  names_fixed <- rownames(output) %in% inputs$model_opt$fixed
-  output[names_est, 1] <- model[["coef"]]
-  output[names_fixed] <- unlist(inputs$model_opt$param)[names_fixed]
-  output[names_est, 2] <- sqrt(diag(model[["vcov"]]))
-  output[names_est, 3] <- output[names_est, 1]/output[names_est, 2]
-  output[names_est, 4] <- 2 * stats::pt(-abs(output[names_est, 3]), df = model[["nobs"]])
-  output[names_est, 5] <- (1 - output[names_est, 1])/output[names_est, 2]
-  output[names_est, 6] <- 2 * stats::pt(-abs(output[names_est, 5]), df = model[["nobs"]])
+  output[names_free, 1] <- model[["param_final"]]
+  output[names_fixed, 1] <- model[["param_fixed"]]
+  output[names_free, 2] <- sqrt(diag(model[["vcov"]]))
+  output[names_free, 3] <- output[names_free, 1]/output[names_free, 2]
+  output[names_free, 4] <- 2 * stats::pt(-abs(output[names_free, 3]), df = model[["nobs"]])
+  output[names_free, 5] <- (1 - output[names_free, 1])/output[names_free, 2]
+  output[names_free, 6] <- 2 * stats::pt(-abs(output[names_free, 5]), df = model[["nobs"]])
   output[names_fixed,  c("S.E.", "T0", "P0", "T1", "P1")] <- NA
   print(round(output, digits = 4))
   cat("\n\n")
