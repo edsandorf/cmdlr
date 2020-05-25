@@ -32,6 +32,8 @@
 
 validate_save_opt <- function(save_opt_input) {
   save_opt <- list(
+    name = "A model without a name",
+    description = "Does not contain a description",
     path = NULL,
     save_summary = FALSE,
     save_model_object = FALSE,

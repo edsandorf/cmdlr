@@ -16,8 +16,6 @@
 validate_model_opt <- function(model_opt_input) {
   # Set the defaults ----
   model_opt <- list(
-    name = "A model without a name",
-    description = "Does not contain a description",
     id = NULL,
     ct = NULL,
     choice = NULL,
