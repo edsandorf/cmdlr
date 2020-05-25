@@ -23,15 +23,22 @@ validate_estim_opt <- function(estim_opt_input) {
     print_level = 0,
     iterlim = 500,
     cores = 1,
-    robust_vcov = TRUE
+    robust_vcov = TRUE,
+    search_start = FALSE,
+    search_start_options = list(
+      simple_search = TRUE,
+      candidates = 100,
+      multiplier = 1
+    )
   )
   
   # Replace the non-specified values with default values
   estim_opt[names(estim_opt_input)] <- estim_opt_input
+  estim_opt$search_start_options[names(estim_opt_input$search_start_options)] <- estim_opt_input$search_start_options
   
   # Check that the optimizer and method is specified correctly ----
   if (is.null(estim_opt[["optimizer"]]) || is.null(estim_opt[["method"]])) {
-    cat(red$bold(symbol$cross), "  estim_opt().\n")
+    message(red$bold(symbol$cross), "  estim_opt().")
     stop("You must specify the optimizer and optimization routine to use in estim_opt.")
   }
   
