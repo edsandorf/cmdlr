@@ -4,12 +4,14 @@
 #' The function searches for new starting values. Either in a random fashion or
 #' based on a smarter search algorithm. The smart search algorithm is a rewritten
 #' version of the search algorithm implemented in the Apollo package. The function
-#' is rewritten to work with the current modelign framework.
+#' is rewritten to work with the current modeling framework.
 #' 
-#' Suggested usage:
-#'   Direct assignment to inputs$model_opt$param
+#' The function is intended for internal use only. 
 #' 
-#' @param inputs List of inputs from 
+#' @inheritParams estimate
+#' @inheritParams prepare_log_lik
+#' @param ll_func A complete and 'wrapped' log-likelihood function created by 
+#' \code{\link{prepare_log_lik}}. 
 #' 
 #' @return A list of parameters
 #' 
@@ -17,24 +19,23 @@
 #' Hess, S. & Palma, D., 2019, Apollo: A flexible, powerful and customisable freeware package for choice model estimation and application, Journal of Choice Modelling, 32
 #' Bierlaire, M., Thémans, M. & Zufferey, N., 2010, A heuristic for nonlinear global optimization, INFORMS Journal on Computing, 22(1):
 #' 
-#' @export
-search_start_values <- function(inputs) {
+search_start_values <- function(ll_func, estim_env, estim_opt, model_opt) {
   cat(blue$bold(symbol$info), bold("  Searching for starting values\n"))
   
   # Get the search options 
-  search_options <- inputs$model_opt$search_start_options
+  search_options <- estim_opt$search_start_options
   
   # Only search for parameters that are not fixed
-  param <- unlist(inputs$model_opt$param)
-  param_est <- param[!(names(param) %in% inputs$model_opt$fixed)]
-  param_fixed <- param[inputs$model_opt$fixed]
+  param <- unlist(model_opt$param)
+  param_est <- param[!(names(param) %in% model_opt$fixed)]
+  param_fixed <- param[model_opt$fixed]
   
   # Set some useful parameters
   K <- length(param_est)
   N <- search_options$candidates
   
   # Prepare the log-likelihood function locally
-  ll_func <- inputs$ll_func
+  # ll_func <- inputs$ll_func
   
   if (search_options$simple_search) {
     # Define the progressbar
@@ -65,12 +66,12 @@ search_start_values <- function(inputs) {
     start_values <- Reduce(rbind, start_values_list)
     
     # Attache the data and draws 
-    attach(inputs$db)
-    on.exit(detach(inputs$db), add = TRUE)
-    if (inputs$model_opt$mixing) {
-      attach(inputs$draws)
-      on.exit(detach(inputs$draws), add = TRUE)
-    }
+    # attach(inputs$db)
+    # on.exit(detach(inputs$db), add = TRUE)
+    # if (inputs$model_opt$mixing) {
+    #   attach(inputs$draws)
+    #   on.exit(detach(inputs$draws), add = TRUE)
+    # }
     
     # Evaluate ll_func at each value
     ll <- lapply(start_values_list, function(param) {
