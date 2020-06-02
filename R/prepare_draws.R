@@ -19,6 +19,9 @@ prepare_draws <- function(db, estim_opt, model_opt) {
   
   # Make the draws and repeat rows equal to S - N*S x R
   draws <- make_random_draws(N, R, D, type)
+  if (D == 1) {
+    draws <- matrix(draws, ncol = 1L)
+  }
   
   # Convert the draws to normal, uniform, triangular ----
   for (i in seq_along(rpar)) {
