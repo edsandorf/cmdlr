@@ -60,9 +60,9 @@ summarize <- function(model) {
   cat("\n\n")
 
   cat("---- Parameter estimates ----\n")
-  output <- matrix(NA, nrow = K, ncol = 6L)
+  output <- matrix(NA, nrow = K, ncol = 11L)
   rownames(output) <- names_all
-  colnames(output) <- c("Est.", "S.E.", "T0", "P0", "T1", "P1")
+  colnames(output) <- c("est.", "s.e.", "t0", "p0", "t1", "p1", "rob. s.e.", "rob. t0", "rob. p0", "rob. t1", "rob. t2")
   output[names_free, 1] <- model[["param_final"]]
   output[names_fixed, 1] <- model[["param_fixed"]]
   output[names_free, 2] <- sqrt(diag(model[["vcov"]]))
@@ -70,7 +70,14 @@ summarize <- function(model) {
   output[names_free, 4] <- 2 * stats::pt(-abs(output[names_free, 3]), df = model[["nobs"]])
   output[names_free, 5] <- (1 - output[names_free, 1])/output[names_free, 2]
   output[names_free, 6] <- 2 * stats::pt(-abs(output[names_free, 5]), df = model[["nobs"]])
-  output[names_fixed,  c("S.E.", "T0", "P0", "T1", "P1")] <- NA
+  if (!is.null(model[["robust_vcov"]])) {
+    output[names_free, 7] <- sqrt(diag(model[["robust_vcov"]]))
+    output[names_free, 8] <- output[names_free, 1]/output[names_free, 7]
+    output[names_free, 9] <- 2 * stats::pt(-abs(output[names_free, 8]), df = model[["nobs"]])
+    output[names_free, 10] <- (1 - output[names_free, 1])/output[names_free, 7]
+    output[names_free, 11] <- 2 * stats::pt(-abs(output[names_free, 10]), df = model[["nobs"]])
+  }
+  output[names_fixed,  c("s.e.", "t0", "p0", "t1", "p1", "rob. s.e.", "rob. t0", "rob. p0", "rob. t1", "rob. t2")] <- NA
   print(round(output, digits = 4))
   cat("\n\n")
 }

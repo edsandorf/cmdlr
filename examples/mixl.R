@@ -15,7 +15,7 @@ save_opt <- list(
   description = "A simple MIXL model with 2 random parameters",
   save_summary = FALSE,
   save_model_object = FALSE,
-  save_worker_info = TRUE
+  save_worker_info = FALSE
 )
 
 # Define the list of estimation options ----
@@ -114,4 +114,4 @@ summarize(model)
 # Save the results ----
 # store(model, save_opt)
 
-# microbenchmark::microbenchmark(estimate(ll, db, estim_opt, model_opt, summary_opt, save_opt), times = 5)
+# microbenchmark::microbenchmark(estimate(ll, db, estim_opt, model_opt, save_opt), times = 5)

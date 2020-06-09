@@ -154,6 +154,10 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
   model[["param_start"]] <- param
   model[["param_fixed"]] <- param_fixed
   
+  # Other
+  N <- model_opt$N
+  K <- length(param_free)
+  
   # Estimate the model using the 'maxLik' package
   if (tolower(estim_opt$optimizer) == "maxlik") {
     model_obj <- maxLik::maxLik(ll_func,
@@ -315,9 +319,19 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
     vcov
   })
 
-  # Robust  
+  # Calculate the robust variance-covariance matrix
   if (estim_opt$robust_vcov && !is.null(model[["vcov"]])) {
+    model[["gradient_obs"]] <- numDeriv::jacobian(ll_func, model[["param_final"]], method = "simple")
+
+    bread <- model[["vcov"]] * N
+    bread[is.na(bread)] <- 0
     
+    meat <- (crossprod(model[["gradient_obs"]]) / N) * (N / (N - K))
+    meat[is.na(meat)] <- 0
+    
+    model[["robust_vcov"]] <- (bread %*% meat %*% bread) / N
+  } else {
+    model[["robust_vcov"]] <- NULL
   }
   
   time_diff <- Sys.time() - time_start_vcov
