@@ -15,11 +15,7 @@
 prepare_log_lik <- function(ll, estim_env, model_opt, workers) {
   # Define wrapper for ll that includes the data mask
   log_lik <- function(param) {
-    invisible(
-      lapply(seq_along(param), function(i) {
-        assign(names(param[i]), param[[i]], envir = estim_env)
-      })
-    )
+    list2env(as.list(param), envir = estim_env)
     eval(body(ll), estim_env)
   }
 

@@ -1,4 +1,5 @@
 ## cmdlR v0.0.2
+* The code no longer uses `attach()/detach()` for parameters and data. Breaks all earlier code.
 * Removed the need for `summary_opt`. This list of options duplicated information found in other options and complicated maintainance. 
 * Options for name and description are moved from `model_opt` to `save_opt` to reduce number of objects passed between functions. 
 * Starting value search options are moved from model options to estimation options, and starting value search is no longer called explicitly by the user, but from within `estimate`. 

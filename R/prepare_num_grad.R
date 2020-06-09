@@ -17,11 +17,7 @@
 prepare_num_grad <- function(ll, estim_env, workers) {
   # Define the eval() wrapper for the numerical gradient
   inner_num_grad <- function(param) {
-    invisible(
-      lapply(seq_along(param), function(i) {
-        assign(names(param[i]), param[[i]], envir = estim_env)
-      })
-    )
+    list2env(as.list(param), envir = estim_env)
     sum(eval(body(ll), estim_env))
   }
   
@@ -29,7 +25,7 @@ prepare_num_grad <- function(ll, estim_env, workers) {
   environment(inner_num_grad) <- environment(prepare_num_grad)
   
   # Define the numerical gradient
-  num_grad <- function(param, converged) {
+  num_grad <- function(param) {
     if (is.null(workers)) {
       numDeriv::grad(inner_num_grad, param, method = "Richardson")
     } else {
