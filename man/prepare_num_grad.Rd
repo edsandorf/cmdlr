@@ -4,20 +4,30 @@
 \alias{prepare_num_grad}
 \title{Prepares the numerical gradient}
 \usage{
-prepare_num_grad(lik, inputs, workers)
+prepare_num_grad(ll, estim_env, workers)
 }
 \arguments{
-\item{lik}{Likelihood function}
+\item{ll}{A log likelihood function. If \code{estim_opt$optimizer = 'ucminf'},
+then the log likelihood function should return the negative log likelihood
+value.}
 
-\item{inputs}{List of inputs}
+\item{estim_env}{A list of data and other variables to be coerced to environment with eval}
 
-\item{workers}{A PSOCK cluster of workers}
+\item{workers}{A PSOCK or Fork cluster of workers created using 
+\code{parallel::makeCluster()}}
 }
 \value{
-A numerical gradient wrapper function
+A high precision numerical gradient function
 }
 \description{
-'nloptr' and 'trustOptim' requires a gradient. This function is a wrapper
-for numDeriv::grad() and prepares a high-precision numerical gradient to
-use with 'nloptr' and 'trustOptim'.
+The optimization routines 'ucminf', 'nloptr' and 'trustOptim' requires the
+user to supply a gradient. Writing an analytical gradient can be quite
+cumbersome for very complex likelihood expressions. This function is a simple
+wrapper around \code{numDeriv::grad()} and prepares a high-precision numerical
+gradient that can be supplied directly to the optimizers that require one. 
+Note that a numerical gradient is slower in calculation and less precise than 
+an analytical gradient.
+}
+\details{
+The function is meant for internal use only.
 }

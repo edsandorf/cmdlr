@@ -11,38 +11,34 @@ db <- cmdlR::data_petr_test
 
 # Define the list of saving options ----
 save_opt <- list(
-  path = file.path("outputs"),
+  name = "MIXL model",
+  description = "A simple MIXL model with 2 random parameters",
   save_summary = FALSE,
-  save_model_object = FALSE
-)
-
-# Define the list of summary options ----
-summary_opt <- list(
-  robust_se = FALSE 
+  save_model_object = FALSE,
+  save_worker_info = TRUE
 )
 
 # Define the list of estimation options ----
 estim_opt <- list(
   optimizer = "ucminf",
   method = "BFGS",
-  cores = 10,
+  cores = 4,
   robust_vcov = TRUE,
   print_level = 2
 )
 
 # Define the list of model options ----
 model_opt <- list(
-  name = "MIXL model",
-  description = "A simple MIXL model with 2 random parameters",
   id = "id",
   ct = "ct",
   choice = "choice",
   N = length(unique(db[["id"]])),
   S = length(unique(db[["ct"]])),
   J = 3L,
+  nobs = nrow(db),
   mixing = TRUE,
   draws_type = "scrambled_sobol",
-  R = 5000, 
+  R = 1000, 
   fixed = c(),
   param = list(
     b_alt1 = 0,
@@ -59,19 +55,7 @@ model_opt <- list(
 )
 
 # Likelihood function - returns the probability of the sequence of choices ----
-lik <- function(param, inputs) {
-  # Attach the parameters and data  ----
-  if (inputs$estim_opt$optimizer %in% c("nloptr")) {
-    names(param) <- names(inputs$model_opt$param)
-  }
-  
-  attach_objects(list(param))
-  on.exit(detach_objects(list(param)), add = TRUE)
-  
-  # Calculate the indices ----
-  N <- length(unique(get(inputs$model_opt$id)))
-  S <- length(unique(get(inputs$model_opt$ct)))
-  choice_var <- get(inputs$model_opt$choice)
+ll <- function(param) {
   
   # Define the random parameters - N*S x R matrices stacked ----
   b_attr1 <- mu_attr1 + sig_attr1 * d_attr1
@@ -118,23 +102,16 @@ lik <- function(param, inputs) {
   -ll
 }
 
-# Validate the model inputs ----
-validate(lik, estim_opt, model_opt, save_opt, summary_opt)
-
-# Prepare for estimation ----
-inputs <- prepare(db, lik, estim_opt, model_opt, save_opt, summary_opt)
-
 # Estimate the model ----
-model <- estimate(inputs)
+model <- estimate(ll, db, estim_opt, model_opt, save_opt)
 
 # Get a summary of the results ----
-summarize(model, inputs)
+summarize(model)
 
 # Collate results to a single file ----
 #collate() 
 
-# Make predictions ----
-# predictions <- predict(model)
-
 # Save the results ----
-# store(model, inputs)
+# store(model, save_opt)
+
+# microbenchmark::microbenchmark(estimate(ll, db, estim_opt, model_opt, summary_opt, save_opt), times = 5)

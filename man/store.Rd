@@ -4,14 +4,35 @@
 \alias{store}
 \title{Stores the results of the model to files}
 \usage{
-store(model, inputs)
+store(model, save_opt)
 }
 \arguments{
 \item{model}{A model opbject returned by \code{estimate}}
 
-\item{inputs}{A list of model inputs}
+\item{save_opt}{List of options for storing the outputs including which
+model outputs to store, how to store them and where to store them.}
 }
 \description{
-This function stores various model outputs to easily accessible .csv files
-and .rds objects.
+This function takes the model object and the list \code{save_opt} and stores
+the specified outputs to files. The model object is stored to an .rds file, 
+model summary created using \code{\link{summarize}} is stored to a .txt file
+using \code{sink()}, and hessian and variance-covariance matrices are stored
+as .csv files. Appropriate checks should be in place to avoid over-writing
+existing files and to close open sink connections. However, it is on the user
+to be careful with file names to avoid any chance of loosing data.
+}
+\examples{
+\dontrun{
+    save_opt <- list(
+    name = "MNL model",
+    description = "A simple MNL model using the Apollo dataset 'mode choice'.",
+    path = file.path("outputs"),
+    save_summary = FALSE,
+    save_model_object = FALSE
+  )
+  
+  model <- estimate(ll, db, estim_opt, model_opt, summary_opt, save_opt)
+  
+  store(model, save_opt)
+}
 }

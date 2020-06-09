@@ -2,23 +2,36 @@
 % Please edit documentation in R/prepare_workers.R
 \name{prepare_workers}
 \alias{prepare_workers}
-\title{Function to prepare the workers for parallel estimation}
+\title{Function preparing the workers}
 \usage{
-prepare_workers(db, draws, inputs, workers)
+prepare_workers(db, draws, workers, model_opt, save_opt)
 }
 \arguments{
-\item{db}{Data}
+\item{db}{A \code{data.frame()} or \code{tibble()} with the data to be used in
+estimation.}
 
-\item{draws}{A list of random draws used in simulation}
+\item{draws}{A list of draws where each list element correspond to one dimension
+or if we are using multiple cores, a list of lists where the top-level list
+corresponds to the cores and the lower-level list corresponds to the draws.}
 
-\item{inputs}{A list containing options and data to be passed to the worker}
+\item{workers}{A PSOCK or Fork cluster of workers created using 
+\code{parallel::makeCluster()}}
 
-\item{workers}{A cluster of workers}
+\item{model_opt}{A list of model options including random parameters, draws,
+fixed and non-fixed parameters during estimation, starting value search 
+procedures etc.}
+
+\item{save_opt}{List of options for storing the outputs including which
+model outputs to store, how to store them and where to store them.}
 }
 \value{
-A cluster of workers
+The function does not return any objects.
 }
 \description{
-The function will set up the workers, split the data and export necessary
-objects and functions to the workers.
+When we estimate the model using multiple cores, we need to set up the workers
+such that the correctly split data, draws, packages and settings are available
+to the log-likelihood function.
+}
+\details{
+The function is meant for internal use only.
 }

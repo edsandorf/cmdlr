@@ -1,19 +1,23 @@
-#' Function to prepare the workers for parallel estimation
+#' Function preparing the workers
 #' 
-#' The function will set up the workers, split the data and export necessary
-#' objects and functions to the workers.
+#' When we estimate the model using multiple cores, we need to set up the workers
+#' such that the correctly split data, draws, packages and settings are available
+#' to the log-likelihood function. 
 #' 
-#' @param db Data
-#' @param draws A list of random draws used in simulation
-#' @param inputs A list containing options and data to be passed to the worker
-#' @param workers A cluster of workers
+#' The function is meant for internal use only. 
 #' 
-#' @return A cluster of workers
+#' @inheritParams estimate
+#' @param draws A list of draws where each list element correspond to one dimension
+#' or if we are using multiple cores, a list of lists where the top-level list
+#' corresponds to the cores and the lower-level list corresponds to the draws.
+#' @param workers A PSOCK or Fork cluster of workers created using 
+#' \code{parallel::makeCluster()} 
+#' 
+#' @return The function does not return any objects. 
 
-prepare_workers <- function(db, draws, inputs, workers) {
-  
+prepare_workers <- function(db, draws, workers, model_opt, save_opt) {
   # Export packages to the worker
-  pkgs <- c("maxLik", "numDeriv")
+  pkgs <- c("maxLik", "numDeriv", "rlang")
   parallel::clusterCall(workers, function(pkgs) {
     lapply(pkgs, require, character.only = TRUE)
     NULL
@@ -21,7 +25,8 @@ prepare_workers <- function(db, draws, inputs, workers) {
   
   # Export functions and indices to the workers
   parallel::clusterExport(workers,
-                          c("lik", "attach_objects", "detach_objects", "inputs"),
+                          c("ll", "detach_objects",
+                            "prepare_estim_env", "model_opt"),
                           envir = environment())
   
   # Export data to the workers 
@@ -30,30 +35,39 @@ prepare_workers <- function(db, draws, inputs, workers) {
     NULL
   })
   
-  # Attach data globally on worker
-  parallel::clusterEvalQ(workers, attach(db))
-  
   # Export the draws to the workers
-  if (isTRUE(inputs$model_opt$mixing)) {
+  if (model_opt$mixing) {
     parallel::parLapply(workers, draws, function(x) {
       assign("draws", x, envir = globalenv())
       NULL
     })
-    parallel::clusterEvalQ(workers, attach(draws))
   }
   
+  # Prepare the estimation environment
+  parallel::parLapply(workers, seq_along(workers), function(x) {
+    db <- get("db", envir = .GlobalEnv)
+    model_opt <- get("model_opt", envir = .GlobalEnv)
+    if (model_opt$mixing) {
+      draws <- get("draws", envir = .GlobalEnv)
+    } else {
+      draws <- NULL
+    }
+      
+    assign("estim_env", prepare_estim_env(db, draws, model_opt), envir = .GlobalEnv)
+  })
+  
   # Save information about what is loaded on the workers
-  if (inputs$save_opt$save_worker_info) {
+  if (save_opt$save_worker_info) {
     worker_info <- get_worker_info(workers)
-    file_path <- file.path(getwd(), inputs$save_opt$path, paste0(make_model_name(inputs$model_opt$name), "-worker-info.txt"))
+    if (is.null(save_opt$path)) save_opt$path <- ""
+    file_path <- file.path(getwd(), save_opt$path, paste0(make_model_name(save_opt$name), "-worker-info.txt"))
     sink(file_path)
     summary_worker_info(worker_info)
     sink()
-    cat(blue$bold(symbol$info), paste0("  Worker information saved to \"",
-                                                   file_path, "\"\n"))
+    message(blue$bold(symbol$info), paste0("  Worker information saved to \"",
+                                                   file_path, "\""))
   }
   
   # Return the workers
-  cat(green$bold(symbol$tick), "  Workers\n")
-  workers
+  message(green$bold(symbol$tick), "  Workers")
 }

@@ -1,4 +1,7 @@
 ## cmdlR v0.0.2
+* Removed the need for `summary_opt`. This list of options duplicated information found in other options and complicated maintainance. 
+* Options for name and description are moved from `model_opt` to `save_opt` to reduce number of objects passed between functions. 
+* Starting value search options are moved from model options to estimation options, and starting value search is no longer called explicitly by the user, but from within `estimate`. 
 * The user must now specify the log of the likelihood value and whether to return a positive or negative value (depends on the optimizer). It is now possible to pass data from inside the log-likelihood function along as `attributes()` of the ll value. This change should make it easier to extend functionality in the future. Breaks code prior to development version v.0.0.1.9007
 * `attach()` data and draws is no longer necessary inside of the log-likelihood function.
 * Took dependence on 'rlang' to make work with environments and expression evaluation easier.

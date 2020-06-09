@@ -7,11 +7,15 @@
 prepare_data(db, estim_opt, model_opt)
 }
 \arguments{
-\item{db}{Data}
+\item{db}{A \code{data.frame()} or \code{tibble()} with the data to be used in
+estimation.}
 
-\item{estim_opt}{List of estimation options}
+\item{estim_opt}{A list of options for the estimation procedure such as 
+type of optimizer, approximation routines, tolerance levels etc.}
 
-\item{model_opt}{List of model options}
+\item{model_opt}{A list of model options including random parameters, draws,
+fixed and non-fixed parameters during estimation, starting value search 
+procedures etc.}
 }
 \value{
 A list of conditions
@@ -20,4 +24,7 @@ A list of conditions
 The function will check the data to see if it is balanced. It will take the
 necessary steps to balance the data. If it is unable to do so, the code will
 return suggestions for how to set up the data.
+}
+\details{
+This function is intended for internal use only.
 }

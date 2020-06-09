@@ -1,72 +1,159 @@
-#' Estimates the model 
+#' Function to estimate a choice model using cmdlR
 #' 
-#' The function is a wrapper for several cmdlR functions that sets up parallel
-#' processes and estimates the data. 
+#' This is the main function used to estimate choice models. The function runs
+#' a set of validation tests to check that all options are correctly specified. 
+#' A correctly specified option only means that the model will run, it does not 
+#' mean that the model specification is correct or that the combination of 
+#' options are correct from a statistical point of view. 
+#' 
+#' If all checks are passed, the function will set up the estimation environment
+#' and define correct and useful wrapper functions. This includes creating and
+#' preparing workers in the context of parallel estimation.
+#' 
+#' Once the estimation environment is set up, the model will be estimated using
+#' the options specified in \code{estim_opt()}. 
 #'
-#' @param inputs List of inputs to the estimation. The result of running
-#' \code{prepare}. 
+#' @param ll A log likelihood function. If \code{estim_opt$optimizer = 'ucminf'},
+#' then the log likelihood function should return the negative log likelihood
+#' value.
+#' 
+#' @param db A \code{data.frame()} or \code{tibble()} with the data to be used in
+#' estimation. 
+#' 
+#' @param estim_opt A list of options for the estimation procedure such as 
+#' type of optimizer, approximation routines, tolerance levels etc. 
+#' 
+#' @param model_opt A list of model options including random parameters, draws,
+#' fixed and non-fixed parameters during estimation, starting value search 
+#' procedures etc. 
+#' 
+#' @param save_opt List of options for storing the outputs including which
+#' model outputs to store, how to store them and where to store them.
+#' 
+#' @param debug A boolean indicating whether the code is run in debug mode. If
+#' TRUE, the code will not estimate the models, but set the number of cores to 1
+#' and return the estimation environment. Defaults to FALSE.
+#' 
+#' @return Returns a cmdlR model object. This is a list containing the following 
+#' elements: 
+#' 
+#' @examples
+#' \dontrun{
+#'   # See /examples for how to use
+#'   estimate(ll, db, estim_opt, model_opt, save_opt, debug = FALSE)
+#' }
 #' 
 #' @export
 
-estimate <- function(inputs) {
+estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
+  # INITIAL PREPARATIONS ----
   time_start <- Sys.time()
-  cat(blue$bold(symbol$info), bold(paste0("  Estimation started: ", time_start, "\n")))
+  message(blue$bold(symbol$info), bold(paste0("   Model estimation started: ", time_start, "\n")))
   
-  # Extract inputs ----
-  estim_opt <- inputs[["estim_opt"]]
-  model_opt <- inputs[["model_opt"]]
-  save_opt <- inputs[["save_opt"]]
-  summary_opt <- inputs[["summary_opt"]]
-  db <- inputs[["db"]]
-  indices <- inputs[["indices"]]
-  workers <- inputs[["workers"]]
-  ll_func <- inputs[["ll_func"]]
-  num_grad <- inputs[["num_grad"]]
-  draws <- inputs[["draws"]]
+  # VALIDATE OPTIONS ----
+  message(blue$bold(symbol$info), bold("   Validating options"))
+  time_start_validate <- Sys.time()
   
-  # Set up serial/parallel estimation handlers ----
-  # Close the workers if the estimation fails
-  if (estim_opt$cores > 1) {
-    on.exit(parallel::stopCluster(workers), add = TRUE)
+  # Estimation options
+  estim_opt <- validate_estim_opt(estim_opt)
+  
+  # Model options
+  model_opt <- validate_model_opt(model_opt)
+  
+  # Save options
+  save_opt <- validate_save_opt(save_opt)
+  
+  # Print section time use
+  time_diff <- Sys.time() - time_start_validate
+  message(blue$bold(symbol$info), paste0("   Validating options took ",
+                                         round(time_diff, 2), " ",
+                                         attr(time_diff, "units"), "\n"))
+  
+  # PREPARE FOR ESTIMATION ----
+  message(blue$bold(symbol$info), bold("   Preparing for estimation"))
+  time_start_prepare <- Sys.time()
+  
+  # Data
+  db <- prepare_data(db, estim_opt, model_opt)
+  
+  # Draws
+  if (model_opt$mixing) {
+    draws <- prepare_draws(db, estim_opt, model_opt)
   } else {
-    attach(db)
-    on.exit(detach(db), add = TRUE)
-    if (model_opt$mixing) {
-      attach(draws)
-      on.exit(detach(draws), add = TRUE)
-    }
+    draws <- NULL
   }
 
-  # Create the model object ----
+  # Workers
+  if (estim_opt$cores > 1) {
+    # Create the cluster of workers and add stopCluster to on.exit()
+    workers <- parallel::makeCluster(estim_opt$cores, type = "PSOCK")
+    on.exit(parallel::stopCluster(workers), add = TRUE)
+    
+    # Prepare the workers
+    prepare_workers(db, draws, workers, model_opt, save_opt)
+    
+  } else {
+    # Prepare the estimation environment
+    estim_env <- prepare_estim_env(db, draws, model_opt)
+    workers <- NULL
+  }
+  
+  # Prepare the log-likelihood function
+  ll_func <- prepare_log_lik(ll, estim_env, model_opt, workers)
+  
+  # Prepare the numerical gradient
+  num_grad <- prepare_num_grad(ll, estim_env, workers)
+  
+  # Print section time use
+  time_diff <- Sys.time() - time_start_prepare
+  message(blue$bold(symbol$info), paste0("   Preparing for estimation took ",
+                                         round(time_diff, 2), " ",
+                                         attr(time_diff, "units"), "\n"))
+  
+  # SEARCH FOR START VALUES ----
+  if (estim_opt$search_start) {
+    time_start_search <- Sys.time()
+    
+    model_opt$param <- search_start_values(ll_func, estim_env, estim_opt, model_opt)
+    
+    time_diff <- Sys.time() - time_start_search
+    message(blue$bold(symbol$info), paste0("   Search for starting values took ",
+                                           round(time_diff, 2), " ",
+                                           attr(time_diff, "units"), "\n"))
+    
+  }
+  
+  # ESTIMATE THE MODEL ----
+  message(blue$bold(symbol$info), bold("   Estimating the model"))
+  time_start_estimate <- Sys.time()
+  converged <- FALSE
+  
+  # Create the model object
   model <- list()
-  model[["name"]] <- model_opt$name
-  model[["description"]] <- model_opt$description
+  model[["name"]] <- save_opt$name
+  model[["description"]] <- save_opt$description
   model[["method"]] <- tolower(estim_opt$method)
   model[["optimizer"]] <- tolower(estim_opt$optimizer)
   model[["cores"]] <- estim_opt$cores
   model[["R"]] <- model_opt$R
   model[["draws_type"]] <- model_opt$draws_type
   model[["time_start"]] <- time_start
+  model[["nobs"]] <- model_opt$nobs
   
-  N <- model_opt$N
-  S <- model_opt$S
-  J <- model_opt$J
-  
-  model[["nobs"]] <- N * S
-  
-  # Estimate the model using the specified optimizer ----
-  converged <- FALSE
+  # Prepare the starting parameters by separating the free and fixed parameters
+  # into two vectors - see the 'apollo' package for details. 
   param <- unlist(model_opt$param)
-  model[["coef_start"]] <- param[!(names(param) %in% model_opt$fixed)]
-  
-  # If we have fixed parameters, we drop the fixed parameters from the vector of parameters - this implementation is heavily inspired by the 'apollo' package
-  param_est <- param[!(names(param) %in% model_opt$fixed)]
+  param_free <- param[!(names(param) %in% model_opt$fixed)]
   param_fixed <- param[model_opt$fixed]
-    
-  # maxLik package ----
+  
+  # Add the starting parameters and fixed parameters to the model object
+  model[["param_start"]] <- param
+  model[["param_fixed"]] <- param_fixed
+  
+  # Estimate the model using the 'maxLik' package
   if (tolower(estim_opt$optimizer) == "maxlik") {
     model_obj <- maxLik::maxLik(ll_func,
-                                start = param_est,
+                                start = param_free,
                                 method = estim_opt$method,
                                 finalHessian = FALSE,
                                 tol = estim_opt$tol, gradtol = estim_opt$gradtol,
@@ -76,7 +163,7 @@ estimate <- function(inputs) {
                                 iterlim = estim_opt$iterlim)
     
     model[["ll"]] <- model_obj$maximum
-    model[["coef"]] <- model_obj$estimate
+    model[["param_final"]] <- model_obj$estimate
     model[["iterations"]] <- model_obj$iterations
     model[["gradient"]] <- model_obj$gradient
     model[["gradient_obs"]] <- model_obj$gradientObs
@@ -87,29 +174,29 @@ estimate <- function(inputs) {
     if (tolower(estim_opt$method) == "nr" && model_obj$code %in% c(0, 1, 2)) converged <- TRUE 
   }
   
-  # ucminf package ----
+  # Estimate the model using the 'ucminf' package
   if (tolower(estim_opt$optimizer) == "ucminf") {
     # Add the sum to the ll
     ll_func_sum <- function(param) {
       sum(ll_func(param))
     }
     
-    model_obj <- ucminf::ucminf(par = param_est,
+    model_obj <- ucminf::ucminf(par = param_free,
                                 fn = ll_func_sum,
                                 hessian = 0)
     
     # Added a minus to make the fit calculations correct
     model[["ll"]] <- -model_obj$value
-    model[["coef"]] <- model_obj$par
+    model[["param_final"]] <- model_obj$par
     model[["message"]] <- model_obj$message
-    model[["gradient"]] <- numDeriv::grad(ll_func_sum, model$coef)
+    model[["gradient"]] <- numDeriv::grad(ll_func_sum, model[["param_final"]])
     
     if (model_obj$convergence %in% c(1, 2, 3, 4)) converged <- TRUE
   }
   
-  # NLOPTR package ----
+  # Estimate the model using the 'NLOPTR' package
   if (tolower(estim_opt$optimizer) == "nloptr") {
-    model_obj <- nloptr::nloptr(param_est, ll_func, num_grad, converged = FALSE,
+    model_obj <- nloptr::nloptr(param_free, ll_func, num_grad, converged = FALSE,
                                 opts = list(
                                   algorithm = estim_opt$method,
                                   print_level = estim_opt$print_level
@@ -117,7 +204,7 @@ estimate <- function(inputs) {
     
     # Added a minus to make the fit calculations correct
     model[["ll"]] <- -model_obj$objective
-    model[["coef"]] <- model_obj$solution
+    model[["param_final"]] <- model_obj$solution
     model[["iterations"]] <- model_obj$iterations
     
     if (model_obj$status %in% c(0)) converged <- TRUE
@@ -131,11 +218,19 @@ estimate <- function(inputs) {
   model[["converged"]] <- converged
   
   # Add the log-likelihood values and attributes to the model object ----
-  model[["ll_values"]] <- ll_func(model$coef)
+  model[["ll_values"]] <- ll_func(model[["param_final"]])
   
-  # Calculate the hessian matrix ----
+  # Print section time use
+  time_diff <- Sys.time() - time_start_estimate
+  message(blue$bold(symbol$info), paste0("   Model estimation took ",
+                                         round(time_diff, 2), " ",
+                                         attr(time_diff, "units"), "\n"))
+  
+  # CALCULATE THE HESSIAN MATRIX ----
+  time_start_hessian <- Sys.time()
+  
   # Define the progress bar
-  K <- length(model$coef)
+  K <- length(model[["param_final"]])
   pb <- progress::progress_bar$new(
     format = "[:bar] :percent :elapsed",
     total = 2 + 8 * (K * (K + 1) / 2),
@@ -151,10 +246,10 @@ estimate <- function(inputs) {
   
   # Try and catch if the Hessian cannot be calculated 
   model[["hessian"]] <- tryCatch({
-    cat(blue$bold(symbol$info), "  Calculating the Hessian matrix. This may take a while. \n")
-    hessian <- numDeriv::hessian(func = ll_func_pb, x = model$coef)
-    colnames(hessian) <- names(model$coef)
-    rownames(hessian) <- names(model$coef)
+    message(blue$bold(symbol$info), bold("   Calculating the Hessian matrix"))
+    hessian <- numDeriv::hessian(func = ll_func_pb, x = model[["param_final"]])
+    colnames(hessian) <- names(model[["param_final"]])
+    rownames(hessian) <- names(model[["param_final"]])
     hessian
   }, error = function(e) {
     NA
@@ -163,8 +258,8 @@ estimate <- function(inputs) {
   # If the Hessian calculation failed, try calculating it using the maxLik package
   if (is.na(model[["hessian"]]) || anyNA(model[["hessian"]])) {
     # Print messages to console
-    cat(red$bold(symbol$cross), "  Hessian calculation using the \'numDeriv\' package.\n")
-    cat(blue$bold(symbol$info), "  Trying to calculate Hessian using the \'maxLik\' package.\n")
+    message(red$bold(symbol$cross), "  Hessian calculation using the \'numDeriv\' package.\n")
+    message(blue$bold(symbol$info), "   Trying to calculate Hessian using the \'maxLik\' package.\n")
     
     # Reset the progress bar
     pb <- progress::progress_bar$new(
@@ -177,12 +272,12 @@ estimate <- function(inputs) {
     # Try calculating the hessian using the maxLik package
     model[["hessian"]] <- tryCatch({
       hessian <- maxLik::maxLik(ll_func_pb,
-                     start = model[["coef"]],
+                     start = model[["param_final"]],
                      print.level = 0,
                      finalHessian = TRUE, method = estim_opt$method,
                      iterlim = 2)$hessian
-      colnames(hessian) <- names(model$coef)
-      rownames(hessian) <- names(model$coef)
+      colnames(hessian) <- names(model[["param_final"]])
+      rownames(hessian) <- names(model[["param_final"]])
       hessian
     }, error = function(e) {
       NA
@@ -191,31 +286,51 @@ estimate <- function(inputs) {
   
   # If the Hessian still cannot be calculated end and return the model object
   if (is.na(model[["hessian"]]) || anyNA(model[["hessian"]])) {
-    cat(red$bold(symbol$cross), "  Hessian calculation failed or contains NA. Returning only some model information.\n")
+    message(red$bold(symbol$cross), "  Hessian calculation failed or contains NA. Returning only some model information.\n")
     time_end <- Sys.time()
     model[["time_end"]]
     return(model)
   }
   
-  cat(green$bold(symbol$tick), "  Hessian calculated successfully.\n")
+  message(green$bold(symbol$tick), "  Hessian calculated successfully.")
   
-  # Calculate the variance-covariance matrix ----
+  # Print section time use
+  time_diff <- Sys.time() - time_start_hessian
+  message(blue$bold(symbol$info), paste0("   Hessian calculation took ",
+                                         round(time_diff, 2), " ",
+                                         attr(time_diff, "units"), "\n"))
+  
+  # CALCULATE THE VCOV MATRIX ----
+  message(blue$bold(symbol$info), bold("   Calculating the variance-covariance matrices"))
+  time_start_vcov <- Sys.time()
+  
+  # Standard
   model[["vcov"]] <- tryCatch({
-    if (inputs$estim_opt$optimizer == "ucminf") {
+    if (estim_opt$optimizer == "ucminf") {
       vcov <- MASS::ginv(model[["hessian"]])
     } else {
       vcov <- MASS::ginv(-model[["hessian"]])
     }
-    colnames(vcov) <- names(model$coef)
-    rownames(vcov) <- names(model$coef)
+    colnames(vcov) <- names(model[["param_final"]])
+    rownames(vcov) <- names(model[["param_final"]])
     vcov
   })
+
+  # Robust  
+  if (estim_opt$robust_vcov && !is.null(model[["vcov"]])) {
+    
+  }
   
-  # Calculate the and model diagnostics ----
-  model[["convergence_criteria"]] <- t(model$gradient) %*% model$vcov %*% model$gradient
+  time_diff <- Sys.time() - time_start_vcov
+  message(blue$bold(symbol$info), paste0("   Variance-covariance calculations took ",
+                                         round(time_diff, 2), " ",
+                                         attr(time_diff, "units"), "\n"))
+  
+  # CALCULATE CONVERGENCE CRITERIA AND MODEL DIAGNOSTICS ----
+  model[["convergence_criteria"]] <- t(model[["gradient"]]) %*% model[["vcov"]] %*% model[["gradient"]]
   
   ll_0 <- tryCatch({
-    ll_0_tmp <- sum(ll_func(model$coef * 0))
+    ll_0_tmp <- sum(ll_func(model[["param_final"]] * 0))
     if (tolower(estim_opt$optimizer) %in% c("nloptr", "ucminf")) {
       -ll_0_tmp
     } else {
@@ -240,16 +355,10 @@ estimate <- function(inputs) {
   model[["dbic"]] <- ((-2L * ll) + (K * (log(nobs) - log(2L * pi))))
   model[["hqic"]] <- ((-2L * ll) + (2L * (K * (log(log(nobs))))))
   
-  # Check if we are estimating a robust variance-covariance matrix
-  if (estim_opt$robust_vcov && !is.null(model[["vcov"]])) {
-    
-  }
-  
-  # Capture time end and print completion message ----
+  # WRAP UP AND RETURN MODEL OBJECT ----
   time_end <- Sys.time()
-  cat(green$bold(symbol$tick), paste0("  Estimation completed on ", time_end, "\n"))
+  message(green$bold(symbol$tick), bold(paste0("   Estimation completed on ", time_end, "\n")))
   model[["time_end"]] <- time_end
   
-  # Return the model object ----
   model
 }

@@ -4,10 +4,20 @@
 \alias{search_start_values}
 \title{Function to search for starting values}
 \usage{
-search_start_values(inputs)
+search_start_values(ll_func, estim_env, estim_opt, model_opt)
 }
 \arguments{
-\item{inputs}{List of inputs from}
+\item{ll_func}{A complete and 'wrapped' log-likelihood function created by 
+\code{\link{prepare_log_lik}}.}
+
+\item{estim_env}{A list of data and other variables to be coerced to environment with eval}
+
+\item{estim_opt}{A list of options for the estimation procedure such as 
+type of optimizer, approximation routines, tolerance levels etc.}
+
+\item{model_opt}{A list of model options including random parameters, draws,
+fixed and non-fixed parameters during estimation, starting value search 
+procedures etc.}
 }
 \value{
 A list of parameters
@@ -16,10 +26,9 @@ A list of parameters
 The function searches for new starting values. Either in a random fashion or
 based on a smarter search algorithm. The smart search algorithm is a rewritten
 version of the search algorithm implemented in the Apollo package. The function
-is rewritten to work with the current modelign framework.
+is rewritten to work with the current modeling framework.
 
-Suggested usage:
-  Direct assignment to inputs$model_opt$param
+The function is intended for internal use only.
 }
 \references{
 Hess, S. & Palma, D., 2019, Apollo: A flexible, powerful and customisable freeware package for choice model estimation and application, Journal of Choice Modelling, 32

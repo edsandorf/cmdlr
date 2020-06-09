@@ -4,20 +4,30 @@
 \alias{prepare_log_lik}
 \title{Prepares the log likelihood function}
 \usage{
-prepare_log_lik(lik, inputs, workers)
+prepare_log_lik(ll, estim_env, model_opt, workers)
 }
 \arguments{
-\item{lik}{Likelihood function}
+\item{ll}{A log likelihood function. If \code{estim_opt$optimizer = 'ucminf'},
+then the log likelihood function should return the negative log likelihood
+value.}
 
-\item{inputs}{List of inputs}
+\item{estim_env}{A list of data and other variables to be coerced to environment with eval}
 
-\item{workers}{A PSOCK cluster of workers}
+\item{model_opt}{A list of model options including random parameters, draws,
+fixed and non-fixed parameters during estimation, starting value search 
+procedures etc.}
+
+\item{workers}{A PSOCK or Fork cluster of workers created using 
+\code{parallel::makeCluster()}}
 }
 \value{
-A log likelihood wrapper functions
+The estimation ready log likelihood function
 }
 \description{
-This function puts the finishing touches on the user supplied log likelihood
-function and ensures that it can be run on a single core or multiple cores
-using both the 'maxlik' and 'nloptr' packages.
+The function takes the user supplied log-likelihood function and creates
+convenient wrappers that ensure the function can be evaluated both using a
+single core and multiple cores.
+}
+\details{
+The function is meant for internal use only.
 }

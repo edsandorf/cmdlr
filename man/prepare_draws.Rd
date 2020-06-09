@@ -7,12 +7,37 @@
 prepare_draws(db, estim_opt, model_opt)
 }
 \arguments{
-\item{db}{Data}
+\item{db}{A \code{data.frame()} or \code{tibble()} with the data to be used in
+estimation.}
 
-\item{estim_opt}{List of estimation options}
+\item{estim_opt}{A list of options for the estimation procedure such as 
+type of optimizer, approximation routines, tolerance levels etc.}
 
-\item{model_opt}{List of model options}
+\item{model_opt}{A list of model options including random parameters, draws,
+fixed and non-fixed parameters during estimation, starting value search 
+procedures etc.}
+}
+\value{
+A list of draws where each list element correspond to one dimension
+or if we are using multiple cores, a list of lists where the top-level list
+corresponds to the cores and the lower-level list corresponds to the draws.
 }
 \description{
-A function that will create and prepare the draws for estimation
+In a model using simulation, we need to prepare a set of random draws to 
+use when simulating/approximating the distributions/integrals. The function
+is a convenient wrapper around the function \code{\link{make_random_draws}}.
+Depending on the model options, the function will transform the supplied
+uniform draws to either standard uniform, standard normal or standard
+triangular. It is up to the user to specify the correct distributions in the
+log-likelihood function.
+}
+\details{
+If we are estimating the model using multiple cores, then the function splits
+the draws correctly based on the number of rows in \code{db}. Preparing the
+draws for parallel processing without first having prepared the data, will 
+cause the estimation to fail. This is because splitting the draws relies on 
+the dimensions of the split data to ensure that the correct draws are assigned
+to the correct individual.
+
+The function is meant for internal use only.
 }
