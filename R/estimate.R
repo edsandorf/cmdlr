@@ -101,6 +101,10 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
   # Prepare the log-likelihood function
   ll_func <- prepare_log_lik(ll, estim_env, model_opt, workers)
   
+  ll_func_sum <- function(param) {
+    sum(ll_func(param))
+  }
+  
   # Prepare the numerical gradient
   num_grad <- prepare_num_grad(ll, estim_env, workers)
   
@@ -176,11 +180,6 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
   
   # Estimate the model using the 'ucminf' package
   if (tolower(estim_opt$optimizer) == "ucminf") {
-    # Add the sum to the ll
-    ll_func_sum <- function(param) {
-      sum(ll_func(param))
-    }
-    
     model_obj <- ucminf::ucminf(par = param_free,
                                 fn = ll_func_sum,
                                 hessian = 0)
