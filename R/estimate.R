@@ -82,7 +82,7 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
   } else {
     draws <- NULL
   }
-
+  
   # Workers
   if (estim_opt$cores > 1) {
     # Create the cluster of workers and add stopCluster to on.exit()
@@ -93,8 +93,25 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
     prepare_workers(db, draws, workers, model_opt, save_opt)
     
   } else {
-    # Prepare the estimation environment
-    estim_env <- prepare_estim_env(db, draws, model_opt)
+    # Create the estimation environment
+    estim_env <- rlang::env()
+    
+    # Define indexes
+    index_list <- list(
+      N = length(unique(db[[model_opt[["id"]]]])),
+      S = length(unique(db[[model_opt[["ct"]]]])),
+      J = model_opt$J,
+      choice_var = db[[model_opt$choice]]
+    )
+    list2env(index_list, envir = estim_env)
+    
+    # Add the data to the estimation environment
+    list2env(as.list(db), envir = estim_env)
+    
+    # Add the draws to the estimation environment
+    if (model_opt$mixing) {
+      list2env(as.list(draws), envir = estim_env)
+    }
     workers <- NULL
   }
   
@@ -176,7 +193,7 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
     model[["gradient"]] <- model_obj$gradient
     model[["gradient_obs"]] <- model_obj$gradientObs
     model[["message"]] <- model_obj$message
-
+    
     if (tolower(estim_opt$method) == "bfgs" && model_obj$code %in% c(0)) converged <- TRUE 
     if (tolower(estim_opt$method) == "bhhh" && model_obj$code %in% c(2, 8)) converged <- TRUE 
     if (tolower(estim_opt$method) == "nr" && model_obj$code %in% c(0, 1, 2)) converged <- TRUE 
@@ -199,7 +216,7 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
   
   # Estimate the model using the 'NLOPTR' package
   if (tolower(estim_opt$optimizer) == "nloptr") {
-    model_obj <- nloptr::nloptr(param_free, ll_func, num_grad, converged = FALSE,
+    model_obj <- nloptr::nloptr(param_free, ll_func, num_grad,
                                 opts = list(
                                   algorithm = estim_opt$method,
                                   print_level = estim_opt$print_level
@@ -240,7 +257,7 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
     clear = FALSE, 
     width = 80
   )
-
+  
   # Define the wrapper function
   ll_func_pb <- function(param) {
     pb$tick()
@@ -275,10 +292,10 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
     # Try calculating the hessian using the maxLik package
     model[["hessian"]] <- tryCatch({
       hessian <- maxLik::maxLik(ll_func_pb,
-                     start = model[["param_final"]],
-                     print.level = 0,
-                     finalHessian = TRUE, method = estim_opt$method,
-                     iterlim = 2)$hessian
+                                start = model[["param_final"]],
+                                print.level = 0,
+                                finalHessian = TRUE, method = estim_opt$method,
+                                iterlim = 2)$hessian
       colnames(hessian) <- names(model[["param_final"]])
       rownames(hessian) <- names(model[["param_final"]])
       hessian
@@ -318,11 +335,11 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
     rownames(vcov) <- names(model[["param_final"]])
     vcov
   })
-
+  
   # Calculate the robust variance-covariance matrix
   if (estim_opt$robust_vcov && !is.null(model[["vcov"]])) {
     model[["gradient_obs"]] <- numDeriv::jacobian(ll_func, model[["param_final"]], method = "simple")
-
+    
     bread <- model[["vcov"]] * N
     bread[is.na(bread)] <- 0
     

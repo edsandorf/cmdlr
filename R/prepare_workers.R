@@ -24,36 +24,36 @@ prepare_workers <- function(db, draws, workers, model_opt, save_opt) {
   }, pkgs)
   
   # Export functions and indices to the workers
-  parallel::clusterExport(workers,
-                          c("ll", "detach_objects",
-                            "prepare_estim_env", "model_opt"),
-                          envir = environment())
+  parallel::clusterExport(workers, "ll", envir = environment())
   
-  # Export data to the workers 
-  parallel::parLapply(workers, db, function(x) {
-    assign("db", x, envir = globalenv())
-    NULL
+  # Set up the estimation environment 
+  estim_opt_list <- lapply(seq_along(db), function(i) {
+    # Create the estimation environment
+    estim_env <- rlang::env()
+    
+    # Define indexes
+    index_list <- list(
+      N = length(unique(db[[i]][[model_opt[["id"]]]])),
+      S = length(unique(db[[i]][[model_opt[["ct"]]]])),
+      J = model_opt$J,
+      choice_var = db[[i]][[model_opt$choice]]
+    )
+    list2env(index_list, envir = estim_env)
+    
+    # Add the data to the estimation environment
+    list2env(as.list(db[[i]]), envir = estim_env)
+    
+    # Add the draws to the estimation environment
+    if (model_opt$mixing) {
+      list2env(as.list(draws[[i]]), envir = estim_env)
+    }
+    
+    estim_env
   })
   
-  # Export the draws to the workers
-  if (model_opt$mixing) {
-    parallel::parLapply(workers, draws, function(x) {
-      assign("draws", x, envir = globalenv())
-      NULL
-    })
-  }
-  
-  # Prepare the estimation environment
-  parallel::parLapply(workers, seq_along(workers), function(x) {
-    db <- get("db", envir = .GlobalEnv)
-    model_opt <- get("model_opt", envir = .GlobalEnv)
-    if (model_opt$mixing) {
-      draws <- get("draws", envir = .GlobalEnv)
-    } else {
-      draws <- NULL
-    }
-      
-    assign("estim_env", prepare_estim_env(db, draws, model_opt), envir = .GlobalEnv)
+  parallel::parLapply(workers, estim_opt_list, function(x) {
+    estim_env <<- x
+    NULL
   })
   
   # Save information about what is loaded on the workers
@@ -65,7 +65,7 @@ prepare_workers <- function(db, draws, workers, model_opt, save_opt) {
     summary_worker_info(worker_info)
     sink()
     message(blue$bold(symbol$info), paste0("  Worker information saved to \"",
-                                                   file_path, "\""))
+                                           file_path, "\""))
   }
   
   # Return the workers
