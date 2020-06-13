@@ -312,6 +312,7 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
     return(model)
   }
   
+  model_obj[["hessian"]] <- model[["hessian"]]
   message(green$bold(symbol$tick), "  Hessian calculated successfully.")
   
   # Print section time use
@@ -347,6 +348,8 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
     meat[is.na(meat)] <- 0
     
     model[["robust_vcov"]] <- (bread %*% meat %*% bread) / N
+    
+    model[["robust_vcov_2"]] <- tryCatch(sandwich::sandwich(model_obj), error = function(e) NA)
   } else {
     model[["robust_vcov"]] <- NULL
   }
