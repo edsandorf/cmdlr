@@ -29,15 +29,24 @@ summarize <- function(model) {
   names_all <- names(model[["param_start"]])
   K <- length(model[["param_start"]])
   
+  # Try to calculate the eigen values of the hessian
+  eigen_val <- tryCatch({
+    eigen(model[["hessian"]])$values
+  },
+  error = function(e) {
+    NA
+  })
+  
   # Print the starting values ----
   cat("---- Parameter information ----\n")
-  output <- matrix(0, nrow = K, ncol = 4)
+  output <- matrix(0, nrow = K, ncol = 5)
   rownames(output) <- names_all
-  colnames(output) <- c("Start", "Final", "Diff", "Grad")
+  colnames(output) <- c("Start", "Final", "Diff", "Grad", "eigen(H)")
   output[, 1] <- model[["param_start"]]
   output[names_free, 2] <- model[["param_final"]]
   output[, 3] <- output[, 2] - output[, 1]
   output[names_free, 4] <- model[["gradient"]]
+  output[names_free, 5] <- eigen_val
   print(round(output, digits = 4))
   cat("\n\n")
 
