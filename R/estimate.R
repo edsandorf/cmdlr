@@ -349,7 +349,6 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
     
     model[["robust_vcov"]] <- (bread %*% meat %*% bread) / N
     
-    model[["robust_vcov_2"]] <- tryCatch(sandwich::sandwich(model_obj), error = function(e) NA)
   } else {
     model[["robust_vcov"]] <- NULL
   }
