@@ -34,24 +34,29 @@ store <- function(model, save_opt) {
   # For storage purposes change the name of the model object to lower case and 
   # '-' separated. 
   model_name <- make_model_name(save_opt$name)
+  model_name <- paste0(Sys.Date(), "-", model_name)
+  
+  # Create the partial path 
+  if (is.null(save_opt$path)) {
+    path <- getwd()
+  } else {
+    path <- file.path(getwd(), save_opt$path)
+  }
   
   # Check that files with the current names don't already exist to avoid over-writing them 
   file_list <- list.files(
-    file.path(getwd(), save_opt$path),
+    path,
     model_name
   )
   
   if (length(file_list) > 0) {
-    cat(red$bold(symbol$cross), "  store().\n")
-    stop("Files already exist in the specified output folder with the current model name. Either delete the files OR choose a new model name. This is to avoid over-writing results you want to keep. You can change the name directly using 'inputs$model_opt$name' and do not have to re-run any models.")
+    cat(yellow$bold(symbol$warning), paste0("  A file with the name ", model_name, " already exists in the specified folder. Adding numbering to the file name.\n"))
+    unique_models <- unique(stringr::str_replace_all(file_list, "(-summary|-model-object|-hessian|-vcov|-param).*", ""))
+    model_name <- paste0(model_name, "-", stringr::str_pad(as.character(length(unique_models) + 1), 3, side = "left", pad = "0"))
   }
   
-  # Create the partial path 
-  if (is.null(save_opt$path)) {
-    path <- file.path(getwd(), model_name)
-  } else {
-    path <- file.path(getwd(), save_opt$path, model_name)
-  }
+  # Set the full path with partial model name
+  path <- file.path(path, model_name)
   
   # Save model summary to .txt ----
   if (isTRUE(save_opt$save_summary)) {
