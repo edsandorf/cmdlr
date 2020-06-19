@@ -15,7 +15,7 @@
 #' 
 #' @return The function does not return any objects. 
 
-prepare_workers <- function(db, draws, workers, model_opt, save_opt) {
+prepare_workers <- function(db, draws, workers, estim_opt, model_opt, save_opt) {
   # Extract relevant information from model_opt
   N <- model_opt$N
   S <- model_opt$S

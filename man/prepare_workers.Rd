@@ -4,7 +4,7 @@
 \alias{prepare_workers}
 \title{Function preparing the workers}
 \usage{
-prepare_workers(db, draws, workers, model_opt, save_opt)
+prepare_workers(db, draws, workers, estim_opt, model_opt, save_opt)
 }
 \arguments{
 \item{db}{A \code{data.frame()} or \code{tibble()} with the data to be used in
@@ -16,6 +16,9 @@ corresponds to the cores and the lower-level list corresponds to the draws.}
 
 \item{workers}{A PSOCK or Fork cluster of workers created using 
 \code{parallel::makeCluster()}}
+
+\item{estim_opt}{A list of options for the estimation procedure such as 
+type of optimizer, approximation routines, tolerance levels etc.}
 
 \item{model_opt}{A list of model options including random parameters, draws,
 fixed and non-fixed parameters during estimation, starting value search 

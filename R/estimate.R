@@ -63,7 +63,7 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
   estim_opt <- validate_estim_opt(estim_opt)
   
   # Model options
-  model_opt <- validate_model_opt(model_opt)
+  model_opt <- validate_model_opt(model_opt, db)
   
   # Save options
   save_opt <- validate_save_opt(save_opt)
@@ -107,7 +107,7 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
     on.exit(parallel::stopCluster(workers), add = TRUE)
     
     # Prepare the workers
-    prepare_workers(db, draws, workers, model_opt, save_opt)
+    prepare_workers(db, draws, workers, estim_opt, model_opt, save_opt)
     
   } else {
     # Create the estimation environment

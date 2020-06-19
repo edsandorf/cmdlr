@@ -4,10 +4,13 @@
 \alias{validate_model_opt}
 \title{Validates and sets default model options}
 \usage{
-validate_model_opt(model_opt_input)
+validate_model_opt(model_opt_input, db)
 }
 \arguments{
 \item{model_opt_input}{A list of user specified model options}
+
+\item{db}{A \code{data.frame()} or \code{tibble()} with the data to be used in
+estimation.}
 }
 \value{
 Returns a list of options with missing input values replaced by 
