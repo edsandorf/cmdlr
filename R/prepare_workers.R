@@ -16,17 +16,48 @@
 #' @return The function does not return any objects. 
 
 prepare_workers <- function(db, draws, workers, model_opt, save_opt) {
-  # Export packages to the worker
+  # Extract relevant information from model_opt
+  N <- model_opt$N
+  S <- model_opt$S
+  R <- model_opt$R
+  
+  # Export packages to the worker ----
   pkgs <- c("maxLik", "numDeriv", "rlang")
   parallel::clusterCall(workers, function(pkgs) {
     lapply(pkgs, require, character.only = TRUE)
     NULL
   }, pkgs)
   
-  # Export functions and indices to the workers
+  # Export functions and indices to the workers ----
   parallel::clusterExport(workers, "ll", envir = environment())
   
-  # Set up the estimation environment 
+  # Split the data ----
+  db <- split_data(db, estim_opt, model_opt)
+  
+  # Split the draws ----
+  the_rows <- lapply(db, function(x) {
+    nrow(x)
+  })
+  rows_index <- vector(mode = "list", length = length(db))
+  rows_index[[1]] <- seq_len(the_rows[[1]])
+  for (i in 2:length(db)) {
+    rows_index[[i]] <- max(rows_index[[i - 1]]) + seq_len(the_rows[[i]])
+  }
+  
+  draws <- lapply(rows_index, function(i) {
+    lapply(draws, function(x) {
+      x[i, , drop = FALSE]
+    })
+  })
+  
+  # Split alt_avail ----
+  alt_avail <- lapply(rows_index, function(i) {
+    lapply(model_opt$alt_avail, function(x) {
+      x[i]
+    })
+  })
+  
+  # Set up the estimation environment ----
   estim_opt_list <- lapply(seq_along(db), function(i) {
     # Create the estimation environment
     estim_env <- rlang::env()
@@ -35,7 +66,8 @@ prepare_workers <- function(db, draws, workers, model_opt, save_opt) {
     index_list <- list(
       N = length(unique(db[[i]][[model_opt[["id"]]]])),
       S = length(unique(db[[i]][[model_opt[["ct"]]]])),
-      J = model_opt$J,
+      J = length(model_opt$alt_avail),
+      alt_avail = alt_avail[[i]],
       choice_var = db[[i]][[model_opt$choice]]
     )
     list2env(index_list, envir = estim_env)

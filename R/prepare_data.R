@@ -21,11 +21,6 @@ prepare_data <- function(db, estim_opt, model_opt) {
     db <- pad_data(db, model_opt)
   }
   
-  # Split the data if estimating in parallel and return as a matrix
-  if (estim_opt$cores > 1) {
-    db <- split_data(db, estim_opt, model_opt)
-  } 
-  
   # Return the manipulated and checked data
   message(green$bold(symbol$tick), "  Data")
   db
