@@ -90,8 +90,12 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
     }
   })
   
-  # Analyze choices 
-  # choice_analysis <- analyze_choices(db, model_opt)
+  # Analyze choices if explanators are present
+  if (is.null(model_opt$choice_analysis_explanators)) {
+    choice_analysis <- NULL
+  } else {
+    choice_analysis <- analyze_choices(db, model_opt)
+  }
   
   # Draws
   if (model_opt$mixing) {
@@ -181,6 +185,7 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
   model[["draws_type"]] <- model_opt$draws_type
   model[["time_start"]] <- time_start
   model[["nobs"]] <- model_opt$nobs
+  model[["choice_analysis"]] <- choice_analysis
   
   # Prepare the starting parameters by separating the free and fixed parameters
   # into two vectors - see the 'apollo' package for details. 

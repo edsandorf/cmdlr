@@ -21,6 +21,9 @@
 #'   \item{save_worker_info}{If \code{TRUE} save information about workers in
 #'   .txt file specified in \code{path}. Only valid if \code{cores > 1}.
 #'    Default is \code{FALSE}.}
+#'   \item{save_choice_analysis}{If \code{TRUE} save information from analyze_choices
+#'   in a .csv file specified in \code{path}.
+#'    Default is \code{FALSE}.}
 #' }
 #' 
 #' The function is intended for internal use only.
@@ -40,7 +43,8 @@ validate_save_opt <- function(save_opt_input) {
     save_hessian = FALSE,
     save_vcov = FALSE,
     save_param = FALSE,
-    save_worker_info = FALSE
+    save_worker_info = FALSE,
+    save_choice_analysis = FALSE
   )
 
   # Replace the non-specified values with default values

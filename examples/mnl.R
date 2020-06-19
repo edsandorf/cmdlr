@@ -17,7 +17,8 @@ save_opt <- list(
   description = "A simple MNL model using the Apollo dataset 'mode choice'.",
   path = file.path("outputs"),
   save_summary = FALSE,
-  save_model_object = FALSE
+  save_model_object = FALSE,
+  save_choice_analysis = FALSE
 )
 
 # Define the list of estimation options ----
@@ -64,7 +65,8 @@ model_opt <- list(
     b_no_frills = 0,
     b_wifi = 0,
     b_food = 0
-  )
+  ),
+  choice_analysis_explanators = c("female", "business", "income")
 )
 
 # Likelihood function - returns the probability of the sequence of choices ----
@@ -127,3 +129,5 @@ summarize(model)
 
 # Save the results ----
 # store(model, save_opt)
+
+model$choice_analysis

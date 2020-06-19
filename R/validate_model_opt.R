@@ -8,12 +8,13 @@
 #'
 #' The function is intended for internal use only.
 #' 
+#' @inheritParams estimate
 #' @param model_opt_input A list of user specified model options
 #'
 #' @return Returns a list of options with missing input values replaced by 
 #' default values
 
-validate_model_opt <- function(model_opt_input) {
+validate_model_opt <- function(model_opt_input, db) {
   # Set the defaults ----
   model_opt <- list(
     id = NULL,
@@ -27,7 +28,8 @@ validate_model_opt <- function(model_opt_input) {
     R = 10,
     fixed = c(""),
     param = NULL,
-    rpar = NULL
+    rpar = NULL,
+    choice_analysis_explanators = NULL
   )
   
   # Replace the non-specified values with default values
@@ -69,6 +71,11 @@ validate_model_opt <- function(model_opt_input) {
   if (!all(model_opt$fixed %in% names(model_opt$param))) {
     message(red$bold(symbol$cross), "  model_opt().\n")
     stop("Some parameters included in 'fixed' is not specified in the list of parameters. Please make sure that the parameters to fix are parameters in your model.")
+  }
+  
+  if (!is.null(model_opt$choice_analysis_explanators) & any(!(model_opt$choice_analysis_explanators %in% names(db)))) {
+    message(red$bold(symbol$cross), "  model_opt().\n")
+    stop("Some parameters included in 'choice_analysis_explanators' does not exist in the data. Please ensure that all explanators exist.")
   }
   
   # Check mixing options ----

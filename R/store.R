@@ -94,4 +94,11 @@ store <- function(model, save_opt) {
     utils::write.csv(model$coef, file_path)
     cat(blue$bold(symbol$info), paste0("  Final parameters saved to: \"", file_path, "\"\n"))  
   }
+  
+  # Save the choice analysis to a .csv file ----
+  if (save_opt$save_choice_analysis) {
+    file_path <- paste0(path, "-choice-analysis.csv")
+    utils::write.csv(model$choice_analysis, file_path)
+    cat(blue$bold(symbol$info), paste0("  Choice analysis saved to: \"", file_path, "\"\n"))  
+  }
 }
