@@ -50,6 +50,11 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
   time_start <- Sys.time()
   message(blue$bold(symbol$info), bold(paste0("   Model estimation started: ", time_start, "\n")))
   
+  # If we are in debug mode, make sure that we set up the estimation environment
+  # for a single core only. The returned environment can be used to run e.g.
+  # the analyze_choices() outside of estimate()
+  if (debug) estim_opt$cores <- 1
+  
   # VALIDATE OPTIONS ----
   message(blue$bold(symbol$info), bold("   Validating options"))
   time_start_validate <- Sys.time()
@@ -126,6 +131,9 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
       list2env(as.list(draws), envir = estim_env)
     }
     workers <- NULL
+    
+    # Return the estimation environment and stop execution if in debug mode
+    if (debug) return(estim_env)
   }
   
   # Prepare the log-likelihood function
