@@ -42,7 +42,12 @@ model_opt <- list(
   choice = "choice",
   N = length(unique(db[["ID"]])),
   S = length(unique(db[["ct"]])),
-  J = 4L,
+  alt_avail = list(
+    alt1 = "av_car",
+    alt2 = "av_bus",
+    alt3 = "av_air", 
+    alt4 = "av_rail"
+  ),
   nobs = nrow(db),
   fixed = c("asc_car", "b_no_frills"),
   param = list(
@@ -72,14 +77,6 @@ ll <- function(param) {
     alt4 = asc_rail + b_tt_rail * time_rail + b_access * access_rail + b_cost * cost_rail + b_no_frills * (service_rail == 1) + b_wifi * (service_rail == 2) + b_food * (service_rail == 3)
   )
   
-  # Alternative availability
-  alt_availability <- list(
-    alt1 = av_car,
-    alt2 = av_bus,
-    alt3 = av_air, 
-    alt4 = av_rail
-  )
-  
   # Calculate the probabilities ----
   # Get the utility of the chosen alternative and subtract it from all utilities
   v_chosen <- Reduce("+", lapply(seq_along(V), function(j) {
@@ -91,13 +88,13 @@ ll <- function(param) {
   # Calculate the exponent and sum of utilities
   exp_v <- lapply(V, function(v) exp(v))
   # Restrict the utility of unavailable alternatives to 0
-  exp_v <- mapply("*", exp_v, alt_availability, SIMPLIFY = FALSE)
+  exp_v <- mapply("*", exp_v, alt_avail, SIMPLIFY = FALSE)
   sum_v <- Reduce("+", exp_v)
   
   # Calculate the probability of the chosen alt
   # Returns zero if a non-available alternative is chosen
   chosen_alt_available <- Reduce("+", lapply(seq_along(V), function(j) {
-    (choice_var == j) * alt_availability[[j]]
+    (choice_var == j) * alt_avail[[j]]
   }))
   pr_chosen <- chosen_alt_available / sum_v
   

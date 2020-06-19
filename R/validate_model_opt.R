@@ -21,7 +21,7 @@ validate_model_opt <- function(model_opt_input) {
     choice = NULL,
     N = NULL,
     S = NULL,
-    J = NULL,
+    alt_avail = NULL,
     mixing = FALSE,
     draws_type = "scrambled_sobol",
     R = 10,
@@ -39,11 +39,19 @@ validate_model_opt <- function(model_opt_input) {
     stop("You must specify the id, ct and choice variables in model_opt.")
   }
   
-  # if (is.null(model_opt$N) || is.null(model_opt$S) || is.null(model_opt$J)) {
-  if (is.null(model_opt$J)) {
+  if (is.null(model_opt$alt_avail)) {
     message(red$bold(symbol$cross), "  model_opt().\n")
-    # stop("You must specify the number of respondents 'N', maximum number of choice occasions 'S' and the maximum number of alternatives 'J'. These can be functions of your data.")
-    stop("You must specify the maximum number of alternatives 'J'. These can be functions of your data.")
+    stop("You must specify the list of alternative availabilities. It can be a list of variables indicating availability, or if the alternative is always available to all individuals, it can be the integer 1. Please see the provided examples for how this is implemented in practice.")
+  } else {
+    # Check if the specified variable exists in the data OR if it is a number
+    lapply(model_opt$alt_avail, function(x) {
+      if ((is.numeric(x) & length(x) == 1 & x == 1) | (x %in% names(db))) {
+        NULL
+     } else {
+       message(red$bold(symbol$cross), "  model_opt().\n")
+       stop("'alt_avail' can only be a character vector indicating a variable in the data or equal to 1.")
+      }
+    })
   }
   
   # Check the fixed parameter options ----

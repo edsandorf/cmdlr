@@ -34,7 +34,11 @@ model_opt <- list(
   choice = "choice",
   N = length(unique(db[["id"]])),
   S = length(unique(db[["ct"]])),
-  J = 3L,
+  alt_avail = list(
+    alt1 = 1,
+    alt2 = 1, 
+    alt3 = 1
+  ),
   nobs = nrow(db),
   mixing = TRUE,
   draws_type = "scrambled_sobol",
@@ -103,7 +107,7 @@ ll <- function(param) {
 }
 
 # Estimate the model ----
-model <- estimate(ll, db, estim_opt, model_opt, save_opt)
+model <- estimate(ll, db, estim_opt, model_opt, save_opt, debug = FALSE)
 
 # Get a summary of the results ----
 summarize(model)

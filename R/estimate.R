@@ -76,6 +76,18 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
   # Data
   db <- prepare_data(db, estim_opt, model_opt)
   
+  # Alternative availability
+  model_opt$alt_avail <- lapply(model_opt$alt_avail, function(x) {
+    if (x == 1) {
+      rep(1, nrow(db))
+    } else {
+      db[[x]]
+    }
+  })
+  
+  # Analyze choices 
+  # choice_analysis <- analyze_choices(db, model_opt)
+  
   # Draws
   if (model_opt$mixing) {
     draws <- prepare_draws(db, estim_opt, model_opt)
@@ -100,7 +112,8 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
     index_list <- list(
       N = length(unique(db[[model_opt[["id"]]]])),
       S = length(unique(db[[model_opt[["ct"]]]])),
-      J = model_opt$J,
+      J = length(model_opt$alt_avail),
+      alt_avail = model_opt$alt_avail,
       choice_var = db[[model_opt$choice]]
     )
     list2env(index_list, envir = estim_env)

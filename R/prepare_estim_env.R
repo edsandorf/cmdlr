@@ -15,7 +15,8 @@ prepare_estim_env <- function(db, draws, model_opt) {
   estim_env <- rlang::env(
     N = length(unique(db[[model_opt[["id"]]]])),
     S = length(unique(db[[model_opt[["ct"]]]])),
-    J = model_opt$J,
+    J = length(model_opt$alt_avail),
+    alt_avail = model_opt$alt_avail,
     choice_var = db[[model_opt$choice]]
   )
   
