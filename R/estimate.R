@@ -256,6 +256,10 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
     if (model_obj$status %in% c(0)) converged <- TRUE
   }
   
+  if (estim_opt$iterlim %in% c(0, 1)) {
+    converged <- TRUE
+  }
+  
   if (!converged) {
     stop("Model failed to converge. Estimation unsuccessful.\n")
   }
