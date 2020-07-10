@@ -240,22 +240,6 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
     if (model_obj$convergence %in% c(1, 2, 3, 4)) converged <- TRUE
   }
   
-  # Estimate the model using the 'NLOPTR' package
-  if (tolower(estim_opt$optimizer) == "nloptr") {
-    model_obj <- nloptr::nloptr(param_free, ll_func, num_grad,
-                                opts = list(
-                                  algorithm = estim_opt$method,
-                                  print_level = estim_opt$print_level
-                                ))
-    
-    # Added a minus to make the fit calculations correct
-    model[["ll"]] <- -model_obj$objective
-    model[["param_final"]] <- model_obj$solution
-    model[["iterations"]] <- model_obj$iterations
-    
-    if (model_obj$status %in% c(0)) converged <- TRUE
-  }
-  
   if (estim_opt$iterlim %in% c(0, 1)) {
     converged <- TRUE
   }
@@ -393,7 +377,7 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
   
   ll_0 <- tryCatch({
     ll_0_tmp <- sum(ll_func(model[["param_final"]] * 0))
-    if (tolower(estim_opt$optimizer) %in% c("nloptr", "ucminf")) {
+    if (tolower(estim_opt$optimizer) %in% c("ucminf")) {
       -ll_0_tmp
     } else {
       ll_0_tmp
