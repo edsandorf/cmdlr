@@ -27,6 +27,22 @@ The choice analysis does not involve any estimation.
 The function is a rewritten version of \code{apollo_choiceAnalysis()}. See
 references.
 }
+\examples{
+\dontrun{
+  model_opt <- list(
+    choice_analysis_explanators = NULL
+  )
+  
+  # OR
+  
+  model_opt <- list(
+    choice_analysis_explanators = c("male", "income")
+  )
+  
+  analyze_choices(db, model_opt)
+}
+
+}
 \references{
 Hess, S. & Palma, D. (2019), Apollo: a flexible, powerful and customisable freeware package for choice model estimation and application, Journal of Choice Modelling, Volume 32, September 2019, 100170
 Hess, S. & Palma, D. (2019), Apollo version 0.1.0, user manual, www.ApolloChoiceModelling.com

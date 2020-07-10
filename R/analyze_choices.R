@@ -12,7 +12,7 @@
 #' @return A matrix with the choice shares and test statistics for difference in
 #' means
 #' 
-#' @example 
+#' @examples 
 #' \dontrun{
 #'   model_opt <- list(
 #'     choice_analysis_explanators = NULL
