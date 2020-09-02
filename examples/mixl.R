@@ -23,6 +23,7 @@ estim_opt <- list(
   optimizer = "ucminf",
   method = "BFGS",
   cores = 4,
+  calculate_hessian = TRUE,
   robust_vcov = TRUE,
   print_level = 2
 )

@@ -1,4 +1,5 @@
 ## cmdlR v0.0.2
+* Added option 'calcualte_hessian' to 'estim_opt'. 
 * Removed NLOPTR as an optimizer since it cannot use referencing by name 
 * Added functionality to analyze choices prior to estimation. 
 * alt_availability is no longer specified in the log-likelihood function, but

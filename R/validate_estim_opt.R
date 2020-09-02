@@ -23,6 +23,7 @@ validate_estim_opt <- function(estim_opt_input) {
     print_level = 0,
     iterlim = 500,
     cores = 1,
+    calculate_hessian = TRUE,
     robust_vcov = TRUE,
     search_start = FALSE,
     search_start_options = list(

@@ -26,6 +26,7 @@ estim_opt <- list(
   optimizer = "maxlik",
   method = "BFGS",
   cores = 1,
+  calculate_hessian = TRUE,
   robust_vcov = TRUE,
   print_level = 2,
   search_start = TRUE,

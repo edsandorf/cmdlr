@@ -260,42 +260,13 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
                                          round(time_diff, 2), " ",
                                          attr(time_diff, "units"), "\n"))
   
-  # CALCULATE THE HESSIAN MATRIX ----
-  time_start_hessian <- Sys.time()
-  
-  # Define the progress bar
-  K <- length(model[["param_final"]])
-  pb <- progress::progress_bar$new(
-    format = "[:bar] :percent :elapsed",
-    total = 2 + 8 * (K * (K + 1) / 2),
-    clear = FALSE, 
-    width = 80
-  )
-  
-  # Define the wrapper function
-  ll_func_pb <- function(param) {
-    pb$tick()
-    sum(ll_func(param))
-  }
-  
-  # Try and catch if the Hessian cannot be calculated 
-  model[["hessian"]] <- tryCatch({
-    message(blue$bold(symbol$info), bold("   Calculating the Hessian matrix"))
-    hessian <- numDeriv::hessian(func = ll_func_pb, x = model[["param_final"]])
-    colnames(hessian) <- names(model[["param_final"]])
-    rownames(hessian) <- names(model[["param_final"]])
-    hessian
-  }, error = function(e) {
-    NA
-  })
-  
-  # If the Hessian calculation failed, try calculating it using the maxLik package
-  if (is.na(model[["hessian"]]) || anyNA(model[["hessian"]])) {
-    # Print messages to console
-    message(red$bold(symbol$cross), "  Hessian calculation using the \'numDeriv\' package.\n")
-    message(blue$bold(symbol$info), "   Trying to calculate Hessian using the \'maxLik\' package.\n")
+  # Check if we are calculating the Hessian matrix
+  if (estim_opt$calculate_hessian) {
+    # CALCULATE THE HESSIAN MATRIX ----
+    time_start_hessian <- Sys.time()
     
-    # Reset the progress bar
+    # Define the progress bar
+    K <- length(model[["param_final"]])
     pb <- progress::progress_bar$new(
       format = "[:bar] :percent :elapsed",
       total = 2 + 8 * (K * (K + 1) / 2),
@@ -303,78 +274,114 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
       width = 80
     )
     
-    # Try calculating the hessian using the maxLik package
+    # Define the wrapper function
+    ll_func_pb <- function(param) {
+      pb$tick()
+      sum(ll_func(param))
+    }
+    
+    # Try and catch if the Hessian cannot be calculated 
     model[["hessian"]] <- tryCatch({
-      hessian <- maxLik::maxLik(ll_func_pb,
-                                start = model[["param_final"]],
-                                print.level = 0,
-                                finalHessian = TRUE, method = estim_opt$method,
-                                iterlim = 2)$hessian
+      message(blue$bold(symbol$info), bold("   Calculating the Hessian matrix"))
+      hessian <- numDeriv::hessian(func = ll_func_pb, x = model[["param_final"]])
       colnames(hessian) <- names(model[["param_final"]])
       rownames(hessian) <- names(model[["param_final"]])
       hessian
     }, error = function(e) {
       NA
     })
-  }
-  
-  # If the Hessian still cannot be calculated end and return the model object
-  if (is.na(model[["hessian"]]) || anyNA(model[["hessian"]])) {
-    message(red$bold(symbol$cross), "  Hessian calculation failed or contains NA. Returning only some model information.\n")
-    time_end <- Sys.time()
-    model[["time_end"]]
-    return(model)
-  }
-  
-  model_obj[["hessian"]] <- model[["hessian"]]
-  message(green$bold(symbol$tick), "  Hessian calculated successfully.")
-  
-  # Print section time use
-  time_diff <- Sys.time() - time_start_hessian
-  message(blue$bold(symbol$info), paste0("   Hessian calculation took ",
-                                         round(time_diff, 2), " ",
-                                         attr(time_diff, "units"), "\n"))
-  
-  # CALCULATE THE VCOV MATRIX ----
-  message(blue$bold(symbol$info), bold("   Calculating the variance-covariance matrices"))
-  time_start_vcov <- Sys.time()
-  
-  # Standard
-  model[["vcov"]] <- tryCatch({
-    if (estim_opt$optimizer == "ucminf") {
-      vcov <- MASS::ginv(model[["hessian"]])
-    } else {
-      vcov <- MASS::ginv(-model[["hessian"]])
+    
+    # If the Hessian calculation failed, try calculating it using the maxLik package
+    if (is.na(model[["hessian"]]) || anyNA(model[["hessian"]])) {
+      # Print messages to console
+      message(red$bold(symbol$cross), "  Hessian calculation using the \'numDeriv\' package.\n")
+      message(blue$bold(symbol$info), "   Trying to calculate Hessian using the \'maxLik\' package.\n")
+      
+      # Reset the progress bar
+      pb <- progress::progress_bar$new(
+        format = "[:bar] :percent :elapsed",
+        total = 2 + 8 * (K * (K + 1) / 2),
+        clear = FALSE, 
+        width = 80
+      )
+      
+      # Try calculating the hessian using the maxLik package
+      model[["hessian"]] <- tryCatch({
+        hessian <- maxLik::maxLik(ll_func_pb,
+                                  start = model[["param_final"]],
+                                  print.level = 0,
+                                  finalHessian = TRUE, method = estim_opt$method,
+                                  iterlim = 2)$hessian
+        colnames(hessian) <- names(model[["param_final"]])
+        rownames(hessian) <- names(model[["param_final"]])
+        hessian
+      }, error = function(e) {
+        NA
+      })
     }
-    colnames(vcov) <- names(model[["param_final"]])
-    rownames(vcov) <- names(model[["param_final"]])
-    vcov
-  })
-  
-  # Calculate the robust variance-covariance matrix
-  if (estim_opt$robust_vcov && !is.null(model[["vcov"]])) {
-    model[["gradient_obs"]] <- numDeriv::jacobian(ll_func, model[["param_final"]], method = "simple")
     
-    bread <- model[["vcov"]] * N
-    bread[is.na(bread)] <- 0
+    # If the Hessian still cannot be calculated end and return the model object
+    if (is.na(model[["hessian"]]) || anyNA(model[["hessian"]])) {
+      message(red$bold(symbol$cross), "  Hessian calculation failed or contains NA. Returning only some model information.\n")
+      time_end <- Sys.time()
+      model[["time_end"]] <- time_end
+      return(model)
+    }
     
-    meat <- (crossprod(model[["gradient_obs"]]) / N) * (N / (N - K))
-    meat[is.na(meat)] <- 0
+    model_obj[["hessian"]] <- model[["hessian"]]
+    message(green$bold(symbol$tick), "  Hessian calculated successfully.")
     
-    model[["robust_vcov"]] <- (bread %*% meat %*% bread) / N
+    # Print section time use
+    time_diff <- Sys.time() - time_start_hessian
+    message(blue$bold(symbol$info), paste0("   Hessian calculation took ",
+                                           round(time_diff, 2), " ",
+                                           attr(time_diff, "units"), "\n"))
+    
+    # CALCULATE THE VCOV MATRIX ----
+    message(blue$bold(symbol$info), bold("   Calculating the variance-covariance matrices"))
+    time_start_vcov <- Sys.time()
+    
+    # Standard
+    model[["vcov"]] <- tryCatch({
+      if (estim_opt$optimizer == "ucminf") {
+        vcov <- MASS::ginv(model[["hessian"]])
+      } else {
+        vcov <- MASS::ginv(-model[["hessian"]])
+      }
+      colnames(vcov) <- names(model[["param_final"]])
+      rownames(vcov) <- names(model[["param_final"]])
+      vcov
+    })
+    
+    # Calculate the robust variance-covariance matrix
+    if (estim_opt$robust_vcov && !is.null(model[["vcov"]])) {
+      model[["gradient_obs"]] <- numDeriv::jacobian(ll_func, model[["param_final"]], method = "simple")
+      
+      bread <- model[["vcov"]] * N
+      bread[is.na(bread)] <- 0
+      
+      meat <- (crossprod(model[["gradient_obs"]]) / N) * (N / (N - K))
+      meat[is.na(meat)] <- 0
+      
+      model[["robust_vcov"]] <- (bread %*% meat %*% bread) / N
+      
+    } else {
+      model[["robust_vcov"]] <- NULL
+    }
+    
+    time_diff <- Sys.time() - time_start_vcov
+    message(blue$bold(symbol$info), paste0("   Variance-covariance calculations took ",
+                                           round(time_diff, 2), " ",
+                                           attr(time_diff, "units"), "\n"))
+    
+    # CALCULATE CONVERGENCE CRITERIA AND MODEL DIAGNOSTICS ----
+    model[["convergence_criteria"]] <- t(model[["gradient"]]) %*% model[["vcov"]] %*% model[["gradient"]]
     
   } else {
-    model[["robust_vcov"]] <- NULL
+    model[["hessian"]] <- NULL
+    model[["vcov"]] <- NULL
   }
-  
-  time_diff <- Sys.time() - time_start_vcov
-  message(blue$bold(symbol$info), paste0("   Variance-covariance calculations took ",
-                                         round(time_diff, 2), " ",
-                                         attr(time_diff, "units"), "\n"))
-  
-  # CALCULATE CONVERGENCE CRITERIA AND MODEL DIAGNOSTICS ----
-  model[["convergence_criteria"]] <- t(model[["gradient"]]) %*% model[["vcov"]] %*% model[["gradient"]]
-  
+    
   ll_0 <- tryCatch({
     ll_0_tmp <- sum(ll_func(model[["param_final"]] * 0))
     if (tolower(estim_opt$optimizer) %in% c("ucminf")) {
