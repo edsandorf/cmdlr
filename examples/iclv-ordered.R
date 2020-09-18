@@ -35,15 +35,12 @@ model_opt <- list(
   id = "ID",
   ct = "task",
   choice = "best",
-  N = length(unique(db[["ID"]])),
-  S = length(unique(db[["task"]])),
   alt_avail = list(
     alt1 = 1,
     alt2 = 1,
     alt3 = 1, 
     alt4 = 1
   ),
-  nobs = nrow(db),
   fixed = c("b_brand_Artemis", "b_country_USA", "b_char_standard"),
   param = list(
     b_brand_Artemis    = 0, 

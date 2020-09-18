@@ -34,13 +34,10 @@ model_opt <- list(
   id = "ID",
   ct = "ct",
   choice = "choice",
-  N = length(unique(db[["ID"]])),
-  S = length(unique(db[["ct"]])),
   alt_avail = list(
     alt1 = 1,
     alt2 = 1
   ),
-  nobs = nrow(db),
   fixed = c("b_asc_2", "g_const_2"),
   param = list(
     b_asc_1 = 0,
