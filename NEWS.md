@@ -1,3 +1,6 @@
+## cmdlR v0.0.3
+
+
 ## cmdlR v0.0.2
 * Added hybrid choice model example and a new mixed logit example. 
 * Added function 'ordered_logit()'
