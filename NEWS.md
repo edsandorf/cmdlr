@@ -1,6 +1,7 @@
 ## cmdlR v0.0.3
 * 'N', 'S' and 'nobs' are no longer specified in 'model_opt' but inferred from 
 the data using the data, id- and choice task variables.
+* Bug fixes
 
 ## cmdlR v0.0.2
 * Added hybrid choice model example and a new mixed logit example. 
