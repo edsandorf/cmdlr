@@ -41,6 +41,13 @@ validate_model_opt <- function(model_opt_input, db) {
     stop("You must specify the id, ct and choice variables in model_opt.")
   }
   
+  # Add N, S and nobs to model_opt
+  model_opt$N <- length(unique(db[[model_opt$id]]))
+  model_opt$S <- length(unique(db[[model_opt$ct]]))
+  # Note that this does not consider missing rows (maybe consider the choice var here?)
+  model_opt$nobs <- nrow(db)
+  
+  # Check the alt_avail option
   if (is.null(model_opt$alt_avail)) {
     message(red$bold(symbol$cross), "  model_opt().\n")
     stop("You must specify the list of alternative availabilities. It can be a list of variables indicating availability, or if the alternative is always available to all individuals, it can be the integer 1. Please see the provided examples for how this is implemented in practice.")

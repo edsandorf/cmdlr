@@ -42,15 +42,12 @@ model_opt <- list(
   id = "ID",
   ct = "ct",
   choice = "choice",
-  N = length(unique(db[["ID"]])),
-  S = length(unique(db[["ct"]])),
   alt_avail = list(
     alt1 = "av_car",
     alt2 = "av_bus",
     alt3 = "av_air", 
     alt4 = "av_rail"
   ),
-  nobs = nrow(db),
   fixed = c("asc_car", "b_no_frills"),
   param = list(
     asc_car = 0,

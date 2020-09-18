@@ -33,14 +33,11 @@ model_opt <- list(
   id = "id",
   ct = "ct",
   choice = "choice",
-  N = length(unique(db[["id"]])),
-  S = length(unique(db[["ct"]])),
   alt_avail = list(
     alt1 = 1,
     alt2 = 1, 
     alt3 = 1
   ),
-  nobs = nrow(db),
   mixing = TRUE,
   draws_type = "scrambled_sobol",
   R = 1000, 
