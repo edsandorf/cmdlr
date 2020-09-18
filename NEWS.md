@@ -1,4 +1,6 @@
 ## cmdlR v0.0.2
+* Added hybrid choice model example and a new mixed logit example. 
+* Added function 'ordered_logit()'
 * Added function 'inspect_list()' to aid with development and exploratory work
 * Added option 'calcualte_hessian' to 'estim_opt'. 
 * Removed NLOPTR as an optimizer since it cannot use referencing by name 
