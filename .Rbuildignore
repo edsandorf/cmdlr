@@ -6,4 +6,5 @@
 ^CRAN-RELEASE$
 ^docs$
 ^examples$
-^Ouputs$
+^Outputs$
+^outputs$
