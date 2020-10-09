@@ -351,6 +351,9 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
       colnames(vcov) <- names(model[["param_final"]])
       rownames(vcov) <- names(model[["param_final"]])
       vcov
+    }, error = function(e) {
+      message(red$bold(symbol$cross), "  Failed to calculate the variance covariance matrix.\n")
+      NULL
     })
     
     # Calculate the robust variance-covariance matrix
