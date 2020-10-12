@@ -48,7 +48,7 @@
 estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
   # INITIAL PREPARATIONS ----
   time_start <- Sys.time()
-  message(blue$bold(symbol$info), bold(paste0("   Model estimation started: ", time_start, "\n")))
+  message(blue$bold(symbol$info), bold(paste0("  Model estimation started: ", time_start, "\n")))
   
   # If we are in debug mode, make sure that we set up the estimation environment
   # for a single core only. The returned environment can be used to run e.g.
@@ -56,7 +56,7 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
   if (debug) estim_opt$cores <- 1
   
   # VALIDATE OPTIONS ----
-  message(blue$bold(symbol$info), bold("   Validating options"))
+  message(blue$bold(symbol$info), bold("  Validating options"))
   time_start_validate <- Sys.time()
   
   # Estimation options
@@ -70,12 +70,12 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
   
   # Print section time use
   time_diff <- Sys.time() - time_start_validate
-  message(blue$bold(symbol$info), paste0("   Validating options took ",
+  message(blue$bold(symbol$info), paste0("  Validating options took ",
                                          round(time_diff, 2), " ",
                                          attr(time_diff, "units"), "\n"))
   
   # PREPARE FOR ESTIMATION ----
-  message(blue$bold(symbol$info), bold("   Preparing for estimation"))
+  message(blue$bold(symbol$info), bold("  Preparing for estimation"))
   time_start_prepare <- Sys.time()
   
   # Data
@@ -152,7 +152,7 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
   
   # Print section time use
   time_diff <- Sys.time() - time_start_prepare
-  message(blue$bold(symbol$info), paste0("   Preparing for estimation took ",
+  message(blue$bold(symbol$info), paste0("  Preparing for estimation took ",
                                          round(time_diff, 2), " ",
                                          attr(time_diff, "units"), "\n"))
   
@@ -163,14 +163,14 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
     model_opt$param <- search_start_values(ll_func, estim_env, estim_opt, model_opt)
     
     time_diff <- Sys.time() - time_start_search
-    message(blue$bold(symbol$info), paste0("   Search for starting values took ",
+    message(blue$bold(symbol$info), paste0("  Search for starting values took ",
                                            round(time_diff, 2), " ",
                                            attr(time_diff, "units"), "\n"))
     
   }
   
   # ESTIMATE THE MODEL ----
-  message(blue$bold(symbol$info), bold("   Estimating the model"))
+  message(blue$bold(symbol$info), bold("  Estimating the model"))
   time_start_estimate <- Sys.time()
   converged <- FALSE
   
@@ -256,7 +256,7 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
   
   # Print section time use
   time_diff <- Sys.time() - time_start_estimate
-  message(blue$bold(symbol$info), paste0("   Model estimation took ",
+  message(blue$bold(symbol$info), paste0("  Model estimation took ",
                                          round(time_diff, 2), " ",
                                          attr(time_diff, "units"), "\n"))
   
@@ -282,7 +282,7 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
     
     # Try and catch if the Hessian cannot be calculated 
     model[["hessian"]] <- tryCatch({
-      message(blue$bold(symbol$info), bold("   Calculating the Hessian matrix"))
+      message(blue$bold(symbol$info), bold("  Calculating the Hessian matrix"))
       hessian <- numDeriv::hessian(func = ll_func_pb, x = model[["param_final"]])
       colnames(hessian) <- names(model[["param_final"]])
       rownames(hessian) <- names(model[["param_final"]])
@@ -295,7 +295,7 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
     if (is.na(model[["hessian"]]) || anyNA(model[["hessian"]])) {
       # Print messages to console
       message(red$bold(symbol$cross), "  Hessian calculation using the \'numDeriv\' package.\n")
-      message(blue$bold(symbol$info), "   Trying to calculate Hessian using the \'maxLik\' package.\n")
+      message(blue$bold(symbol$info), "  Trying to calculate Hessian using the \'maxLik\' package.\n")
       
       # Reset the progress bar
       pb <- progress::progress_bar$new(
@@ -333,12 +333,12 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
     
     # Print section time use
     time_diff <- Sys.time() - time_start_hessian
-    message(blue$bold(symbol$info), paste0("   Hessian calculation took ",
+    message(blue$bold(symbol$info), paste0("  Hessian calculation took ",
                                            round(time_diff, 2), " ",
                                            attr(time_diff, "units"), "\n"))
     
     # CALCULATE THE VCOV MATRIX ----
-    message(blue$bold(symbol$info), bold("   Calculating the variance-covariance matrices"))
+    message(blue$bold(symbol$info), bold("  Calculating the variance-covariance matrices"))
     time_start_vcov <- Sys.time()
     
     # Standard
@@ -373,12 +373,14 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
     }
     
     time_diff <- Sys.time() - time_start_vcov
-    message(blue$bold(symbol$info), paste0("   Variance-covariance calculations took ",
+    message(blue$bold(symbol$info), paste0("  Variance-covariance calculations took ",
                                            round(time_diff, 2), " ",
                                            attr(time_diff, "units"), "\n"))
     
     # CALCULATE CONVERGENCE CRITERIA AND MODEL DIAGNOSTICS ----
-    model[["convergence_criteria"]] <- t(model[["gradient"]]) %*% model[["vcov"]] %*% model[["gradient"]]
+    if (!is.null(model[["vcov"]])) {
+      model[["convergence_criteria"]] <- t(model[["gradient"]]) %*% model[["vcov"]] %*% model[["gradient"]]
+    }
     
   } else {
     model[["hessian"]] <- NULL
@@ -413,7 +415,7 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
   
   # WRAP UP AND RETURN MODEL OBJECT ----
   time_end <- Sys.time()
-  message(green$bold(symbol$tick), bold(paste0("   Estimation completed on ", time_end, "\n")))
+  message(green$bold(symbol$tick), bold(paste0("  Estimation completed on ", time_end, "\n")))
   model[["time_end"]] <- time_end
   
   model
