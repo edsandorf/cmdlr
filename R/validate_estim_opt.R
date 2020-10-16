@@ -30,7 +30,8 @@ validate_estim_opt <- function(estim_opt_input) {
       simple_search = TRUE,
       candidates = 100,
       multiplier = 1
-    )
+    ),
+    check_data = TRUE
   )
   
   # Replace the non-specified values with default values

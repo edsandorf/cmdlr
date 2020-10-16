@@ -1,4 +1,6 @@
 ## cmdlR v0.0.3
+* The 'check_data' option passed to 'estim_opt' allows the user to bypass 
+data checks. Useful for Monte Carlo analysis.
 * Added the functions 'rep_row()' and 'rep_col'
 * 'N', 'S' and 'nobs' are no longer specified in 'model_opt' but inferred from the data using the data, id- and choice task variables.
 * Bug fixes

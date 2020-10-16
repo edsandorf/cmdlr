@@ -16,7 +16,7 @@ prepare_data <- function(db, estim_opt, model_opt) {
   S <- length(unique(db[[model_opt[["ct"]]]]))
 
   # Check choice tasks
-  if ((N * S) != nrow(db)) {
+  if (((N * S) != nrow(db)) & isTRUE(estim_opt$check_data)) {
     message(yellow$bold(symbol$warning), "  Unequal number of choice occasions across individuals. Padding the data with NA.")
     db <- pad_data(db, model_opt)
   }
