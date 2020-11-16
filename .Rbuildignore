@@ -8,3 +8,5 @@
 ^examples$
 ^Outputs$
 ^outputs$
+^_pkgdown\.yml$
+^pkgdown$
