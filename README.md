@@ -1,7 +1,7 @@
 <!-- badges: start -->
-[![Travis build status](https://travis-ci.com/edsandorf/cmdlR.svg?branch=master)](https://travis-ci.com/edsandorf/cmdlR)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version-last-release/cmdlR)](https://cran.r-project.org/package=cmdlR)
 [![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/cmdlR)](http://www.r-pkg.org/pkg/cmdlR)
+[![R build status](https://github.com/edsandorf/cmdlR/workflows/R-CMD-check/badge.svg)](https://github.com/edsandorf/cmdlR/actions)
 <!-- badges: end -->
 
 # cmdlR: Choice Modeling in R

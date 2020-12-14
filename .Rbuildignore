@@ -1,6 +1,5 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-^\.travis\.yml$
 ^cran-comments\.md$
 ^README\.md$
 ^CRAN-RELEASE$
@@ -10,3 +9,4 @@
 ^outputs$
 ^_pkgdown\.yml$
 ^pkgdown$
+^\.github$
