@@ -1,4 +1,5 @@
 ## cmdlR v0.0.3
+* Added an example with a MDCEV model with an outside good. Tested on Apollo data. 
 * The 'check_data' option passed to 'estim_opt' allows the user to bypass 
 data checks. Useful for Monte Carlo analysis.
 * Added the functions 'rep_row()' and 'rep_col'
