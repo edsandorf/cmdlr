@@ -20,7 +20,7 @@ pad_data <- function(db, model_opt) {
     db_tmp <- db[db[, model_opt[["id"]]] == i, ]
     if (nrow(db_tmp) != S) {
       db_tmp <- merge(ct_tmp, db_tmp, by = model_opt[["ct"]], all.x = TRUE)
-      db_tmp$id <- i
+      db_tmp[, model_opt[["id"]]] <- i
     }
     
     # Return the padded data matrix
