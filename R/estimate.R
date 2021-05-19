@@ -160,13 +160,16 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
   if (estim_opt$search_start) {
     time_start_search <- Sys.time()
     
-    model_opt$param <- search_start_values(ll_func, estim_env, estim_opt, model_opt)
+    start_values <- search_start_values(ll_func, estim_env, estim_opt, model_opt)
+    model_opt$param <- as.list(start_values[1, , drop = TRUE][-ncol(start_values)])
     
     time_diff <- Sys.time() - time_start_search
     message(blue$bold(symbol$info), paste0("  Search for starting values took ",
                                            round(time_diff, 2), " ",
                                            attr(time_diff, "units"), "\n"))
     
+  } else {
+    start_values <- NULL
   }
   
   # ESTIMATE THE MODEL ----
@@ -195,6 +198,7 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
   
   # Add the starting parameters and fixed parameters to the model object
   model[["param_start"]] <- param
+  model[["starting_values"]] <- start_values
   model[["param_fixed"]] <- param_fixed
   
   # Other
@@ -203,15 +207,23 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
   
   # Estimate the model using the 'maxLik' package
   if (tolower(estim_opt$optimizer) == "maxlik") {
-    model_obj <- maxLik::maxLik(ll_func,
-                                start = param_free,
-                                method = estim_opt$method,
-                                finalHessian = FALSE,
-                                tol = estim_opt$tol, gradtol = estim_opt$gradtol,
-                                reltol = estim_opt$reltol, 
-                                steptol = estim_opt$steptol,
-                                print.level = estim_opt$print_level, 
-                                iterlim = estim_opt$iterlim)
+    model_obj <- tryCatch({
+      maxLik::maxLik(ll_func,
+                     start = param_free,
+                     method = estim_opt$method,
+                     finalHessian = FALSE,
+                     tol = estim_opt$tol, gradtol = estim_opt$gradtol,
+                     reltol = estim_opt$reltol, 
+                     steptol = estim_opt$steptol,
+                     print.level = estim_opt$print_level, 
+                     iterlim = estim_opt$iterlim)
+    }, error = function(e) {
+      NULL
+    })
+    
+    if (is.null(model_obj)) {
+      return(model)
+    }
     
     model[["ll"]] <- model_obj$maximum
     model[["param_final"]] <- model_obj$estimate
@@ -227,9 +239,14 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
   
   # Estimate the model using the 'ucminf' package
   if (tolower(estim_opt$optimizer) == "ucminf") {
-    model_obj <- ucminf::ucminf(par = param_free,
-                                fn = ll_func_sum,
-                                hessian = 0)
+    model_obj <- tryCatch({
+      ucminf::ucminf(par = param_free,
+                     fn = ll_func_sum,
+                     hessian = 0)
+    }, error = function(e) {
+      return(model)
+    })
+
     
     # Added a minus to make the fit calculations correct
     model[["ll"]] <- -model_obj$value
@@ -418,5 +435,6 @@ estimate <- function(ll, db, estim_opt, model_opt, save_opt, debug = FALSE) {
   message(green$bold(symbol$tick), bold(paste0("  Estimation completed on ", time_end, "\n")))
   model[["time_end"]] <- time_end
   
-  model
+  # Explicit return
+  return(model)
 }

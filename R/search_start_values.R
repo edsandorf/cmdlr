@@ -81,7 +81,6 @@ search_start_values <- function(ll_func, estim_env, estim_opt, model_opt) {
     
     start_values <- cbind(start_values, Reduce(rbind, ll))
     start_values <- start_values[order(start_values[, ncol(start_values)], decreasing = TRUE), ]
-    start_values <- start_values[1, , drop = TRUE][-ncol(start_values)]
     
   } else {
     cat("Not implemented yet. Moving on ... \n")
@@ -89,5 +88,5 @@ search_start_values <- function(ll_func, estim_env, estim_opt, model_opt) {
   
   # Print complete message and return the starting values as a named list
   cat(green$bold(symbol$tick), "  Starting values\n")
-  as.list(start_values)
+  return(start_values)
 }
