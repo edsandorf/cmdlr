@@ -1,3 +1,41 @@
+#' Repeat rows
+#'
+#' Repeats each row in the matrix or data frame 'x' a number of times equal to
+#' 'times'.
+#'
+#' @param x A matrix or data frame
+#' @param times An integer indicating the number of times to repeat the
+#' row/column
+#'
+#' @examples
+#' test_matrix <- matrix(runif(12), 4)
+#' rep_rows(test_matrix, 2)
+#'
+#' @export
+rep_rows <- function(x, times) {
+  stopifnot(is.data.frame(x) || is.matrix(x))
+  
+  return(x[rep(seq_len(nrow(x)), each = times), , drop = FALSE])
+}
+
+#' Repeat columns
+#'
+#' Repeats each column of the matrix or data frame 'x' a number of times equal
+#' to 'times'.
+#'
+#' @inheritParams rep_rows
+#'
+#' @examples
+#' test_matrix <- matrix(runif(12), 4)
+#' rep_cols(test_matrix, 2)
+#'
+#' @export
+rep_cols <- function(x, times) {
+  stopifnot(is.data.frame(x) || is.matrix(x))
+  
+  return(x[, rep(seq_len(ncol(x)), each = times), drop = FALSE])
+}
+
 #' Inspect a list
 #' 
 #' A useful function for exploratory work or when coding. Takes a list as an
@@ -44,4 +82,29 @@ inspect_list <- function(x) {
       }
     }
   })
+}
+
+
+#' Load a multiple packages
+#' 
+#' Loads all packages in 'pkgs'
+#' 
+#' @param pkgs A character string of packages
+#' 
+#' @return NULL
+#' 
+#' @export
+load_packages <- function(pkgs) {
+  stopifnot(is.character(pkgs))
+  
+  lapply(pkgs, require, character.only = TRUE)
+  
+  return(NULL)
+}
+
+#' A function to create a model name
+#'
+#' @param model_name A string
+make_model_name <- function(model_name) {
+  gsub("([.\\s+])+", "-", tolower(model_name), perl = TRUE)
 }

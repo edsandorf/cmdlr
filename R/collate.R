@@ -36,8 +36,11 @@ collate <- function(path = NULL, pattern = NULL, digits = 4) {
   
   # If there are no .rds files returned, then stop
   if (length(file_list) < 1) {
-    cat(red$bold(symbol$cross), paste0("  collate().\n"))
-    stop("Can only collate results from .rds files. Make sure that you have stored the model object in the location specified in path and that your pattern, if applied, does match at least one of the model objects .rds")
+    stop(
+      "Can only collate results from .rds files. Make sure that you have stored 
+      the model object in the location specified in path and that your pattern, 
+      if applied, does match at least one of the model objects .rds"
+    )
   }
   
   # Lapply through the vector to read in the model objects
@@ -64,7 +67,7 @@ collate <- function(path = NULL, pattern = NULL, digits = 4) {
     i_est <- i + (i - 1)
     i_se <- i_est + 1
     
-    # Extract the coefficients, calculate the standard errors and place into matrix
+    # Extract the coefficients, calculate the standard errors
     coef_tmp <- round(models[[i]][["param_final"]], digits)
     se_tmp <- round(sqrt(diag(models[[i]][["vcov"]])), digits)
     results[names(coef_tmp), i_est] <- coef_tmp
@@ -86,6 +89,5 @@ collate <- function(path = NULL, pattern = NULL, digits = 4) {
   # Write the .csv file to the outputs folder
   file_path <- paste0(path, "-collated-results.csv")
   utils::write.csv(results, file_path)
-  message(blue$bold(symbol$info), paste0("  Robust standard errors are not included in the collated file.\n"))
-  message(blue$bold(symbol$info), paste0("  The collated results are saved to: \"", file_path, "\"\n"))
+  cli::cli_alert_info(paste0("The results are saved to: ", file_path))
 }

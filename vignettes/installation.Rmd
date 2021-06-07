@@ -39,7 +39,7 @@ Project development is such that the master branch contains the latest stable re
 Once you have installed the desired version of the package, go ahead and load it using the `library()` function. You will see a welcome message and the cmdlR logo. 
 
 ```{r setup}
-library(cmdlR)
+library(cmdlr)
 ```
 
 You should now be ready to go. To test our installation, try to run one of the included examples. 

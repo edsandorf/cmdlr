@@ -1,9 +1,9 @@
 # Tidy the environment prior to loading packages ----
-cmdlR::tidy()
+# cmdlR::tidy()
 rm(list = ls(all = TRUE))
 
 # Load the packages ----
-pkgs <- c("cmdlR")
+pkgs <- c("cmdlr")
 invisible(lapply(pkgs, require, character.only = TRUE))
 
 # Load and manipulate the data ----
@@ -32,13 +32,7 @@ estim_opt <- list(
   cores = 1,
   calculate_hessian = TRUE,
   robust_vcov = TRUE,
-  print_level = 2,
-  search_start = FALSE,
-  search_start_options = list(
-    simple_search = TRUE,
-    candidates = 100,
-    multiplier = 1
-  )
+  print_level = 2
 )
 
 # Define the list of model options ----
@@ -77,6 +71,9 @@ model_opt <- list(
     sigma              = 0
   )
 )
+
+# Validate options ----
+validated_options <- validate(estim_opt, model_opt, save_opt, db)
 
 # Likelihood function - returns the probability of the sequence of choices ----
 ll <- function(param) {
@@ -199,7 +196,7 @@ ll <- function(param) {
   pr_chosen <- exp(term_1 + term_2 + term_3 + term_4 + term_5)
   
   # Calculate the product over the panel by reshaping to have rows equal to S
-  pr_chosen <- matrix(pr_chosen, nrow = S)
+  pr_chosen <- matrix(pr_chosen, nrow = n_ct)
   
   # If the data is padded, we need to insert ones before taking the product
   index_na <- is.na(pr_chosen)
@@ -213,19 +210,14 @@ ll <- function(param) {
   attributes(ll) <- list(
     pr_chosen = pr_chosen
   )
-  -ll
+  return(-ll)
 }
 
+# Prepare inputs ----
+prepared_inputs <- prepare(db, ll, validated_options)
+
 # Estimate the model ----
-model <- estimate(ll, db, estim_opt, model_opt, save_opt, debug = FALSE)
+model <- estimate(ll, prepared_inputs, validated_options)
 
 # Get a summary of the results ----
 summarize(model)
-
-# Collate results to a single file ----
-#collate() 
-
-# Save the results ----
-# store(model, save_opt)
-
-# model$choice_analysis

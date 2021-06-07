@@ -1,9 +1,9 @@
 # Tidy the environment prior to loading packages ----
-cmdlR::tidy()
+# cmdlR::tidy()
 rm(list = ls(all = TRUE))
 
 # Load the packages ----
-pkgs <- c("cmdlR")
+pkgs <- c("cmdlr")
 invisible(lapply(pkgs, require, character.only = TRUE))
 
 # Load and manipulate the data ----
@@ -12,8 +12,8 @@ db$ct <- rep(1:9, times = 388)
 
 # Define the list of saving options ----
 save_opt <- list(
-  name = "LC model",
-  description = "A simple LC model with 2 classes",
+  name = "MIXL uncorrelated LN",
+  description = "A mixed logit model with uncorrelated log-normals",
   path = file.path("outputs"),
   save_summary = FALSE,
   save_model_object = FALSE
@@ -21,9 +21,9 @@ save_opt <- list(
 
 # Define the list of estimation options ----
 estim_opt <- list(
-  optimizer = "maxlik",
+  optimizer = "ucminf",
   method = "BFGS",
-  cores = 2,
+  cores = 4,
   calculate_hessian = TRUE,
   robust_vcov = TRUE,
   print_level = 2
@@ -41,17 +41,17 @@ model_opt <- list(
   fixed = c(),
   param = list(
     mu_log_b_tt    =-3,
-    sigma_log_b_tt = 0,
+    sigma_log_b_tt = 0.1,
     mu_log_b_tc    =-3,
-    sigma_log_b_tc = 0,
+    sigma_log_b_tc = 0.1,
     mu_log_b_hw    =-3,
-    sigma_log_b_hw = 0,
+    sigma_log_b_hw = 0.1,
     mu_log_b_ch    =-3,
-    sigma_log_b_ch = 0
+    sigma_log_b_ch = 0.1
   ),
   mixing = TRUE,
-  draws_type = "standard_halton",
-  R = 500, 
+  draws_type = "standard-halton",
+  n_draws = 500, 
   rpar = list(
     draws_tt = "normal",
     draws_tc = "normal",
@@ -59,6 +59,9 @@ model_opt <- list(
     draws_ch = "normal"
   )
 )
+
+# Validate options ----
+validated_options <- validate(estim_opt, model_opt, save_opt, db)
 
 # Likelihood function - returns the probability of the sequence of choices ----
 ll <- function(param) {
@@ -94,7 +97,7 @@ ll <- function(param) {
   pr_chosen <- chosen_alt_available / sum_v
   
   # Calculate the product over the panel by reshaping to have rows equal to S
-  pr_chosen <- matrix(pr_chosen, nrow = S)
+  pr_chosen <- matrix(pr_chosen, nrow = n_ct)
   
   # If the data is padded, we need to insert ones before taking the product
   index_na <- is.na(pr_chosen)
@@ -104,22 +107,20 @@ ll <- function(param) {
   pr_seq <- Rfast::colprods(pr_chosen)
   
   # Reshape the matrix such that each row is an individual and average over draws
-  pr_seq <- matrix(pr_seq, nrow = N)
+  pr_seq <- matrix(pr_seq, nrow = n_id)
   pr_seq <- Rfast::rowmeans(pr_seq)
   ll <- log(pr_seq)
   
   # Return the likelihood value
-  ll
+  return(-ll)
 }
 
+# Prepare inputs ----
+prepared_inputs <- prepare(db, ll, validated_options)
+
 # Estimate the model ----
-model <- estimate(ll, db, estim_opt, model_opt, save_opt, debug = FALSE)
+model <- estimate(ll, prepared_inputs, validated_options)
 
 # Get a summary of the results ----
 summarize(model)
 
-# Collate results to a single file ----
-#collate() 
-
-# Save the results ----
-# store(model, save_opt)

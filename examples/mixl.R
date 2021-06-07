@@ -1,13 +1,13 @@
 # Tidy the environment prior to loading packages ----
-cmdlR::tidy()
+# cmdlR::tidy()
 rm(list = ls(all = TRUE))
 
 # Load the packages ----
-pkgs <- c("cmdlR")
+pkgs <- c("cmdlr")
 invisible(lapply(pkgs, require, character.only = TRUE))
 
 # Load and manipulate the data ----
-db <- cmdlR::data_petr_test
+db <- cmdlr::data_petr_test
 
 # Define the list of saving options ----
 save_opt <- list(
@@ -39,8 +39,8 @@ model_opt <- list(
     alt3 = 1
   ),
   mixing = TRUE,
-  draws_type = "scrambled_sobol",
-  R = 1000, 
+  draws_type = "scrambled-sobol",
+  n_draws = 1000, 
   fixed = c(),
   param = list(
     b_alt1 = 0,
@@ -55,6 +55,9 @@ model_opt <- list(
     d_attr2 = "normal"
   )
 )
+
+# Validate options ----
+validated_options <- validate(estim_opt, model_opt, save_opt, db)
 
 # Likelihood function - returns the probability of the sequence of choices ----
 ll <- function(param) {
@@ -86,7 +89,7 @@ ll <- function(param) {
   pr_chosen <- 1 / sum_v
   
   # Calculate the product over the panel by reshaping to have rows equal to S
-  pr_chosen <- matrix(pr_chosen, nrow = S)
+  pr_chosen <- matrix(pr_chosen, nrow = n_ct)
   
   # If the data is padded, we need to insert ones before taking the product
   index_na <- is.na(pr_chosen)
@@ -96,24 +99,20 @@ ll <- function(param) {
   pr_seq <- Rfast::colprods(pr_chosen)
   
   # Reshape the matrix such that each row is an individual and average over draws
-  pr_seq <- matrix(pr_seq, nrow = N)
+  pr_seq <- matrix(pr_seq, nrow = n_id)
   pr_seq <- Rfast::rowmeans(pr_seq)
   
   # Return the likelihood value
   ll <- log(pr_seq)
-  -ll
+  
+  return(-ll)
 }
 
+# Prepare inputs ----
+prepared_inputs <- prepare(db, ll, validated_options)
+
 # Estimate the model ----
-model <- estimate(ll, db, estim_opt, model_opt, save_opt, debug = FALSE)
+model <- estimate(ll, prepared_inputs, validated_options)
 
 # Get a summary of the results ----
 summarize(model)
-
-# Collate results to a single file ----
-#collate() 
-
-# Save the results ----
-# store(model, save_opt)
-
-# microbenchmark::microbenchmark(estimate(ll, db, estim_opt, model_opt, save_opt), times = 5)

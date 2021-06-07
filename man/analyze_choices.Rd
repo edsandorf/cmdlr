@@ -4,15 +4,13 @@
 \alias{analyze_choices}
 \title{Analyzes choices}
 \usage{
-analyze_choices(db, model_opt)
+analyze_choices(db, validated_options)
 }
 \arguments{
-\item{db}{A \code{data.frame()} or \code{tibble()} with the data to be used in
-estimation.}
+\item{db}{A data.frame containing the estimation data}
 
-\item{model_opt}{A list of model options including random parameters, draws,
-fixed and non-fixed parameters during estimation, starting value search 
-procedures etc.}
+\item{validated_options}{A list of validated model options returned from 
+\code{\link{validate}}}
 }
 \value{
 A matrix with the choice shares and test statistics for difference in
@@ -44,6 +42,9 @@ references.
 
 }
 \references{
-Hess, S. & Palma, D. (2019), Apollo: a flexible, powerful and customisable freeware package for choice model estimation and application, Journal of Choice Modelling, Volume 32, September 2019, 100170
-Hess, S. & Palma, D. (2019), Apollo version 0.1.0, user manual, www.ApolloChoiceModelling.com
+Hess, S. & Palma, D. (2019), Apollo: a flexible, powerful and customisable 
+freeware package for choice model estimation and application, Journal of 
+Choice Modelling, Volume 32, September 2019, 100170
+Hess, S. & Palma, D. (2019), Apollo version 0.1.0, user manual,
+ www.ApolloChoiceModelling.com
 }

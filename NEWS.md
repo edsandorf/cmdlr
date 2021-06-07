@@ -1,4 +1,5 @@
 ## cmdlR v0.0.3
+* The code has undergone major refactoring and linting, while giving the documentation a much needed update. Previously, some functions relied on scoping rather than explicit passing of arguments. This is now fixed. 
 * Added an example with a MDCEV model with an outside good. Tested on Apollo data. 
 * The 'check_data' option passed to 'estim_opt' allows the user to bypass 
 data checks. Useful for Monte Carlo analysis.

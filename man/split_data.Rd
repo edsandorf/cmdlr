@@ -2,19 +2,20 @@
 % Please edit documentation in R/split_data.R
 \name{split_data}
 \alias{split_data}
-\title{Function to split the data}
+\title{Split the data into a list}
 \usage{
-split_data(db, estim_opt, model_opt)
+split_data(db, str_id, cores)
 }
 \arguments{
-\item{db}{A data frame}
+\item{db}{A \code{data.frame()} or \code{tibble()} containing the data}
 
-\item{estim_opt}{List of estimation options}
+\item{str_id}{A character string giving the name of the id variable}
 
-\item{model_opt}{List of model options}
+\item{cores}{An integer indicating the number of cores to use in estimation}
 }
 \value{
-A list of data matrices with length equal to \code{cores}.
+A list of data.frames with length equal to the number of cores to 
+use in estimation
 }
 \description{
 The function takes the data and splits it into roughly equal chunks to be
@@ -22,7 +23,8 @@ sent to the workers for parallel processing. The function takes care to not
 split the same individual across multiple workers.
 }
 \details{
-It is important that the function is run after \code{check_data}. The code
-only splits individuals and observations correctly if there are equal
-number of rows per individual.
+Note that the function will only split the data correctly if all respondents
+have the same number of rows. Therefore, it is important that this function
+is called after the data has been padded with NAs in case of unequal 
+number of choice tasks.
 }

@@ -1,4 +1,4 @@
 library(testthat)
-library(cmdlR)
+library(cmdlr)
 
-test_check("cmdlR")
+test_check("cmdlr")

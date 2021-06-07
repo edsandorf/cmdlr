@@ -7,6 +7,7 @@
 #' The function is a rewritten version of \code{apollo_choiceAnalysis()}. See
 #' references. 
 #' 
+#' @param db A data.frame containing the estimation data
 #' @inheritParams estimate
 #' 
 #' @return A matrix with the choice shares and test statistics for difference in
@@ -28,13 +29,18 @@
 #' }
 #' 
 #' @references 
-#' Hess, S. & Palma, D. (2019), Apollo: a flexible, powerful and customisable freeware package for choice model estimation and application, Journal of Choice Modelling, Volume 32, September 2019, 100170
-#' Hess, S. & Palma, D. (2019), Apollo version 0.1.0, user manual, www.ApolloChoiceModelling.com
+#' Hess, S. & Palma, D. (2019), Apollo: a flexible, powerful and customisable 
+#' freeware package for choice model estimation and application, Journal of 
+#' Choice Modelling, Volume 32, September 2019, 100170
+#' Hess, S. & Palma, D. (2019), Apollo version 0.1.0, user manual,
+#'  www.ApolloChoiceModelling.com
 #' 
 #' @export
 
-analyze_choices <- function(db, model_opt) {
+analyze_choices <- function(db, validated_options) {
   # Extract useful information
+  model_opt <- validated_options[["model_opt"]]
+  
   alt_avail <- model_opt$alt_avail
   choice_var <- db[[model_opt[["choice"]]]]
   

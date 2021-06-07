@@ -4,20 +4,39 @@
 \alias{search_start_values}
 \title{Function to search for starting values}
 \usage{
-search_start_values(ll_func, estim_env, estim_opt, model_opt)
+search_start_values(
+  ll,
+  prepared_inputs,
+  validated_options,
+  type = "simple",
+  n_candidates = 100,
+  n_return = 10,
+  multiplier = 1
+)
 }
 \arguments{
-\item{ll_func}{A complete and 'wrapped' log-likelihood function created by 
-\code{\link{prepare_log_lik}}.}
+\item{ll}{This is the 'raw' log-likelihood function passed to the estimation
+routine. It is important that the user takes into account whether the 
+optimization routine is a minimizer (e.g. 'ucminf') or a maximizer 
+(e.g. 'maxlik').}
 
-\item{estim_env}{A list of data and other variables to be coerced to environment with eval}
+\item{prepared_inputs}{A list of prepared inputs returned from 
+\code{\link{prepare}}}
 
-\item{estim_opt}{A list of options for the estimation procedure such as 
-type of optimizer, approximation routines, tolerance levels etc.}
+\item{validated_options}{A list of validated model options returned from 
+\code{\link{validate}}}
 
-\item{model_opt}{A list of model options including random parameters, draws,
-fixed and non-fixed parameters during estimation, starting value search 
-procedures etc.}
+\item{type}{A character string indicating whether to use a simple or a smart
+search algorithm. Default is 'simple'}
+
+\item{n_candidates}{An integer giving the numer of candidates to evaluate.
+Default is 100.}
+
+\item{n_return}{An integer giving the number of parameter vectors to return.
+The default is 10}
+
+\item{multiplier}{A double indicating a multiplier for the 'simple' search
+algorithm. The default is 1.}
 }
 \value{
 A list of parameters
@@ -27,10 +46,11 @@ The function searches for new starting values. Either in a random fashion or
 based on a smarter search algorithm. The smart search algorithm is a rewritten
 version of the search algorithm implemented in the Apollo package. The function
 is rewritten to work with the current modeling framework.
-
-The function is intended for internal use only.
 }
 \references{
-Hess, S. & Palma, D., 2019, Apollo: A flexible, powerful and customisable freeware package for choice model estimation and application, Journal of Choice Modelling, 32
-Bierlaire, M., Thémans, M. & Zufferey, N., 2010, A heuristic for nonlinear global optimization, INFORMS Journal on Computing, 22(1):
+Hess, S. & Palma, D., 2019, Apollo: A flexible, powerful and customisable f
+reeware package for choice model estimation and application, Journal of 
+Choice Modelling, 32
+Bierlaire, M., Thémans, M. & Zufferey, N., 2010, A heuristic for nonlinear 
+global optimization, INFORMS Journal on Computing, 22(1):
 }
