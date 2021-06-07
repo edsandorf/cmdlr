@@ -4,13 +4,13 @@
 \alias{store}
 \title{Stores the results of the model to files}
 \usage{
-store(model, save_opt)
+store(model, validated_options)
 }
 \arguments{
 \item{model}{A model opbject returned by \code{estimate}}
 
-\item{save_opt}{List of options for storing the outputs including which
-model outputs to store, how to store them and where to store them.}
+\item{validated_options}{A list of validated model options returned from 
+\code{\link{validate}}}
 }
 \description{
 This function takes the model object and the list \code{save_opt} and stores

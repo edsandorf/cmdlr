@@ -36,8 +36,11 @@ collate <- function(path = NULL, pattern = NULL, digits = 4) {
   
   # If there are no .rds files returned, then stop
   if (length(file_list) < 1) {
-    cat(red$bold(symbol$cross), paste0("  collate().\n"))
-    stop("Can only collate results from .rds files. Make sure that you have stored the model object in the location specified in path and that your pattern, if applied, does match at least one of the model objects .rds")
+    stop(
+      "Can only collate results from .rds files. Make sure that you have stored 
+      the model object in the location specified in path and that your pattern, 
+      if applied, does match at least one of the model objects .rds"
+    )
   }
   
   # Lapply through the vector to read in the model objects
@@ -48,9 +51,10 @@ collate <- function(path = NULL, pattern = NULL, digits = 4) {
   # Extract the names and create a matrix to use for matching
   # This works, but it does it alphabetically and numerically - extension here?
   row_names <- c(
-    unique(sort(Reduce(c, lapply(models, function(x) names(x$coef))))),
+    unique(sort(Reduce(c, lapply(models, function(x) names(x$param_final))))),
     "name", "nobs", "K", "ll", "adj_rho_sqrd", "bic", "aic", "draws_type", "R"
   )
+  
   results <- matrix(NA, nrow = length(row_names), ncol = (length(models) * 2),
                     dimnames = list(
                       row_names,
@@ -63,8 +67,8 @@ collate <- function(path = NULL, pattern = NULL, digits = 4) {
     i_est <- i + (i - 1)
     i_se <- i_est + 1
     
-    # Extract the coefficients, calculate the standard errors and place into matrix
-    coef_tmp <- round(models[[i]][["coef"]], digits)
+    # Extract the coefficients, calculate the standard errors
+    coef_tmp <- round(models[[i]][["param_final"]], digits)
     se_tmp <- round(sqrt(diag(models[[i]][["vcov"]])), digits)
     results[names(coef_tmp), i_est] <- coef_tmp
     results[names(se_tmp), i_se] <- se_tmp
@@ -72,7 +76,7 @@ collate <- function(path = NULL, pattern = NULL, digits = 4) {
     # Extrac the model name and characteristics and append to the matrix
     results["name", i_est] <- models[[i]][["name"]]
     results["nobs", i_est] <- models[[i]][["nobs"]]
-    results["K", i_est] <- length(models[[i]][["coef"]])
+    results["K", i_est] <- length(models[[i]][["param_final"]])
     results["ll", i_est] <- round(models[[i]][["ll"]], digits)
     results["adj_rho_sqrd", i_est] <- round(models[[i]][["adj_rho_sqrd"]], digits)
     results["bic", i_est] <- round(models[[i]][["bic"]], digits)
@@ -85,5 +89,5 @@ collate <- function(path = NULL, pattern = NULL, digits = 4) {
   # Write the .csv file to the outputs folder
   file_path <- paste0(path, "-collated-results.csv")
   utils::write.csv(results, file_path)
-  cat(blue$bold(symbol$info), paste0("  The collated results are saved to: \"", file_path, "\"\n"))
+  cli::cli_alert_info(paste0("The results are saved to: ", file_path))
 }

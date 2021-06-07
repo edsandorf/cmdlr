@@ -1,0 +1,12 @@
+authors:
+  Erlend Dancke Sandorf:
+    href: https://edsandorf.me
+navbar:
+  structure:
+    left:  [home, intro, articles, tutorials, news, reference]
+    right: [github]
+url: https://cmdlr.edsandorf.me
+template:
+  params:
+    bootswatch: cerulean
+

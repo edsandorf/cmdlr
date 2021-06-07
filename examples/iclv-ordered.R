@@ -1,9 +1,9 @@
 # Tidy the environment prior to loading packages ----
-cmdlR::tidy()
+# cmdlR::tidy()
 rm(list = ls(all = TRUE))
 
 # Load the packages ----
-pkgs <- c("cmdlR")
+pkgs <- c("cmdlr")
 invisible(lapply(pkgs, require, character.only = TRUE))
 
 # Load and manipulate the data ----
@@ -24,7 +24,7 @@ save_opt <- list(
 estim_opt <- list(
   optimizer = "maxlik",
   method = "BFGS",
-  cores = 1,
+  cores = 4,
   calculate_hessian = TRUE,
   robust_vcov = TRUE,
   print_level = 2
@@ -35,15 +35,12 @@ model_opt <- list(
   id = "ID",
   ct = "task",
   choice = "best",
-  N = length(unique(db[["ID"]])),
-  S = length(unique(db[["task"]])),
   alt_avail = list(
     alt1 = 1,
     alt2 = 1,
     alt3 = 1, 
     alt4 = 1
   ),
-  nobs = nrow(db),
   fixed = c("b_brand_Artemis", "b_country_USA", "b_char_standard"),
   param = list(
     b_brand_Artemis    = 0, 
@@ -88,12 +85,15 @@ model_opt <- list(
     tau_dominance_4    = 2
   ),
   mixing = TRUE,
-  R = 100,
-  draws_type = "standard_halton",
+  n_draws = 100,
+  draws_type = "standard-halton",
   rpar = list(
     eta = "normal"
   )
 )
+
+# Validate options ----
+validated_options <- validate(estim_opt, model_opt, save_opt, db)
 
 # Likelihood function - returns the probability of the sequence of choices ----
 ll <- function(param) {
@@ -188,7 +188,7 @@ ll <- function(param) {
   pr_chosen <- pr_chosen
   
   # Calculate the product over the panel by reshaping to have rows equal to S
-  pr_chosen <- matrix(pr_chosen, nrow = S)
+  pr_chosen <- matrix(pr_chosen, nrow = n_ct)
   
   # If the data is padded, we need to insert ones before taking the product
   index_na <- is.na(pr_chosen)
@@ -198,7 +198,7 @@ ll <- function(param) {
   pr_seq <- Rfast::colprods(pr_chosen)
   
   # Reshape the matrix such that each row is an individual and average over draws
-  pr_seq <- matrix(pr_seq, nrow = N)
+  pr_seq <- matrix(pr_seq, nrow = n_id)
   
   # Multiply with the matrix of indicator likelihoods. NOTE: This will not work
   # correctly if indicator observations are at the choice task level. 
@@ -207,17 +207,14 @@ ll <- function(param) {
   ll <- log(pr_seq)
   
   # Return the likelihood value
-  ll
+  return(ll)
 }
 
+# Prepare inputs ----
+prepared_inputs <- prepare(db, ll, validated_options)
+
 # Estimate the model ----
-model <- estimate(ll, db, estim_opt, model_opt, save_opt, debug = FALSE)
+model <- estimate(ll, prepared_inputs, validated_options)
 
 # Get a summary of the results ----
 summarize(model)
-
-# Collate results to a single file ----
-#collate() 
-
-# Save the results ----
-# store(model, save_opt)

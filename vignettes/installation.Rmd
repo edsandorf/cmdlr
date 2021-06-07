@@ -1,0 +1,45 @@
+---
+title: "Introduction and installation"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{vignette-cmdlR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+Choice modeling has been around for decades. 
+
+# Why another R package?
+Over the years, I have written a lot of code to estimate choice models in R. Every time I began a new project, I would make a copy of codes used in a previous project and change them to solve the needs of my current project. This meant that bugs fixed in one project could still be unfixed in another, and features added in some places were unavailable in others. Keeping track of files and changes became increasingly difficult and I spent tons of time trying to figure out when and where I fixed a bug or added a feature. In an attempt to combat this, I started tracking the main developments in a GitHub repository. While marginally better, it still did not work great. Instead of copying files from one location to another, I would clone the repository every time I started a new project, which ultimately led to the same proliferation of code. The ultimate solution to this was to write an R package, and the answer to the question: Why another R package? - To make my life easier!
+
+Writing an R package, function documentation, package vignette and creating a package website became a fun side project and taught me a lot about how R works, how GitHub works and how to maintain an open source project. Not only is my research code easily available to me and others, it has made me a better programmer. Making faster and more readable, flexible and maintainable code became important. Rewriting my code with these things in mind allowed me to rethink how I solved problems in the past. I have no ambition that this will be a widely used package. For that, there are too many good options out there. However, to me, it is a fun project, makes my research more available and my life easier.
+
+
+# The name
+Everyone (on the internet) says that you need a cathcy name for your package. Someting that is memorable. `cmdlR` is short for Choice Modeler or Choice Modeling in R. I like both, because it captures both what we are and what we do as choice modelers. 
+
+# Installing and loading the package
+The package is not yet on CRAN (I don't know if it will ever be), but it is available to install from my [GitHub repository](https://github.com/edsandorf/cmdlR). The easiest way to access the package is installing it directly using the `install_github()` function from the `devtools` package. 
+
+```{r eval=FALSE}
+devtools::install_github("edsandorf/cmdlR")
+```
+
+Project development is such that the master branch contains the latest stable release whereas the different development branches contains newer features, but may break older code, contain bugs or be otherwise unstable. 
+
+Once you have installed the desired version of the package, go ahead and load it using the `library()` function. You will see a welcome message and the cmdlR logo. 
+
+```{r setup}
+library(cmdlr)
+```
+
+You should now be ready to go. To test our installation, try to run one of the included examples. 

@@ -4,53 +4,40 @@
 \alias{estimate}
 \title{Function to estimate a choice model using cmdlR}
 \usage{
-estimate(ll, db, estim_opt, model_opt, save_opt, debug = FALSE)
+estimate(ll, prepared_inputs, validated_options)
 }
 \arguments{
-\item{ll}{A log likelihood function. If \code{estim_opt$optimizer = 'ucminf'},
-then the log likelihood function should return the negative log likelihood
-value.}
+\item{ll}{This is the 'raw' log-likelihood function passed to the estimation
+routine. It is important that the user takes into account whether the 
+optimization routine is a minimizer (e.g. 'ucminf') or a maximizer 
+(e.g. 'maxlik').}
 
-\item{db}{A \code{data.frame()} or \code{tibble()} with the data to be used in
-estimation.}
+\item{prepared_inputs}{A list of prepared inputs returned from 
+\code{\link{prepare}}}
 
-\item{estim_opt}{A list of options for the estimation procedure such as 
-type of optimizer, approximation routines, tolerance levels etc.}
-
-\item{model_opt}{A list of model options including random parameters, draws,
-fixed and non-fixed parameters during estimation, starting value search 
-procedures etc.}
-
-\item{save_opt}{List of options for storing the outputs including which
-model outputs to store, how to store them and where to store them.}
-
-\item{debug}{A boolean indicating whether the code is run in debug mode. If
-TRUE, the code will not estimate the models, but set the number of cores to 1
-and return the estimation environment. Defaults to FALSE.}
+\item{validated_options}{A list of validated model options returned from 
+\code{\link{validate}}}
 }
 \value{
-Returns a cmdlR model object. This is a list containing the following 
-elements:
+A list with model results including the hessian, standard and
+robust variance-covariance matrixes and
 }
 \description{
-This is the main function used to estimate choice models. The function runs
-a set of validation tests to check that all options are correctly specified. 
-A correctly specified option only means that the model will run, it does not 
-mean that the model specification is correct or that the combination of 
-options are correct from a statistical point of view.
+The function is a wrapper around one of several optimization routines that
+either maximize or minimize the log-likelihood function. If estimation 
+is successful, the function calculates a high-precision numerical hessian
+and a standard and robust variance-covariance matrix.
 }
 \details{
-If all checks are passed, the function will set up the estimation environment
-and define correct and useful wrapper functions. This includes creating and
-preparing workers in the context of parallel estimation.
-
-Once the estimation environment is set up, the model will be estimated using
-the options specified in \code{estim_opt()}.
+NOTE: There are no checks on whether the log-likelihood function is correctly
+specified. If you see that your log-likelihood value is getting progressively
+worse from starting values, check your 'll' specification and that it 
+corresponds to the chosen optmizer.
 }
 \examples{
 \dontrun{
   # See /examples for how to use
-  estimate(ll, db, estim_opt, model_opt, save_opt, debug = FALSE)
+  estimate(ll, prepared_inputs, validated_options)
 }
 
 }

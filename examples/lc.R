@@ -1,9 +1,9 @@
 # Tidy the environment prior to loading packages ----
-cmdlR::tidy()
+# cmdlR::tidy()
 rm(list = ls(all = TRUE))
 
 # Load the packages ----
-pkgs <- c("cmdlR")
+pkgs <- c("cmdlr")
 invisible(lapply(pkgs, require, character.only = TRUE))
 
 # Load and manipulate the data ----
@@ -34,13 +34,10 @@ model_opt <- list(
   id = "ID",
   ct = "ct",
   choice = "choice",
-  N = length(unique(db[["ID"]])),
-  S = length(unique(db[["ct"]])),
   alt_avail = list(
     alt1 = 1,
     alt2 = 1
   ),
-  nobs = nrow(db),
   fixed = c("b_asc_2", "g_const_2"),
   param = list(
     b_asc_1 = 0,
@@ -58,8 +55,11 @@ model_opt <- list(
   )
 )
 
+# Validate options ----
+validated_options <- validate(estim_opt, model_opt, save_opt, db)
+
 # Likelihood function - returns the probability of the sequence of choices ----
-ll <- function(param, inputs) {
+ll <- function(param) {
   # Define the class probability functions ----
   P <- list(
     class1 = g_const_1,
@@ -97,7 +97,7 @@ ll <- function(param, inputs) {
     pr_chosen <- 1 / sum_v
     
     # Calculate the product over the panel by reshaping to have rows equal to S
-    pr_chosen <- matrix(pr_chosen, nrow = S)
+    pr_chosen <- matrix(pr_chosen, nrow = n_ct)
     
     # If the data is padded, we need to insert ones before taking the product
     index_na <- is.na(pr_chosen)
@@ -123,9 +123,9 @@ ll <- function(param, inputs) {
   
   # If we have specified constants only then we need to make this the correct dim
   if (nrow(cls_pr) == 1) {
-    cls_pr <- matrix(rep(cls_pr, each = N), nrow = N)
+    cls_pr <- matrix(rep(cls_pr, each = n_id), nrow = n_id)
   } else {
-    cls_pr <- matrix(cls_pr, nrow = S)
+    cls_pr <- matrix(cls_pr, nrow = n_ct)
     cls_pr <- matrix(matrixStats::colMeans2(cls_pr, na.rm = TRUE), ncol = length(P))
   }
   
@@ -137,17 +137,15 @@ ll <- function(param, inputs) {
   attributes(ll) <- list(
     pr_seq = pr_seq
   )
-  -ll
+  
+  return(-ll)
 }
 
+# Prepare inputs ----
+prepared_inputs <- prepare(db, ll, validated_options)
+
 # Estimate the model ----
-model <- estimate(ll, db, estim_opt, model_opt, save_opt)
+model <- estimate(ll, prepared_inputs, validated_options)
 
 # Get a summary of the results ----
 summarize(model)
-
-# Collate results to a single file ----
-#collate() 
-
-# Save the results ----
-# store(model, save_opt)

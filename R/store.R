@@ -27,9 +27,13 @@
 #' }
 #' @export
 
-store <- function(model, save_opt) {
+store <- function(model, validated_options) {
   # Make sure that we do close file-writing if the function exits
   # on.exit(sink(), add = TRUE)
+  
+  estim_opt <- validated_options[["estim_opt"]]
+  model_opt <- validated_options[["model_opt"]]
+  save_opt <- validated_options[["save_opt"]]
   
   # For storage purposes change the name of the model object to lower case and 
   # '-' separated. 
@@ -50,7 +54,7 @@ store <- function(model, save_opt) {
   )
   
   if (length(file_list) > 0) {
-    cat(yellow$bold(symbol$warning), paste0("  A file with the name ", model_name, " already exists in the specified folder. Adding numbering to the file name.\n"))
+    # cat(yellow$bold(symbol$warning), paste0("  A file with the name ", model_name, " already exists in the specified folder. Adding numbering to the file name.\n"))
     unique_models <- unique(stringr::str_replace_all(file_list, "(-summary|-model-object|-hessian|-vcov|-param).*", ""))
     model_name <- paste0(model_name, "-", stringr::str_pad(as.character(length(unique_models) + 1), 3, side = "left", pad = "0"))
   }
@@ -64,41 +68,41 @@ store <- function(model, save_opt) {
     sink(file_path)
     summarize(model)
     sink()
-    cat(blue$bold(symbol$info), paste0("  Model summary saved to: \"", file_path, "\"\n"))
+    # cat(blue$bold(symbol$info), paste0("  Model summary saved to: \"", file_path, "\"\n"))
   }
   
   # Save model object to .rds ----
   if (isTRUE(save_opt$save_model_object)) {
     file_path <- paste0(path, "-model-object.rds")
     saveRDS(model, file_path)
-    cat(blue$bold(symbol$info), paste0("  Model object saved to: \"", file_path, "\"\n"))
+    # cat(blue$bold(symbol$info), paste0("  Model object saved to: \"", file_path, "\"\n"))
   }
   
   # Save hessian to a .csv file ----
   if (isTRUE(save_opt$save_hessian)) {
     file_path <- paste0(path, "-hessian.csv")
     utils::write.csv(model$hessian, file_path)
-    cat(blue$bold(symbol$info), paste0("  Hessian matrix saved to: \"", file_path, "\"\n"))  
+    # cat(blue$bold(symbol$info), paste0("  Hessian matrix saved to: \"", file_path, "\"\n"))  
   }
   
   # Save variance-covariance matrix to .csv file ----
   if (isTRUE(save_opt$save_vcov)) {
     file_path <- paste0(path, "-vcov.csv")
     utils::write.csv(model$vcov, file_path)
-    cat(blue$bold(symbol$info), paste0("  Variance-covariance matrix saved to: \"", file_path, "\"\n"))  
+    # cat(blue$bold(symbol$info), paste0("  Variance-covariance matrix saved to: \"", file_path, "\"\n"))  
   }
   
   # Save parameters to a .csv file ----
   if (isTRUE(save_opt$save_param)) {
     file_path <- paste0(path, "-param.csv")
     utils::write.csv(model$coef, file_path)
-    cat(blue$bold(symbol$info), paste0("  Final parameters saved to: \"", file_path, "\"\n"))  
+    # cat(blue$bold(symbol$info), paste0("  Final parameters saved to: \"", file_path, "\"\n"))  
   }
   
   # Save the choice analysis to a .csv file ----
-  if (save_opt$save_choice_analysis) {
+  if (isTRUE(save_opt$save_choice_analysis)) {
     file_path <- paste0(path, "-choice-analysis.csv")
     utils::write.csv(model$choice_analysis, file_path)
-    cat(blue$bold(symbol$info), paste0("  Choice analysis saved to: \"", file_path, "\"\n"))  
+    # cat(blue$bold(symbol$info), paste0("  Choice analysis saved to: \"", file_path, "\"\n"))  
   }
 }

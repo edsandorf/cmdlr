@@ -1,9 +1,9 @@
 # Tidy the environment prior to loading packages ----
-cmdlR::tidy()
+# cmdlR::tidy()
 rm(list = ls(all = TRUE))
 
 # Load the packages ----
-pkgs <- c("cmdlR")
+pkgs <- c("cmdlr")
 invisible(lapply(pkgs, require, character.only = TRUE))
 
 # Load and manipulate the data ----
@@ -28,13 +28,7 @@ estim_opt <- list(
   cores = 1,
   calculate_hessian = TRUE,
   robust_vcov = TRUE,
-  print_level = 2,
-  search_start = TRUE,
-  search_start_options = list(
-    simple_search = TRUE,
-    candidates = 100,
-    multiplier = 1
-  )
+  print_level = 2
 )
 
 # Define the list of model options ----
@@ -42,15 +36,12 @@ model_opt <- list(
   id = "ID",
   ct = "ct",
   choice = "choice",
-  N = length(unique(db[["ID"]])),
-  S = length(unique(db[["ct"]])),
   alt_avail = list(
     alt1 = "av_car",
     alt2 = "av_bus",
     alt3 = "av_air", 
     alt4 = "av_rail"
   ),
-  nobs = nrow(db),
   fixed = c("asc_car", "b_no_frills"),
   param = list(
     asc_car = 0,
@@ -66,9 +57,11 @@ model_opt <- list(
     b_no_frills = 0,
     b_wifi = 0,
     b_food = 0
-  ),
-  choice_analysis_explanators = c("female", "business", "income")
+  )
 )
+
+# Validate options ----
+validated_options <- validate(estim_opt, model_opt, save_opt, db)
 
 # Likelihood function - returns the probability of the sequence of choices ----
 ll <- function(param) {
@@ -102,7 +95,7 @@ ll <- function(param) {
   pr_chosen <- chosen_alt_available / sum_v
   
   # Calculate the product over the panel by reshaping to have rows equal to S
-  pr_chosen <- matrix(pr_chosen, nrow = S)
+  pr_chosen <- matrix(pr_chosen, nrow = n_ct)
   
   # If the data is padded, we need to insert ones before taking the product
   index_na <- is.na(pr_chosen)
@@ -116,19 +109,40 @@ ll <- function(param) {
   attributes(ll) <- list(
     pr_chosen = pr_chosen
   )
-  ll
+  
+  return(ll)
 }
 
+# Prepare inputs ----
+prepared_inputs <- prepare(db, ll, validated_options)
+
+# Search for starting values ----
+start_values <- search_start_values(ll,
+                                     prepared_inputs, 
+                                    validated_options,
+                                    type = "simple")
+validated_options[["model_opt"]][["param"]] <- as.list(start_values[1, ])
+
 # Estimate the model ----
-model <- estimate(ll, db, estim_opt, model_opt, save_opt)
+model <- estimate(ll, prepared_inputs, validated_options)
 
 # Get a summary of the results ----
 summarize(model)
 
-# Collate results to a single file ----
-#collate() 
 
-# Save the results ----
-# store(model, save_opt)
 
-model$choice_analysis
+# SEARCH FOR START VALUES ----
+# if (estim_opt$search_start) {
+#   time_start_search <- Sys.time()
+#   
+#   start_values <- search_start_values(ll_func, estim_env, estim_opt, model_opt)
+#   model_opt$param <- as.list(start_values[1, , drop = TRUE][-ncol(start_values)])
+#   
+#   time_diff <- Sys.time() - time_start_search
+#   message(blue$bold(symbol$info), paste0("  Search for starting values took ",
+#                                          round(time_diff, 2), " ",
+#                                          attr(time_diff, "units"), "\n"))
+#   
+# } else {
+#   start_values <- NULL
+# }
