@@ -4,17 +4,18 @@
 \alias{panel_product}
 \title{Take the panel product}
 \usage{
-panel_product(pr_chosen, S)
+panel_product(probability, n_ct)
 }
 \arguments{
-\item{pr_chosen}{The probability of the chosen alternative returned from
+\item{probability}{The probability of the chosen alternative returned from
 \code{mnl_probs}}
 
-\item{S}{The number of choie occasions per individual}
+\item{n_ct}{The number of choie situations per individual}
 }
 \value{
-A vector that is N * DRAWS stacked by
+A vector of sequence probabilities. If our model contains inter-
+individual draws, then this vector is n_id * n_draws
 }
 \description{
-Takes the product across the same choice situations for the same individual.
+Calculates the product across choice observations for the same individual
 }

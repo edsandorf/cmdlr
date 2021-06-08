@@ -1,22 +1,24 @@
 #' Take the panel product
 #' 
-#' Takes the product across the same choice situations for the same individual.
+#' Calculates the product across choice observations for the same individual
 #' 
-#' @param pr_chosen The probability of the chosen alternative returned from
+#' @param probability The probability of the chosen alternative returned from
 #' \code{mnl_probs}
-#' @param S The number of choie occasions per individual 
+#' @param n_ct The number of choie situations per individual 
 #' 
-#' @return A vector that is N * DRAWS stacked by 
-
-panel_product <- function(pr_chosen, S) {
+#' @return A vector of sequence probabilities. If our model contains inter-
+#' individual draws, then this vector is n_id * n_draws
+#' 
+#' @export
+panel_product <- function(probability, n_ct) {
   # Reshape to have rows equal to number of choice occasions
-  pr_chosen <- matrix(pr_chosen, nrow = S)
+  pr_chosen <- matrix(probability, nrow = n_ct)
   
   # If the data is padded, we need to insert ones before taking the product
-  index_na <- is.na(pr_chosen)
-  pr_chosen[index_na][!is.nan(pr_chosen[index_na])] <- 1
+  index_na <- is.na(probability)
+  probability[index_na][!is.nan(probability[index_na])] <- 1L
   
   # Calculate the probability of the sequence
-  pr_seq <- Rfast::colprods(pr_chosen)
+  pr_seq <- Rfast::colprods(probability)
   return(pr_seq)
 }
