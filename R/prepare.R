@@ -370,8 +370,7 @@ prepare_log_lik <- function(ll, estim_env, workers) {
                                       param = param,
                                       ll = ll)
       
-      # do.call() is faster
-      values <- Reduce(c, values)
+      values <- do.call(c, values)
     }
     
     if (return_sum) {
