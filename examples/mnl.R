@@ -128,21 +128,3 @@ model <- estimate(ll, prepared_inputs, validated_options)
 
 # Get a summary of the results ----
 summarize(model)
-
-
-
-# SEARCH FOR START VALUES ----
-# if (estim_opt$search_start) {
-#   time_start_search <- Sys.time()
-#   
-#   start_values <- search_start_values(ll_func, estim_env, estim_opt, model_opt)
-#   model_opt$param <- as.list(start_values[1, , drop = TRUE][-ncol(start_values)])
-#   
-#   time_diff <- Sys.time() - time_start_search
-#   message(blue$bold(symbol$info), paste0("  Search for starting values took ",
-#                                          round(time_diff, 2), " ",
-#                                          attr(time_diff, "units"), "\n"))
-#   
-# } else {
-#   start_values <- NULL
-# }
