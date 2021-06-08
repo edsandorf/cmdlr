@@ -19,6 +19,7 @@ Imports:
   stringr,
   randtoolbox,
   Rfast,
+  matrixStats,
   parallel,
   MASS,
   maxLik,
