@@ -4,8 +4,8 @@ year <- 2019
 note <- sprintf("R package version %s", meta$Version)
 
 bibentry(bibtype = "Manual",
-         title = "{cmdlR}: Choice Modeling in R",
+         title = "{cmdlr}: Choice Modeling in R",
          author = c(person(c("Erlend", "Dancke"), "Sandorf")),
          year = year,
          note = note,
-         url = "https://cmdlR.edsandorf.me")
+         url = "https://cmdlr.edsandorf.me")
