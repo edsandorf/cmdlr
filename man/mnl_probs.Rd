@@ -2,7 +2,7 @@
 % Please edit documentation in R/mnl_probs.R
 \name{mnl_probs}
 \alias{mnl_probs}
-\title{Function for calculating the MNL probabilities}
+\title{Calculate the MNL probability}
 \usage{
 mnl_probs(V, model_opt)
 }
@@ -12,6 +12,11 @@ mnl_probs(V, model_opt)
 \item{model_opt}{List of model options}
 }
 \description{
+Function is convenient way to calculate the MNL probabilities.
+}
+\details{
+Function for calculating the MNL probabilities
+
 Calculate the MNL probabilities taking the difference from the chosen
 alternative.
 }
