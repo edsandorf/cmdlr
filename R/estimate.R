@@ -111,6 +111,7 @@ estimate <- function(ll,
   )
   
   # Add other information to the model object
+  class(model) <- "cmdlr"
   model[["name"]] <- save_opt[["name"]]
   model[["description"]] <- save_opt[["description"]]
   model[["method"]] <- estim_opt[["method"]]
