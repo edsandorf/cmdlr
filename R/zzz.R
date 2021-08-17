@@ -8,7 +8,7 @@
 #' @return Nothing
 
 .onAttach <- function (libname, pkgname) {
-  installed_version <- utils::packageDescription("cmdlR", fields = "Version")
+  installed_version <- utils::packageDescription("cmdlr", fields = "Version")
   
   description <- tryCatch({
     readLines("https://raw.githubusercontent.com/edsandorf/cmdlR/master/DESCRIPTION")
@@ -42,13 +42,13 @@
   )
 
   packageStartupMessage(logo, "\n\n",
-    "Thank you for using cmdlR! \n\n",
+    "Thank you for using cmdlr! \n\n",
     "You are currently using version: ",
     installed_version, "\n\n",
     "The latest version is: ", remote_version, "\n\n",
     "To access the latest version, please run \n",
-    "devtools::install_github('edsandorf/cmdlR') \n\n",
+    "devtools::install_github('edsandorf/cmdlr') \n\n",
     
     "To cite this package: \n",
-    "utils::citation('cmdlR')")
+    "utils::citation('cmdlr')")
 }
