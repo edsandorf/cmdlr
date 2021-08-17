@@ -163,7 +163,6 @@ ll <- function(param) {
       current_v <- V[[ancestors_j[[k]]]]
       next_v <- V[[ancestors_j[[k + 1]]]]
       pr_alt[[j]] <- pr_alt[[j]] + (current_v - next_v) / nesting_parameters[[ancestors_j[[k + 1]]]]
-      
     }
   }
   
