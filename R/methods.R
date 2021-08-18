@@ -42,3 +42,13 @@ vcov.cmdlr <- function(object, robust = FALSE, ...) {
   
   return(covmat)
 }
+
+#' S3 Generic for printing choice shares
+#' 
+#' @param x An object of class choice_shares
+#' @param ... Other parameters passed to print 
+#' 
+#' @export
+# print.choice_shares <- function(x, ...) {
+#   
+# }
