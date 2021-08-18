@@ -19,4 +19,9 @@
 #' @name cmldr
 #' 
 #' @importFrom stats runif qnorm
+#' @importFrom rlang sym :=
+#' @importFrom dplyr bind_cols bind_rows n group_by starts_with
+#' @importFrom magrittr %>%
+#' @importFrom forcats as_factor
+#' @importFrom ggplot2 ggplot geom_bar aes ggtitle xlab ylab scale_y_continuous labs
 NULL
