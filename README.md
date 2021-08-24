@@ -2,7 +2,7 @@
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version-last-release/cmdlR)](https://cran.r-project.org/package=cmdlR)
 [![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/cmdlR)](http://www.r-pkg.org/pkg/cmdlR)
 [![R build status](https://github.com/edsandorf/cmdlR/workflows/R-CMD-check/badge.svg)](https://github.com/edsandorf/cmdlR/actions)
-[![Coverage Status](https://codecov.io/github/r-lib/devtools/coverage.svg?branch=master)](https://codecov.io/github/edsandorf/cmdlr?branch=master)
+[![Coverage Status](https://codecov.io/github/edsandorf/cmdlr/coverage.svg?branch=master)](https://codecov.io/github/edsandorf/cmdlr?branch=master)
 <!-- badges: end -->
 
 # cmdlR: Choice Modeling in R
