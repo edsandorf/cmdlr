@@ -111,7 +111,7 @@ estimate <- function(ll,
   )
   
   # Add other information to the model object
-  class(model) <- "cmdlr"
+  class(model) <- c("cmdlr", "list")
   model[["name"]] <- save_opt[["name"]]
   model[["description"]] <- save_opt[["description"]]
   model[["method"]] <- estim_opt[["method"]]
@@ -265,16 +265,19 @@ estimate <- function(ll,
       return(NA)
     })
     
+    model[["gradient_obs"]] <- numDeriv::jacobian(log_lik,
+                                                  model[["param_final"]],
+                                                  param_fixed = param_fixed,
+                                                  workers = workers,
+                                                  ll = ll, 
+                                                  return_sum = FALSE,
+                                                  pb = NULL,
+                                                  method = "simple")
+    
+    
     # Calculate the robust variance-covariance matrix
     if (estim_opt[["robust_vcov"]] && !anyNA(model[["vcov"]])) {
-      model[["gradient_obs"]] <- numDeriv::jacobian(log_lik,
-                                                    model[["param_final"]],
-                                                    param_fixed = param_fixed,
-                                                    workers = workers,
-                                                    ll = ll, 
-                                                    return_sum = FALSE,
-                                                    pb = NULL,
-                                                    method = "simple")
+
       
       bread <- model[["vcov"]] * n_id
       bread[is.na(bread)] <- 0
