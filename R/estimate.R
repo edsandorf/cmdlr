@@ -329,20 +329,10 @@ estimate <- function(ll,
     return(NA)
   })
   
-  ll_2 <- -2L * model[["ll"]]
-  model[["n_obs"]] <- n_obs
-  model[["ll_0"]] <- ll_0
-  model[["adj_rho_sqrd"]] <- (1L - ((model[["ll"]] - n_par) / (ll_0)))
-  model[["aic"]] <- ll_2 + (2L * n_par)
-  model[["aic3"]] <- ll_2 + (3L * n_par)
-  model[["caic"]] <- ll_2 + (n_par * (log(n_obs) + 1L))
-  model[["caic_star"]] <- ll_2 + (n_par * (log((n_obs + 2L) / 24L) + 1L ))
-  model[["ht_aic"]] <- ll_2 + (2L * n_par) + (((2L * (n_par + 1L)) * (n_par + 2L))/(n_obs - n_par - 2L))
-  model[["bic"]] <- ll_2 + (n_par * log(n_obs))
-  model[["bic_star"]] <- ll_2 + (n_par * (log((n_obs + 2L) / 24L)))
-  model[["dbic"]] <- ll_2 + (n_par * (log(n_obs) - log(2L * pi)))
-  model[["hqic"]] <- ll_2 + (2L * (n_par * (log(log(n_obs)))))
-  
+  model[["optimum"]] <- model[["ll"]]
+  model[["optimum_values"]] <- model[["ll_values"]]
+  model[["optimum_at_zero"]] <- ll_0
+
   # WRAP UP AND RETURN MODEL OBJECT ----
   model[["time_end"]] <- Sys.time()
   time_diff <- model[["time_end"]] - time_start
