@@ -9,7 +9,7 @@ License: file LICENSE
 Encoding: UTF-8
 URL: https://cmdlr.edsandorf.me, https://github.com/edsandorf/cmdlR
 LazyData: true
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 Depends: R (>= 3.1.0)
 Imports:
   rlang,
