@@ -7,7 +7,7 @@
 \method{coef}{cmdlr}(object, ...)
 }
 \arguments{
-\item{object}{Model object}
+\item{object}{A model object of class 'cmdlr'}
 
 \item{...}{Other arguments passed to the function}
 }

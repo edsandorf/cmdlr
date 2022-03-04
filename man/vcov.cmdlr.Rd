@@ -7,7 +7,7 @@
 \method{vcov}{cmdlr}(object, robust = FALSE, ...)
 }
 \arguments{
-\item{object}{Model object}
+\item{object}{A model object of class 'cmdlr'}
 
 \item{robust}{If TRUE return the robust vcov}
 
