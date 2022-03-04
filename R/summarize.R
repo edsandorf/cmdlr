@@ -1,3 +1,15 @@
+#' S3 Generic for model summary
+#'
+#' @param object Model object
+#' @param ... Other arguments passed to the function
+#' 
+#' @method summary cmdlr
+#' 
+#' @export
+summary.cmdlr <- function(object, ...) {
+  summarize(object)
+}
+
 #' Summarizes outputs
 #'
 #' This function is a wrapper for several small summary functions that provide
