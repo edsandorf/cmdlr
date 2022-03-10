@@ -6,6 +6,11 @@
 \usage{
 bread(object, ...)
 }
+\arguments{
+\item{object}{A model object of class 'cmdlr'}
+
+\item{...}{Other arguments passed to the function}
+}
 \description{
 Create the bread of the sandwich
 }

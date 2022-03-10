@@ -1,3 +1,7 @@
+## cmdlr v0.0.4
+* Major structural changes to the code with multiple changes breaking existing code.
+* Added S3 Generic for vcov
+
 ## cmdlR v0.0.3
 * The code has undergone major refactoring and linting, while giving the documentation a much needed update. Previously, some functions relied on scoping rather than explicit passing of arguments. This is now fixed. 
 * Added an example with a MDCEV model with an outside good. Tested on Apollo data. 

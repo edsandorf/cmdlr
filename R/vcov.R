@@ -1,10 +1,14 @@
+#' @importFrom stats vcov
+#' @export
+stats::vcov
+
 #' S3 generic for vcov
 #' 
-#' A generic method for obtaining the variance covariance matrix. It is a 
-#' wrapper around the \link{\code{ginv}} from the MASS package to calculate the
-#' (negative) inverse of the Hessian matrix. 
+#' A generic method for obtaining standard and robust variance covariance matrix
 #'
 #' @param object A model object of class 'cmdlr'
+#' @param robust A boolean equal to TRUE if you want to return a robust 
+#' variance covariance matrix based on a simple sandwich estimator 
 #' @param ... Other arguments passed to the function
 #'
 #' @return A matrix with row and column names equal to the parameters of the
@@ -13,46 +17,61 @@
 #' @method vcov cmdlr
 #'
 #' @export
-vcov.cmdlr <- function(object, ...) {
-  vcov_matrix <- tryCatch({
-    if (object[["control"]][["optimizer"]] %in% c("ucminf")) {
-      x <- MASS::ginv(object[["hessian"]])
-      
-    } else {
-      x <- MASS::ginv(-object[["hessian"]])
-      
-    }
+vcov.cmdlr <- function(object, robust = TRUE, ...) {
+  if (robust) {
+    return(normal_vcov(object))
     
-    colnames(x) <- rownames(x) <- names(object[["param_free"]])
+  } else {
+    return(robust_vcov(object))
     
-    return(x)
-    
-  }, error = function(e) {
-    cli::cli_alert_danger("Failed to calculate variance-covariance matrix.")
-    return(NA)
-    
-  })
+  }
+}
 
-  return(vcov_matrix)
+#' Normal variance-covariance matrix
+#'
+#' The function is a wrapper around the [MASS::] from the MASS package
+#' to calculate the (negative) inverse of the Hessian matrix. 
+#'
+#' @inheritParams vcov.cmdlr
+#'
+#' @return A matrix with row and column names equal to the parameters of the
+#' fitted model
+normal_vcov <- function(object, ...) {
+  return(
+    tryCatch({
+      if (object[["control"]][["optimizer"]] %in% c("ucminf")) {
+        x <- MASS::ginv(object[["hessian"]])
+        
+      } else {
+        x <- MASS::ginv(-object[["hessian"]])
+        
+      }
+      
+      colnames(x) <- rownames(x) <- names(object[["param_free"]])
+      
+      return(x)
+      
+    }, error = function(e) {
+      cli::cli_alert_danger("Failed to calculate variance-covariance matrix.")
+      return(NA)
+      
+    })
+  )
 }
 
 #' A sandwich estimator for robust standard errors
 #'
 #' A straight forward sandwich estimator for robust standard errors with a 
-#' correction based on the number of individuals/respondents in the data. The
-#' variance-covariance matrix is based on the 'cmdlr' \link{\code{vcov}} 
-#' function.
+#' correction based on the number of individuals/respondents in the data.
 #'
-#' @inheritParams vcov
+#' @inheritParams vcov.cmdlr
 #'
 #' @return A matrix with row and column names equal to the parameters of the
 #' fitted model 
-#' 
-#' @export
 robust_vcov <- function(object, ...) {
-  n_id <- nid(model)
-  bread <- bread(model, n_id)
-  meat <- meat(model, n_id)
+  n_id <- nid(object)
+  bread <- bread(object, n_id)
+  meat <- meat(object, n_id)
   
   return(
     (bread %*% meat %*% bread) / n_id
@@ -61,10 +80,10 @@ robust_vcov <- function(object, ...) {
 
 #' Create the bread of the sandwich
 #' 
-#' @inheritParams vcov
+#' @inheritParams vcov.cmdlr
 #' 
 bread <- function(object, ...) {
-  n_id <- nid(model)
+  n_id <- nid(object)
   crumbs <- vcov(object) * n_id
   crumbs[is.na(crumbs)] <- 0
   
@@ -73,10 +92,10 @@ bread <- function(object, ...) {
 
 #'Create the meat of the sandwich
 #'
-#' @inheritParams vcov
+#' @inheritParams vcov.cmdlr
 #'
 meat <- function(object, ...) {
-  n_id <- nid(model)
+  n_id <- nid(object)
   adj <- n_id / (n_id - length(coef(object)))
   juices <- crossprod(gradient_obs(object)) / n_id
   juices[is.na(juices)] <- 0

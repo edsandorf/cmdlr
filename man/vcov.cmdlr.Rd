@@ -4,10 +4,13 @@
 \alias{vcov.cmdlr}
 \title{S3 generic for vcov}
 \usage{
-\method{vcov}{cmdlr}(object, ...)
+\method{vcov}{cmdlr}(object, robust = TRUE, ...)
 }
 \arguments{
 \item{object}{A model object of class 'cmdlr'}
+
+\item{robust}{A boolean equal to TRUE if you want to return a robust 
+variance covariance matrix based on a simple sandwich estimator}
 
 \item{...}{Other arguments passed to the function}
 }
@@ -16,7 +19,5 @@ A matrix with row and column names equal to the parameters of the
 fitted model
 }
 \description{
-A generic method for obtaining the variance covariance matrix. It is a 
-wrapper around the \link{\code{ginv}} from the MASS package to calculate the
-(negative) inverse of the Hessian matrix.
+A generic method for obtaining standard and robust variance covariance matrix
 }
