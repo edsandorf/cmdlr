@@ -52,6 +52,33 @@ nid <- function(object, ...) {
     length(function_values(object, ...))
   )
 }
+
+#' A generic print function for printing a 'cmdlr' object
+#' 
+#' @param x A 'cmdlr' model object
+#' @param ... Other parameters passed to 'cmdlr'
+#'
+#' @method print cmdlr
+#'
+#' @export
+print.cmdlr <- function(x, ...) {
+  cat("---------------------------------------------------------------------\n")
+  cat("Model name            ", x[["name"]], "\n")
+  cat("Model description     ", x[["description"]], "\n")
+  cat("Convergence message   ", x[["message"]], "\n")
+  cat("Convergence criteria  ", convergence_criteria(x), "\n")
+  cat(paste0("Estimation started     ", x[["time_start"]], "\n"))
+  cat(paste0("Estimation completed   ", x[["time_end"]], "\n"))
+  cat("\n\n")
+  print(coef(x))
+  cat("\n\n")
+  cat("---------------------------------------------------------------------\n")
+}
+
+
+
+
+
 #' S3 Generic for printing choice shares
 #' 
 #' @param x An object of class choice_shares
@@ -61,3 +88,6 @@ nid <- function(object, ...) {
 # print.choice_shares <- function(x, ...) {
 #   
 # }
+
+
+
