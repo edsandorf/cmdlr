@@ -20,10 +20,10 @@ generics::tidy
 #' @export
 tidy.cmdlr <- function(x, robust = TRUE, hypotheses = NULL, ...) {
   # Fix the vector of standard errors
-  std_err <- structure(rep(NA, length(x[["param_start"]])),
-                       names = names(x[["param_start"]]))
+  std_err <- structure(rep(NA, length(start_param(x))),
+                       names = names(start_param(x)))
   
-  std_err[names(x[["param_free"]])] <- sqrt(diag(vcov(x, robust = robust)))
+  std_err[names(free_param(x))] <- sqrt(diag(vcov(x, robust = robust)))
   
   # Check whether hypotheses are supplied
   if (is.null(hypotheses)) {
@@ -36,8 +36,8 @@ tidy.cmdlr <- function(x, robust = TRUE, hypotheses = NULL, ...) {
   
   # Construct the tibble
   coef_tibble <- tibble::tibble(
-    term = names(x[["param_start"]]),
-    estimate = x[["param_final"]],
+    term = names(start_param(x)),
+    estimate = final_param(x),
     std.err = std_err, 
     statistic = (estimate - hypotheses) / std_err,
     p.value = 2 * stats::pt(-abs(.data$statistic), df = nobs(x))
