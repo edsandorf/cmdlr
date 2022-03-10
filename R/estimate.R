@@ -235,7 +235,7 @@ estimate <- function(ll,
   
   # WRAP UP AND RETURN MODEL OBJECT ----
   cli::cli_h2("Wrapping up")
-  model[["times_start"]] <- time_start
+  model[["time_start"]] <- time_start
   model[["time_end"]] <- Sys.time()
   time_diff <- model[["time_end"]] - time_start
   cli::cli_alert_info(paste("Model estimation took",
