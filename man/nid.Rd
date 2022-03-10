@@ -7,9 +7,9 @@
 nid(object, ...)
 }
 \arguments{
-\item{object}{A model object of class 'cmdlr'}
+\item{object}{A 'cmdlr' model object}
 
-\item{...}{Additional arguments passed}
+\item{...}{Additional parameters passed to the function}
 }
 \description{
 A generic method for getting the number of individuals based on the lenght of

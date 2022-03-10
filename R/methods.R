@@ -1,3 +1,7 @@
+#' @importFrom stats coef
+#' @export
+stats::coef
+
 #' S3 generic for coef
 #'
 #' @param object A model object of class 'cmdlr'
@@ -7,9 +11,14 @@
 #'
 #' @export
 coef.cmdlr <- function(object, ...) {
-  result <- object[["param_final"]]
-  return(result)
+  return(
+    free_param(object, ...)
+  )
 }
+
+#' @importFrom stats nobs
+#' @export
+stats::nobs
 
 #' S3 generic for nobs
 #' 
@@ -23,7 +32,7 @@ coef.cmdlr <- function(object, ...) {
 #' 
 #' 
 #' @export
-nobs <- function(object, use.fallback = FALSE, ...) {
+nobs.cmdlr <- function(object, use.fallback = FALSE, ...) {
   return(
     nrow(gradient_obs(object, ...))
   )
@@ -34,7 +43,8 @@ nobs <- function(object, use.fallback = FALSE, ...) {
 #' A generic method for getting the number of individuals based on the lenght of
 #' the vector of optimum values
 #'
-#' @inheritParams nobs
+#' @param object A 'cmdlr' model object
+#' @param ... Additional parameters passed to the function
 #' 
 #' @export
 nid <- function(object, ...) {
