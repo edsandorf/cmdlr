@@ -111,7 +111,7 @@ estimate <- function(ll,
                             sep = " "))
   
   # OPTIMUM VALUES ----
-  model[["optimum_values"]] <- log_lik(model[["param_free"]],
+  model[["optimum_values"]] <- log_lik(free_param(model),
                                        param_fixed,
                                        workers,
                                        ll,
@@ -120,7 +120,7 @@ estimate <- function(ll,
   # OPTIMUM AT 0 ----
   
   ll_0 <- tryCatch({
-    ll_0_tmp <- log_lik(model[["param_free"]] * 0,
+    ll_0_tmp <- log_lik(free_param(model) * 0,
                         param_fixed = param_fixed,
                         workers = workers,
                         ll =ll,
@@ -143,7 +143,7 @@ estimate <- function(ll,
   
   # GRADIENT ----
   model[["gradient"]] <- numDeriv::grad(log_lik,
-                                        model[["param_free"]],
+                                        free_param(model),
                                         param_fixed = param_fixed,
                                         workers = workers,
                                         ll = ll,
@@ -156,7 +156,7 @@ estimate <- function(ll,
     time_start_jacobian <- Sys.time()
     
     model[["gradient_obs"]] <- numDeriv::jacobian(log_lik,
-                                                  model[["param_free"]],
+                                                  free_param(model),
                                                   param_fixed = param_fixed,
                                                   workers = workers,
                                                   ll = ll, 
@@ -183,7 +183,7 @@ estimate <- function(ll,
     # Calculate Hessian using the 'numderiv' package
     model[["hessian"]] <- hessian("numderiv",
                                   log_lik, 
-                                  model[["param_free"]],
+                                  free_param(model),
                                   param_fixed,
                                   workers, 
                                   ll,
@@ -201,7 +201,7 @@ estimate <- function(ll,
       
       model[["hessian"]] <- hessian("maxlik",
                                     log_lik, 
-                                    model[["param_final"]],
+                                    free_param(model),
                                     param_fixed,
                                     workers, 
                                     ll,
