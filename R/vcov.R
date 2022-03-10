@@ -47,7 +47,7 @@ normal_vcov <- function(object, ...) {
         
       }
       
-      colnames(x) <- rownames(x) <- names(object[["param_free"]])
+      colnames(x) <- rownames(x) <- names(free_param(object))
       
       return(x)
       
