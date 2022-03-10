@@ -6,7 +6,7 @@
 #' 
 #' @export
 
-tidy <- function() {
+clean_global_env <- function() {
   # Delete all non-essential objects from the work space
   rm(list = ls(all.names = TRUE), envir = .GlobalEnv)
   

@@ -23,7 +23,7 @@ save_opt <- list(
 
 # Define the list of estimation options ----
 estim_opt <- list(
-  optimizer = "maxlik",
+  optimizer = "ucminf",
   method = "BFGS",
   cores = 1,
   calculate_hessian = TRUE,
@@ -59,9 +59,6 @@ model_opt <- list(
     b_food = 0
   )
 )
-
-# Validate options ----
-validated_options <- validate(estim_opt, model_opt, save_opt, db)
 
 # Likelihood function - returns the probability of the sequence of choices ----
 ll <- function(param) {
@@ -110,8 +107,11 @@ ll <- function(param) {
     pr_chosen = pr_chosen
   )
   
-  return(ll)
+  return(-ll)
 }
+
+# Validate options ----
+validated_options <- validate(estim_opt, model_opt, save_opt, db)
 
 # Prepare inputs ----
 prepared_inputs <- prepare(db, ll, validated_options)

@@ -27,7 +27,7 @@
 #' }
 #' @export
 
-store <- function(model, validated_options) {
+save_model <- function(model, validated_options) {
   # Make sure that we do close file-writing if the function exits
   # on.exit(sink(), add = TRUE)
   

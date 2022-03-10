@@ -39,6 +39,10 @@ validate <- function(input_estim_opt, input_model_opt, input_save_opt, db) {
 validate_estim_opt <- function(input_estim_opt) {
   # Set the missing to default values
   estim_opt <- list(
+    cores = 1,
+    calculate_hessian = TRUE,
+    calculate_jacobian = TRUE,
+    check_data = TRUE,
     tol = 1e-08,
     reltol = sqrt(.Machine$double.eps),
     gradtol = 1e-06,
@@ -46,10 +50,9 @@ validate_estim_opt <- function(input_estim_opt) {
     lambdatol = 1e-6,
     print_level = 0,
     iterlim = 500,
-    cores = 1,
-    calculate_hessian = TRUE,
-    robust_vcov = TRUE,
-    check_data = TRUE
+    grad = "forward",
+    gradstep = c(1e-6, 1e-8),
+    stepmax = 1
   )
   
   # Replace the non-specified values with default values
@@ -58,33 +61,38 @@ validate_estim_opt <- function(input_estim_opt) {
   # Check that the optimizer and method is specified correctly
   if (is.null(estim_opt[["optimizer"]]) || is.null(estim_opt[["method"]])) {
     stop("Optimizer and method must be specified in estim_opt")
+    
   } else {
     method <- estim_opt$method <- toupper(estim_opt$method)
     optimizer <- estim_opt$optimizer <- tolower(estim_opt$optimizer)
+    
   }
   
   # Check that the specified optimizer is correct
   if (!(optimizer %in% c("maxlik", "ucminf"))) {
     stop("Optmizer must be 'maxlik' or 'ucminf'")
+    
   } 
   
   # Check that the specified method is correct. 
   if (optimizer == "maxlik" && !(method %in% c("BFGS", "BHHH", "NR"))) {
     stop("Method must be either 'BFGS', 'BHHH' or 'NR' with 'maxlik'.")
+    
   }
   
   if (optimizer == "ucminf" && !(method %in% "BFGS")) {
     stop("Method must be 'BFGS' with 'ucminf'")
+    
   }
   
   # Check the number of cores
   if (estim_opt$cores > parallel::detectCores()) {
     stop("The number of specified cores exceed available.")
+    
   }
   
   # Check that input values are logical
   stopifnot(is.logical(estim_opt[["calculate_hessian"]]))
-  stopifnot(is.logical(estim_opt[["robust_vcov"]]))
   stopifnot(is.logical(estim_opt[["check_data"]]))
   
   # Return the validated list of estimation options

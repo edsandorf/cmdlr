@@ -11,28 +11,6 @@ coef.cmdlr <- function(object, ...) {
   return(result)
 }
 
-#' S3 generic for vcov
-#'
-#' @param object A model object of class 'cmdlr'
-#' @param robust If TRUE return the robust vcov
-#' @param ... Other arguments passed to the function
-#' 
-#' @method vcov cmdlr
-#'
-#' @export
-vcov.cmdlr <- function(object, robust = FALSE, ...) {
-  # We should probably have a separate function for robust to reduce the size of the model object.
-  if (robust) {
-    covmat <- object$robust_vcov
-    
-  } else {
-    covmat <- object$vcov
-  }
-  
-  return(covmat)
-}
-
-
 #' S3 generic for nobs
 #' 
 #' A generic method for getting the number of observations based on the number

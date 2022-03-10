@@ -7,11 +7,11 @@
 #' 
 #' @export
 summary.cmdlr <- function(object, robust = TRUE, ...) {
-
   
-
+  
+  
   summary_object <- list(
-    
+    parameter_info = summary_parameter_info(object)
   )
   
   class(summary_object) <- "summary.cmdlr"
@@ -25,17 +25,9 @@ summary.cmdlr <- function(object, robust = TRUE, ...) {
 #' @method print summary.cmdlr
 #'
 print.summary.cmdlr <- function(x, ...) {
-  cat("Convergence message   ", object[["message"]], "\n")
-  cat("Convergence criteria  ", convergence_criteria(model), "\n")
-  cat(paste0("Estimation started    ", object[["time_start"]], "\n"))
-  cat(paste0("Estimation completed  ", object[["time_end"]], "\n"))
-  
-  
   cat("---- Parameter information ----\n")
   print(x[[1]])
   cat("\n\n")
-  
-  
 }
 
 #' Summary of parameter info
@@ -62,7 +54,7 @@ summary_parameter_info <- function(object, ...) {
   grad[names(object[["param_free"]])] <- object[["gradient"]]
   
   param_info <- tibble::tibble(
-    term = names(object[["param_start"]]),
+    names = names(object[["param_start"]]),
     start = object[["param_start"]],
     final = object[["param_final"]],
     diff = final - start,
@@ -73,14 +65,8 @@ summary_parameter_info <- function(object, ...) {
   return(param_info)
 }
 
-#' Create a summary function for the coefficient matrix
-#'
-#'
-#'
-#' @method tidy cmdlr
-#'
-#' @export
-tidy.cmdlr <- function(object, robust = TRUE, hypotheses = NULL, ...) {
+summary_coef_mat <- function(object, robust = TRUE, ...) {
+  
   # Fix the vector of standard errors
   std_err <- structure(rep(NA, length(object[["param_start"]])),
                        names = names(object[["param_start"]]))
@@ -93,57 +79,31 @@ tidy.cmdlr <- function(object, robust = TRUE, hypotheses = NULL, ...) {
     
   }
   
-  # Check whether hypotheses are supplied
-  if (is.null(hypotheses)) {
-    hypotheses <- rep(0, length(std_err))
-    
-  } else {
-    stopifnot(length(std_err) == length(hypotheses))
-    
-  }
-  
   # Construct the tibble
   coef_tibble <- tibble::tibble(
-    term = names(object[["param_start"]]),
-    estimate = object[["param_final"]],
-    std_err = std_err, 
-    statistic = (estimate - hypotheses) / std_err,
-    p_value = 2 * stats::pt(-abs(statistic), df = nobs(object)),
-    stars = stars(p_value)
+    names = names(object[["param_start"]]),
+    est = object[["param_final"]],
+    std_err = std_err
   )
   
   return(coef_tibble)
   
 }
 
-#' Summary of model fits
-#'
-#' A wrapper function around \link{\code{model_fit}} returning all fit
-#' calculations as a tibble. 
-#' 
-#' @param object A model object of class 'cmdlr'
-#' 
-#' @return A tibble
-#'
-#' @export
-glance.cmdlr <- function(object, ...) {
-  
-  fit <- tibble::tibble(
-    log_lik = object[["optimum"]], 
-    adj_rho_sqrd = model_fit(object, "adj_rho_sqrd"),
-    aic = model_fit(object, "aic"),
-    aic3 = model_fit(object, "aic3"),
-    caic = model_fit(object, "caic"),
-    caic_star = model_fit(object, "caic_star"),
-    ht_aic = model_fit(object, "ht_aic"),
-    bic = model_fit(object, "bic"),
-    bic_star = model_fit(object, "bic_star"),
-    dbic = model_fit(object, "dbic"),
-    hqic = model_fit(object, "hqic")
-  )
-  
-  return(fit)
+# MUST BE CHANGED TO BE BROOM PACKAGE INTERFACE
+summary_model_fit <- function(object, ...) {
+  cat("Adj. Rho^2   ", model_fit(model, "adj_rho_sqrd"), "\n")
+  cat("AIC          ", model_fit(model, "aic"), "\n")
+  cat("AIC3         ", model_fit(model, "aic3"), "\n")
+  cat("CAIC         ", model_fit(model, "caic"), "\n")
+  cat("CAIC*        ", model_fit(model, "caic_star"), "\n")
+  cat("HT-AIC/AICc  ", model_fit(model, "ht_aic"), "\n")
+  cat("BIC          ", model_fit(model, "bic"), "\n")
+  cat("BIC*         ", model_fit(model, "bic_star"), "\n")
+  cat("DBIC         ", model_fit(model, "dbic"), "\n")
+  cat("HQIC         ", model_fit(model, "hqic"), "\n")
 }
+
 
 
 
@@ -166,7 +126,10 @@ summarize <- function(model) {
   cat("Number of cores used  ", model[["cores"]], "\n")
   cat("Number of draws used  ", model[["n_draws"]], "\n")
   cat("Type of draws used    ", model[["draws_type"]], "\n")
-
+  cat("Convergence message   ", model[["message"]], "\n")
+  cat("Convergence criteria  ", convergence_criteria(model), "\n")
+  cat(paste0("Estimation started    ", model[["time_start"]], "\n"))
+  cat(paste0("Estimation completed  ", model[["time_end"]], "\n"))
   cat("\n\n")
 
   # Define some helpful variables
@@ -190,7 +153,35 @@ summarize <- function(model) {
   cat("\n\n")
 
   cat("---- Parameter estimates ----\n")
+  output <- matrix(NA, nrow = n_par, ncol = 11L)
+  column_names <- c("est.", "s.e.", "t0", "p0", "t1", "p1",
+                    "rob. s.e.", "rob. t0", "rob. p0", "rob. t1", "rob. p1")
+  rownames(output) <- names_all
+  colnames(output) <- column_names
+  output[names_free, 1] <- model[["param_final"]]
+  output[names_fixed, 1] <- model[["param_fixed"]]
+  
+  # Check if the variance-covariance matrix was computed
+  if (!is.null(model[["vcov"]])) {
+    output[names_free, 2] <- sqrt(diag(model[["vcov"]]))
+    output[names_free, 3] <- output[names_free, 1]/output[names_free, 2]
+    output[names_free, 4] <- 2 * stats::pt(-abs(output[names_free, 3]),
+                                           df = model[["n_obs"]])
+    output[names_free, 5] <- (1 - output[names_free, 1])/output[names_free, 2]
+    output[names_free, 6] <- 2 * stats::pt(-abs(output[names_free, 5]),
+                                           df = model[["n_obs"]])
+  }
 
+  # Check if the robust variance-covariance matrix was computed
+  if (!is.null(model[["robust_vcov"]])) {
+    output[names_free, 7] <- sqrt(diag(model[["robust_vcov"]]))
+    output[names_free, 8] <- output[names_free, 1]/output[names_free, 7]
+    output[names_free, 9] <- 2 * stats::pt(-abs(output[names_free, 8]),
+                                           df = model[["n_obs"]])
+    output[names_free, 10] <- (1 - output[names_free, 1])/output[names_free, 7]
+    output[names_free, 11] <- 2 * stats::pt(-abs(output[names_free, 10]),
+                                            df = model[["n_obs"]])
+  }
   
   output[names_fixed, column_names[-1]] <- NA
   print(round(output, digits = 4))
@@ -198,54 +189,13 @@ summarize <- function(model) {
 }
 
 
-#' Calculate p-values
-#' 
-#' A convenient function to calculate p-values for **t-statistics**. By default
-#' p-values are calculated based on the null hypothesis that the true parameters
-#' are equal to zero. To test against other values a vector of "hypotheses" 
-#' must be supplied. 
-#' 
-#' @param est A vector of model estimates
-#' @param std_err A vector of standard errors
-#' @param df An integer giving the degrees of freedom for the test
-#' @param hypotheses A vector of values to test against. The vector must be the
-#' same length as `est`. If no vector is supplied, the default test is against
-#' 0. 
-#' 
-#' @return A vector of p-values the length of `est`
-#' 
-#' @export
-pval <- function(est, std_err, df, hypotheses = NULL) {
-  if (is.null(hypotheses)) {
-    hypotheses <- rep(0, length(est))
-    
-  } else {
-    stopifnot(length(est) == length(hypotheses))
-    
-  }
-  
-  return(
-    2 * stats::pt(-abs((est - hypotheses) / std_err), df = df)
-  )
-}
 
-#' Create significance stars
-#' 
-#' A convenient function that creates stars based on any vector of supplied 
-#' p-values. 
-#' 
-#' @param pval A vector of p-values
-#' 
-#' @return A character vector of stars indicating significance at different 
-#' levels
-stars <- function(pval) {
-  star <- rep("", length(pval))
-  star[pval < 0.1] <- "."
-  star[pval < 0.05] <- "*"
-  star[pval < 0.01] <- "**"
-  star[pval < 0.001] <- "***"
-  
-  return(
-    star
-  )
-}
+## Additional crap for summary function
+# model[["name"]] <- save_opt[["name"]]
+# model[["description"]] <- save_opt[["description"]]
+# model[["method"]] <- estim_opt[["method"]]
+# model[["optimizer"]] <- estim_opt[["optimizer"]]
+# model[["cores"]] <- estim_opt[["cores"]]
+# model[["n_draws"]] <- model_opt[["n_draws"]]
+# model[["draws_type"]] <- model_opt[["draws_type"]]
+# model[["time_start"]] <- time_start
