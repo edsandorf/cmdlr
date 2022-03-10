@@ -6,6 +6,10 @@
 #' 
 #' @param type A character string giving the method to use when approximating
 #' the Hessian. One of: "numderiv" or "maxlik". 
+#' @inheritParams estimate_model
+#' @param method A method for the approximation of the Hessian. Only necessary
+#' for the maxlik package
+#' 
 hessian <- function(type,
                     log_lik,
                     param_free,
