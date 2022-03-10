@@ -44,7 +44,6 @@ estimate <- function(ll,
   estim_env <- prepared_inputs[["estim_env"]]
   control <- validated_options[["estim_opt"]]
   model_opt <- validated_options[["model_opt"]]
-  save_opt <- validated_options[["save_opt"]]
   
   cores <- validated_options[["estim_opt"]][["cores"]]
   str_param_fixed <- validated_options[["model_opt"]][["fixed"]]
@@ -235,6 +234,8 @@ estimate <- function(ll,
   
   # WRAP UP AND RETURN MODEL OBJECT ----
   cli::cli_h2("Wrapping up")
+  model[["name"]] <- model_opt[["name"]]
+  model[["description"]] <- model_opt[["description"]]
   model[["time_start"]] <- time_start
   model[["time_end"]] <- Sys.time()
   time_diff <- model[["time_end"]] - time_start

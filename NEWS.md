@@ -1,7 +1,10 @@
 ## cmdlr v0.0.4
 * Major structural changes to the code with multiple changes breaking existing code.
+* Standardized the model object which now has the class 'cmdlr'. This means that the model object has fewer elements and rely on S3 generics for many operations. For example, neither the standard nor robust vcov is available, but can be obtained with the S3 generic for vcov
 * Added S3 Generic for vcov
-* Added S3 generics for glance() and tidy(), and a placeholder for augment() that are consistent with the 'broom' package. 
+* Added S3 generics for glance() and tidy(), and a placeholder for augment() that are consistent with the 'broom' package.
+* save_opt() is no longer part of the code. Instead a new function save with arguments is provided. 
+
 
 ## cmdlR v0.0.3
 * The code has undergone major refactoring and linting, while giving the documentation a much needed update. Previously, some functions relied on scoping rather than explicit passing of arguments. This is now fixed. 

@@ -7,19 +7,17 @@
 #' 
 #' @param input_estim_opt A named list of estimation options
 #' @param input_model_opt A named list of model options
-#' @param input_save_opt A named list of save options
 #' @param db A data.frame with the data used for estimation 
 #'  
 #' @return Returns a list with three elements. 
 #' 
 #' @export
-validate <- function(input_estim_opt, input_model_opt, input_save_opt, db) {
+validate <- function(input_estim_opt, input_model_opt, db) {
   cli::cli_h1("Validating options")
   
   list_of_options <- list(
     estim_opt = validate_estim_opt(input_estim_opt),
-    model_opt = validate_model_opt(input_model_opt, db),
-    save_opt = validate_save_opt(input_save_opt)
+    model_opt = validate_model_opt(input_model_opt, db)
   )
   
   cli::cli_alert_success("All options validated and defaults set.")
@@ -115,6 +113,8 @@ validate_estim_opt <- function(input_estim_opt) {
 validate_model_opt <- function(input_model_opt, db) {
   # Set the defaults ----
   model_opt <- list(
+    name = "A model without a name",
+    description = "Does not contain a description",
     id = NULL,
     ct = NULL,
     choice = NULL,
@@ -215,56 +215,4 @@ validate_model_opt <- function(input_model_opt, db) {
   cli::cli_alert_success("Model options")
   
   return(model_opt)
-}
-
-#' Validates and sets default save options
-#'
-#' The function validates the user supplied list of save options and sets 
-#' defaults for the missing options.
-#' 
-#' The function is intended for internal use only.
-#'  
-#' @inheritParams validate
-#' 
-#' @return Returns a list of options with missing input values replaced by 
-#' default values
-
-validate_save_opt <- function(input_save_opt) {
-  save_opt <- list(
-    name = "A model without a name",
-    description = "Does not contain a description",
-    path = NULL,
-    save_summary = FALSE,
-    save_model_object = FALSE,
-    save_hessian = FALSE,
-    save_vcov = FALSE,
-    save_param = FALSE,
-    save_worker_info = FALSE
-  )
-  
-  # Replace the non-specified values with default values
-  save_opt[names(input_save_opt)] <- input_save_opt
-  
-  # Check output location
-  if (is.null(save_opt[["path"]])) {
-    cli::cli_alert_info(
-      paste0("No output folder specified. Using default location:\n",
-             file.path(getwd()))
-    )
-  }
-  
-  # Check that the input values are logical
-  stopifnot(is.logical(save_opt[["save_summary"]]))
-  stopifnot(is.logical(save_opt[["save_model_object"]]))
-  stopifnot(is.logical(save_opt[["save_hessian"]]))
-  stopifnot(is.logical(save_opt[["save_vcov"]]))
-  stopifnot(is.logical(save_opt[["save_param"]]))
-  stopifnot(is.logical(save_opt[["save_worker_info"]]))
-  
-  
-  
-  # Return the validated list of saving options
-  cli::cli_alert_success("Save options")
-  
-  return(save_opt)
 }

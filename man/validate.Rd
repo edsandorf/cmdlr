@@ -4,14 +4,12 @@
 \alias{validate}
 \title{Validate all options}
 \usage{
-validate(input_estim_opt, input_model_opt, input_save_opt, db)
+validate(input_estim_opt, input_model_opt, db)
 }
 \arguments{
 \item{input_estim_opt}{A named list of estimation options}
 
 \item{input_model_opt}{A named list of model options}
-
-\item{input_save_opt}{A named list of save options}
 
 \item{db}{A data.frame with the data used for estimation}
 }
