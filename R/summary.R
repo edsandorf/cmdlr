@@ -9,10 +9,12 @@
 #' @export
 summary.cmdlr <- function(object, robust = TRUE, ...) {
   cat("---------------------------------------------------------------------\n")
+  cat("Model name            ", object[["name"]], "\n")
+  cat("Model description     ", object[["description"]], "\n")
   cat("Convergence message   ", object[["message"]], "\n")
   cat("Convergence criteria  ", convergence_criteria(object), "\n")
-  cat(paste0("Estimation started    ", object[["time_start"]], "\n"))
-  cat(paste0("Estimation completed  ", object[["time_end"]], "\n"))
+  cat(paste0("Estimation started     ", object[["time_start"]], "\n"))
+  cat(paste0("Estimation completed   ", object[["time_end"]], "\n"))
   cat("\n\n")
   
   cat("----------------------------- Model fit -----------------------------\n")
