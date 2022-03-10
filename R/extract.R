@@ -1,6 +1,6 @@
 #' Extract the function value from the model object
 #' 
-#' @param object A model object of class 'cmdlr'
+#' @param object A 'cmdlr' model object
 #' @param ... Additional arguments passed to the function
 #' 
 #' @return A single numeric value
@@ -60,5 +60,46 @@ gradient_obs <- function(object, ...) {
   )
 }
 
+#' Extract free parameters from the model object
+#'
+#' @inheritParams function_value
+#' 
+#' @export
+free_param <- function(object, ...) {
+  return(
+    object[["param_free"]]
+  )
+}
 
+#' Extract fixed parameters from the model object
+#'
+#' @inheritParams function_value
+#' 
+#' @export
+fixed_param <- function(object, ...) {
+  return(
+    object[["param_fixed"]]
+  )
+}
 
+#' Extract starting parameters from the model object
+#'
+#' @inheritParams function_value
+#' 
+#' @export
+start_param <- function(object, ...) {
+  return(
+    object[["param_start"]]
+  )
+}
+
+#' Extract final parameters from the model object
+#'
+#' @inheritParams function_value
+#' 
+#' @export
+final_param <- function(object, ...) {
+  return(
+    object[["param_final"]]
+  )
+}
