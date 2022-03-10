@@ -38,7 +38,7 @@ model_fit <- function(object, type = "bic", ...) {
   )
   
   names(fit) <- type
-  class(fit) <- c("model_fit", "numeric")
+  # class(fit) <- c("model_fit", "numeric")
   return(fit)
 }
 
