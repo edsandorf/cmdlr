@@ -7,7 +7,7 @@
 gradient(object, ...)
 }
 \arguments{
-\item{object}{A model object of class 'cmdlr'}
+\item{object}{A 'cmdlr' model object}
 
 \item{...}{Additional arguments passed to the function}
 }
