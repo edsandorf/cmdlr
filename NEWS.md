@@ -1,6 +1,7 @@
 ## cmdlr v0.0.4
 * Major structural changes to the code with multiple changes breaking existing code.
 * Added S3 Generic for vcov
+* Added S3 generics for glance() and tidy(), and a placeholder for augment() that are consistent with the 'broom' package. 
 
 ## cmdlR v0.0.3
 * The code has undergone major refactoring and linting, while giving the documentation a much needed update. Previously, some functions relied on scoping rather than explicit passing of arguments. This is now fixed. 
