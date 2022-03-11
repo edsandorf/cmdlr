@@ -7,32 +7,33 @@
 #' @method summary cmdlr
 #' 
 #' @export
-summary.cmdlr <- function(object, robust = TRUE, ...) {
+summary.cmdlr <- function(object, robust = FALSE, ...) {
   cat("---------------------------------------------------------------------\n")
-  cat("Model name            ", object[["name"]], "\n")
-  cat("Model description     ", object[["description"]], "\n")
-  cat("Convergence message   ", object[["message"]], "\n")
-  cat("Convergence criteria  ", convergence_criteria(object), "\n")
-  cat(paste0("Estimation started     ", object[["time_start"]], "\n"))
-  cat(paste0("Estimation completed   ", object[["time_end"]], "\n"))
+  cat_summary_info(object, robust = robust, ...)
   cat("\n\n")
   
   cat("----------------------------- Model fit -----------------------------\n")
-  print(glance(object) %>%
-          tidyr::pivot_longer(tidyselect::everything(),
-                              names_to = "stat", 
-                              values_to = "value"))
+  glance(object) %>%
+    tidyr::pivot_longer(tidyselect::everything(),
+                        names_to = "stat", 
+                        values_to = "value") %>% 
+    dplyr::mutate(
+      value = round(.data$value, 4L)
+    ) %>% 
+    print()
   cat("\n\n")
   
   cat("----------------------- Parameter information -----------------------\n")
-  print(parameter_info(object))
+  parameter_info(object) %>% 
+    print(n = Inf)
   cat("\n\n")
   
   cat("----------------------------- Parameters-----------------------------\n")
-  print(tidy(object, robust = robust) %>% 
-          dplyr::mutate(
-            star = stars(.data$p.value)
-          ))
+  tidy(object, robust = robust) %>% 
+    dplyr::mutate(
+      star = stars(.data$p.value)
+    ) %>% 
+    print(n = Inf)
   cat("---------------------------------------------------------------------\n")
   cat("'***' - 0.1% level, '**' - 1% level, '*' - 5% level, '.' - 10% level\n")
   cat(paste0("Reported using ",
@@ -40,6 +41,19 @@ summary.cmdlr <- function(object, robust = TRUE, ...) {
              "standard errors\n"))
   cat("\n\n")
   
+}
+
+#' Wrapper for cat sequence
+#'
+#' @param x A 'cmdlr' model object
+#' @inheritParams summary.cmdlr
+cat_summary_info <- function(x, ...) {
+  cat("Model name            ", get_name(x), "\n")
+  cat("Model description     ", get_description(x), "\n")
+  cat("Convergence message   ", get_convergence_message(x), "\n")
+  cat("Convergence criteria  ", convergence_criteria(x, ...), "\n")
+  cat(paste0("Estimation started     ", get_estimation_start(x), "\n"))
+  cat(paste0("Estimation completed   ", get_estimation_end(x), "\n"))
 }
 
 #' Summary of parameter info
@@ -142,8 +156,8 @@ stars <- function(pval) {
 #' @return A named numeric 
 #' 
 #' @export
-convergence_criteria <- function(object, robust = TRUE, ...) {
-  grad <- gradient(object)
+convergence_criteria <- function(object, robust = FALSE, ...) {
+  grad <- get_gradient(object)
   
   crit <- t(grad) %*% vcov(object, robust = robust) %*% grad
   
