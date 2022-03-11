@@ -8,101 +8,66 @@
 #' existing files and to close open sink connections. However, it is on the user
 #' to be careful with file names to avoid any chance of loosing data.  
 #'
-#' @param model A model opbject returned by \code{estimate}
-#' @inheritParams estimate
+#' @param x A 'cmdlr' model object
+#' @param path The file path to the folder where the output should be saved. 
+#' The default is the current working directory. The file name is inferred 
+#' based on the model name and the 'what' argument.
+#' @param what What output to save. One of: 'object', 'summary', 'hessian', 
+#' 'vcov'. The default is the model object.
+#' @param ... Additional parameters passed to the function. For example, 
+#' 'robust' if you are saving the variance-covariance matrix
 #' 
-#' @examples
-#' \dontrun{
-#'     save_opt <- list(
-#'     name = "MNL model",
-#'     description = "A simple MNL model using the Apollo dataset 'mode choice'.",
-#'     path = file.path("outputs"),
-#'     save_summary = FALSE,
-#'     save_model_object = FALSE
-#'   )
-#'   
-#'   model <- estimate(ll, db, estim_opt, model_opt, summary_opt, save_opt)
-#'   
-#'   store(model, save_opt)
-#' }
 #' @export
-
-save_model <- function(model, validated_options) {
-  # Make sure that we do close file-writing if the function exits
-  # on.exit(sink(), add = TRUE)
-  
-  estim_opt <- validated_options[["estim_opt"]]
-  model_opt <- validated_options[["model_opt"]]
-  save_opt <- validated_options[["save_opt"]]
+save <- function(x, path = getwd(), what = "object", ...) {
   
   # For storage purposes change the name of the model object to lower case and 
   # '-' separated. 
-  model_name <- make_model_name(save_opt$name)
-  model_name <- paste0(Sys.Date(), "-", model_name)
+  path_name <- make_model_name(get_name(x))
   
-  # Create the partial path 
-  if (is.null(save_opt$path)) {
-    path <- getwd()
-  } else {
-    path <- file.path(getwd(), save_opt$path)
-  }
   
-  # Check that files with the current names don't already exist to avoid over-writing them 
-  file_list <- list.files(
-    path,
-    model_name
+  switch(what,
+         object = save_object(x, path),
+         summary = save_summary(x, path),
+         hessian = save_hessian(x, path),
+         vcov = save_vcov(x, path, ...))
+  
+}
+
+#' Save the model object
+#'
+#' @inheritParams save
+save_object <- function(x, path, ...) {
+  
+}
+
+#' Save the summary to file
+#'
+#' @inheritParams save
+save_summary <- function(x, path, ...) {
+  
+}
+
+#' Save the hessian matrix
+#'
+#' @inheritParams save
+save_hessian <- function(x, path, ...) {
+  
+}
+
+#' Save the variance covariance matrix
+#'
+#' @inheritParams save
+save_vcov <- function(x, path, ...) {
+  
+}
+
+#' Create the model name used when saving the data
+#'
+#' @param x A string
+make_model_name <- function(x) {
+  return(
+    paste(Sys.Date(), 
+          gsub("([.\\s+])+", "-", tolower(x), perl = TRUE),
+          sep = "-")
   )
-  
-  if (length(file_list) > 0) {
-    # cat(yellow$bold(symbol$warning), paste0("  A file with the name ", model_name, " already exists in the specified folder. Adding numbering to the file name.\n"))
-    unique_models <- unique(stringr::str_replace_all(file_list, "(-summary|-model-object|-hessian|-vcov|-param).*", ""))
-    model_name <- paste0(model_name, "-", stringr::str_pad(as.character(length(unique_models) + 1), 3, side = "left", pad = "0"))
-  }
-  
-  # Set the full path with partial model name
-  path <- file.path(path, model_name)
-  
-  # Save model summary to .txt ----
-  if (isTRUE(save_opt$save_summary)) {
-    file_path <- paste0(path, "-summary.txt")
-    sink(file_path)
-    summarize(model)
-    sink()
-    # cat(blue$bold(symbol$info), paste0("  Model summary saved to: \"", file_path, "\"\n"))
-  }
-  
-  # Save model object to .rds ----
-  if (isTRUE(save_opt$save_model_object)) {
-    file_path <- paste0(path, "-model-object.rds")
-    saveRDS(model, file_path)
-    # cat(blue$bold(symbol$info), paste0("  Model object saved to: \"", file_path, "\"\n"))
-  }
-  
-  # Save hessian to a .csv file ----
-  if (isTRUE(save_opt$save_hessian)) {
-    file_path <- paste0(path, "-hessian.csv")
-    utils::write.csv(model$hessian, file_path)
-    # cat(blue$bold(symbol$info), paste0("  Hessian matrix saved to: \"", file_path, "\"\n"))  
-  }
-  
-  # Save variance-covariance matrix to .csv file ----
-  if (isTRUE(save_opt$save_vcov)) {
-    file_path <- paste0(path, "-vcov.csv")
-    utils::write.csv(model$vcov, file_path)
-    # cat(blue$bold(symbol$info), paste0("  Variance-covariance matrix saved to: \"", file_path, "\"\n"))  
-  }
-  
-  # Save parameters to a .csv file ----
-  if (isTRUE(save_opt$save_param)) {
-    file_path <- paste0(path, "-param.csv")
-    utils::write.csv(model$coef, file_path)
-    # cat(blue$bold(symbol$info), paste0("  Final parameters saved to: \"", file_path, "\"\n"))  
-  }
-  
-  # Save the choice analysis to a .csv file ----
-  if (isTRUE(save_opt$save_choice_analysis)) {
-    file_path <- paste0(path, "-choice-analysis.csv")
-    utils::write.csv(model$choice_analysis, file_path)
-    # cat(blue$bold(symbol$info), paste0("  Choice analysis saved to: \"", file_path, "\"\n"))  
-  }
 }
