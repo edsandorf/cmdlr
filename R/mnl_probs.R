@@ -53,7 +53,6 @@ mnl_probs <- function(V, model_opt) {
 #' available alternatives. 
 #' 
 #' @param alt_avail List of alternative availabilities
-#' @inheritParams mnl_probability
 #' 
 #' @return A vector of length equal to the number of choice observations in 
 #' the data (incl. NAs from the padding during data setup)
