@@ -2,7 +2,7 @@
 % Please edit documentation in R/estimate.R
 \name{estimate}
 \alias{estimate}
-\title{Function to estimate a choice model using cmdlR}
+\title{Function to estimate a choice model using cmdlr}
 \usage{
 estimate(ll, prepared_inputs, validated_options)
 }
@@ -23,7 +23,6 @@ A list with model results including the hessian, standard and
 robust variance-covariance matrixes and
 }
 \description{
-The function is a wrapper around one of several optimization routines that
 either maximize or minimize the log-likelihood function. If estimation 
 is successful, the function calculates a high-precision numerical hessian
 and a standard and robust variance-covariance matrix.
@@ -32,7 +31,7 @@ and a standard and robust variance-covariance matrix.
 NOTE: There are no checks on whether the log-likelihood function is correctly
 specified. If you see that your log-likelihood value is getting progressively
 worse from starting values, check your 'll' specification and that it 
-corresponds to the chosen optmizer.
+corresponds to the chosen optimizer.
 }
 \examples{
 \dontrun{
