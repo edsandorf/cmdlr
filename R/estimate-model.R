@@ -51,13 +51,13 @@ estimate_model <- function(type,
   
   # Set convergence to TRUE if set to converge at starting values
   if (control[["iterlim"]] %in% c(0, 1)) {
-    model[["converged"]] <- TRUE
+    model[["convergence"]] <- TRUE
   }
   
   # Additional model object elements
   model[["param_start"]] <- model[["param_final"]] <- param_start
   model[["param_fixed"]] <- param_fixed
-  model[["param_final"]][names(param_free)] <- model[["param_free"]]
+  model[["param_final"]][names(param_free)] <- get_param_free(model)
   model[["control"]] <- control
   
   # Set the new classes of the model object
@@ -107,10 +107,10 @@ estimate_maxlik <- function(log_lik,
   if (control[["method"]] == "BFGS" && model_obj[["code"]] %in% c(0) ||
       control[["method"]] == "BHHH" && model_obj[["code"]] %in% c(2, 8) ||
       control[["method"]] == "NR" && model_obj[["code"]] %in% c(0, 1, 2)) {
-    model[["converged"]] <- TRUE
+    model[["convergence"]] <- TRUE
     
   }   else {
-    model[["converged"]] <- FALSE
+    model[["convergence"]] <- FALSE
   }
   
   return(model)
@@ -155,9 +155,9 @@ estimate_ucminf <- function(log_lik,
   model[["convergence_code"]] <- model_obj[["convergence"]]
   
   if (model_obj[["convergence"]] %in% c(1, 2, 3, 4)) {
-    model[["converged"]] <- TRUE
+    model[["convergence"]] <- TRUE
   } else {
-    model[["converged"]] <- FALSE
+    model[["convergence"]] <- FALSE
   }
   
   return(model)

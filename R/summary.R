@@ -55,26 +55,26 @@ summary.cmdlr <- function(object, robust = TRUE, ...) {
 #' @export
 parameter_info <- function(object, ...) {
   
-  eigen_values <- grad <- rep(NA, length(start_param(object)))
-  names(eigen_values) <- names(grad) <- names(start_param(object))
+  eigen_values <- grad <- rep(NA, length(get_param_start(object)))
+  names(eigen_values) <- names(grad) <- names(get_param_start(object))
   
   # Calculate the Eigen values of the model object
-  eigen_values[names(free_param(object))] <- tryCatch({
-    eigen(object[["hessian"]])[["values"]]
+  eigen_values[names(get_param_free(object))] <- tryCatch({
+    eigen(get_hessian(object))[["values"]]
   },
   error = function(e) {
     return(
-      rep(NA, nrow(object[["hessian"]]))
+      rep(NA, nrow(get_hessian(object)))
     )
   })
   
   # Fix gradient 
-  grad[names(free_param(object))] <- object[["gradient"]]
+  grad[names(get_param_free(object))] <- get_gradient(object)
   
   param_info <- tibble::tibble(
-    term = names(start_param(object)),
-    start = start_param(object),
-    final = final_param(object),
+    term = names(get_param_start(object)),
+    start = get_param_start(object),
+    final = get_param_final(object),
     diff = .data$final - .data$start,
     grad = grad,
     eigen = eigen_values

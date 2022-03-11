@@ -41,14 +41,14 @@ normal_vcov <- function(object, ...) {
   return(
     tryCatch({
       if (object[["control"]][["optimizer"]] %in% c("ucminf")) {
-        x <- MASS::ginv(object[["hessian"]])
+        x <- MASS::ginv(get_hessian(object))
         
       } else {
-        x <- MASS::ginv(-object[["hessian"]])
+        x <- MASS::ginv(-get_hessian(object))
         
       }
       
-      colnames(x) <- rownames(x) <- names(free_param(object))
+      colnames(x) <- rownames(x) <- names(get_param_free(object))
       
       return(x)
       
@@ -85,7 +85,7 @@ robust_vcov <- function(object, ...) {
 #' 
 bread <- function(object, ...) {
   n_id <- nid(object)
-  crumbs <- vcov(object) * n_id
+  crumbs <- vcov(object, robust = FALSE) * n_id
   crumbs[is.na(crumbs)] <- 0
   
   return(crumbs)
@@ -98,7 +98,7 @@ bread <- function(object, ...) {
 meat <- function(object, ...) {
   n_id <- nid(object)
   adj <- n_id / (n_id - length(coef(object)))
-  juices <- crossprod(gradient_obs(object)) / n_id
+  juices <- crossprod(get_gradient_obs(object)) / n_id
   juices[is.na(juices)] <- 0
   
   return(juices)

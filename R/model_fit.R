@@ -47,8 +47,8 @@ model_fit <- function(object, type = "bic", ...) {
 #' @inheritParams model_fit
 adj_rho_sqrd <- function(object, ...) {
   n_par <- length(coef(object))
-  maximum <- function_value(object)
-  maximum_zero <- function_value_zero(object)
+  maximum <- get_function_value(object)
+  maximum_zero <- get_function_value_zero(object)
   
   return(
     1 - ((maximum - n_par) / maximum_zero)
@@ -60,7 +60,7 @@ adj_rho_sqrd <- function(object, ...) {
 #' @inheritParams model_fit
 aic <- function(object, ...) {
   n_par <- length(coef(object))
-  maximum <- function_value(object)
+  maximum <- get_function_value(object)
   
   return(
     -2 * maximum + (2 * n_par)
@@ -72,7 +72,7 @@ aic <- function(object, ...) {
 #' @inheritParams model_fit
 aic3 <- function(object, ...) {
   n_par <- length(coef(object))
-  maximum <- function_value(object)
+  maximum <- get_function_value(object)
   
   return(
     -2 * maximum + (3 * n_par)
@@ -84,7 +84,7 @@ aic3 <- function(object, ...) {
 #' @inheritParams model_fit
 caic <- function(object, ...) {
   n_par <- length(coef(object))
-  maximum <- function_value(object)
+  maximum <- get_function_value(object)
   n_obs <- nobs(object)
   
   return(
@@ -97,7 +97,7 @@ caic <- function(object, ...) {
 #' @inheritParams model_fit
 caic_star <- function(object, ...) {
   n_par <- length(coef(object))
-  maximum <- function_value(object)
+  maximum <- get_function_value(object)
   n_obs <- nobs(object)
   
   return(
@@ -110,7 +110,7 @@ caic_star <- function(object, ...) {
 #' @inheritParams model_fit
 ht_aic <- function(object, ...) {
   n_par <- length(coef(object))
-  maximum <- function_value(object)
+  maximum <- get_function_value(object)
   n_obs <- nobs(object)
   
   return(
@@ -123,7 +123,7 @@ ht_aic <- function(object, ...) {
 #' @inheritParams model_fit
 bic <- function(object, ...) {
   n_par <- length(coef(object))
-  maximum <- function_value(object)
+  maximum <- get_function_value(object)
   n_obs <- nobs(object)
   
   return(
@@ -136,7 +136,7 @@ bic <- function(object, ...) {
 #' @inheritParams model_fit
 bic_star <- function(object, ...) {
   n_par <- length(coef(object))
-  maximum <- function_value(object)
+  maximum <- get_function_value(object)
   n_obs <- nobs(object)
   
   return(
@@ -149,7 +149,7 @@ bic_star <- function(object, ...) {
 #' @inheritParams model_fit
 dbic <- function(object, ...) {
   n_par <- length(coef(object))
-  maximum <- function_value(object)
+  maximum <- get_function_value(object)
   n_obs <- nobs(object)
   
   return(
@@ -162,7 +162,7 @@ dbic <- function(object, ...) {
 #' @inheritParams model_fit
 hqic <- function(object, ...) {
   n_par <- length(coef(object))
-  maximum <- function_value(object)
+  maximum <- get_function_value(object)
   n_obs <- nobs(object)
   
   return(

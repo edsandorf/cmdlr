@@ -12,7 +12,7 @@ stats::coef
 #' @export
 coef.cmdlr <- function(object, ...) {
   return(
-    free_param(object, ...)
+    get_param_free(object, ...)
   )
 }
 
@@ -34,7 +34,7 @@ stats::nobs
 #' @export
 nobs.cmdlr <- function(object, use.fallback = FALSE, ...) {
   return(
-    nrow(gradient_obs(object, ...))
+    nrow(get_gradient_obs(object, ...))
   )
 }
 
@@ -49,7 +49,7 @@ nobs.cmdlr <- function(object, use.fallback = FALSE, ...) {
 #' @export
 nid <- function(object, ...) {
   return(
-    length(function_values(object, ...))
+    length(get_function_values(object, ...))
   )
 }
 
@@ -63,12 +63,7 @@ nid <- function(object, ...) {
 #' @export
 print.cmdlr <- function(x, ...) {
   cat("---------------------------------------------------------------------\n")
-  cat("Model name            ", x[["name"]], "\n")
-  cat("Model description     ", x[["description"]], "\n")
-  cat("Convergence message   ", x[["message"]], "\n")
-  cat("Convergence criteria  ", convergence_criteria(x), "\n")
-  cat(paste0("Estimation started     ", x[["time_start"]], "\n"))
-  cat(paste0("Estimation completed   ", x[["time_end"]], "\n"))
+  cat_summary_info(x, ...)
   cat("\n\n")
   print(coef(x))
   cat("\n\n")
