@@ -4,6 +4,7 @@
 * Added S3 Generic for vcov
 * Added S3 generics for glance() and tidy(), and a placeholder for augment() that are consistent with the 'broom' package.
 * save_opt() is no longer part of the code. Instead a new function save with arguments is provided. 
+* All examples are updated to reflect changes to the overall structure
 
 
 ## cmdlR v0.0.3
