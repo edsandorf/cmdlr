@@ -6,34 +6,16 @@ rm(list = ls(all = TRUE))
 pkgs <- c("cmdlr")
 invisible(lapply(pkgs, require, character.only = TRUE))
 
-# Load and manipulate the data ----
-db <- apollo::apollo_modeChoiceData
-db <- db[db$SP == 1, ]
-db$ct <- rep(1:14, times = 500)
-db$mean_income <- mean(db$income)
-
-# Define the list of saving options ----
-save_opt <- list(
-  name = "Nested logit model",
-  description = "A simple NL model with 2 nests using the Apollo dataset 'mode choice'.",
-  path = file.path("outputs"),
-  save_summary = FALSE,
-  save_model_object = FALSE,
-  save_choice_analysis = FALSE
-)
-
 # Define the list of estimation options ----
 estim_opt <- list(
   optimizer = "maxlik",
-  method = "BFGS",
-  cores = 1,
-  calculate_hessian = TRUE,
-  robust_vcov = TRUE,
-  print_level = 2
+  method = "BFGS"
 )
 
 # Define the list of model options ----
 model_opt <- list(
+  name = "Nested logit model",
+  description = "A simple NL model with 2 nests using the Apollo dataset 'mode choice'.",
   id = "ID",
   ct = "ct",
   choice = "choice",
@@ -67,9 +49,6 @@ model_opt <- list(
     lambda_pt = 0.95
   )
 )
-
-# Validate options ----
-validated_options <- validate(estim_opt, model_opt, save_opt, db)
 
 # Likelihood function - returns the probability of the sequence of choices ----
 ll <- function(param) {
@@ -194,6 +173,15 @@ ll <- function(param) {
   return(ll)
 }
 
+# Load and manipulate the data ----
+db <- apollo::apollo_modeChoiceData
+db <- db[db$SP == 1, ]
+db$ct <- rep(1:14, times = 500)
+db$mean_income <- mean(db$income)
+
+# Validate options ----
+validated_options <- validate(estim_opt, model_opt, db)
+
 # Prepare inputs ----
 prepared_inputs <- prepare(db, ll, validated_options)
 
@@ -201,4 +189,4 @@ prepared_inputs <- prepare(db, ll, validated_options)
 model <- estimate(ll, prepared_inputs, validated_options)
 
 # Get a summary of the results ----
-summarize(model)
+summary(model)

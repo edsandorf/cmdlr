@@ -6,33 +6,16 @@ rm(list = ls(all = TRUE))
 pkgs <- c("cmdlr")
 invisible(lapply(pkgs, require, character.only = TRUE))
 
-# Load and manipulate the data ----
-db <- apollo::apollo_modeChoiceData
-db <- db[db$SP == 1, ]
-db$ct <- rep(1:14, times = 500)
-
-# Define the list of saving options ----
-save_opt <- list(
-  name = "MNL model",
-  description = "A simple MNL model using the Apollo dataset 'mode choice'.",
-  path = file.path("outputs"),
-  save_summary = FALSE,
-  save_model_object = FALSE,
-  save_choice_analysis = FALSE
-)
-
 # Define the list of estimation options ----
 estim_opt <- list(
   optimizer = "ucminf",
-  method = "BFGS",
-  cores = 1,
-  calculate_hessian = TRUE,
-  robust_vcov = TRUE,
-  print_level = 2
+  method = "BFGS"
 )
 
 # Define the list of model options ----
 model_opt <- list(
+  name = "MNL model",
+  description = "A simple MNL model using the Apollo dataset 'mode choice'.",
   id = "ID",
   ct = "ct",
   choice = "choice",
@@ -110,8 +93,13 @@ ll <- function(param) {
   return(-ll)
 }
 
+# Load and manipulate the data ----
+db <- apollo::apollo_modeChoiceData
+db <- db[db$SP == 1, ]
+db$ct <- rep(1:14, times = 500)
+
 # Validate options ----
-validated_options <- validate(estim_opt, model_opt, save_opt, db)
+validated_options <- validate(estim_opt, model_opt, db)
 
 # Prepare inputs ----
 prepared_inputs <- prepare(db, ll, validated_options)
@@ -127,4 +115,4 @@ validated_options[["model_opt"]][["param"]] <- as.list(start_values[1, ])
 model <- estimate(ll, prepared_inputs, validated_options)
 
 # Get a summary of the results ----
-summarize(model)
+summary(model)

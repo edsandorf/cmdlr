@@ -6,31 +6,17 @@ rm(list = ls(all = TRUE))
 pkgs <- c("cmdlr")
 invisible(lapply(pkgs, require, character.only = TRUE))
 
-# Load and manipulate the data ----
-db <- apollo::apollo_swissRouteChoiceData
-db$ct <- rep(1:9, times = 388)
-
-# Define the list of saving options ----
-save_opt <- list(
-  name = "MIXL uncorrelated LN",
-  description = "A mixed logit model with uncorrelated log-normals",
-  path = file.path("outputs"),
-  save_summary = FALSE,
-  save_model_object = FALSE
-)
-
 # Define the list of estimation options ----
 estim_opt <- list(
   optimizer = "ucminf",
   method = "BFGS",
-  cores = 4,
-  calculate_hessian = TRUE,
-  robust_vcov = TRUE,
-  print_level = 2
+  cores = 4
 )
 
 # Define the list of model options ----
 model_opt <- list(
+  name = "MIXL uncorrelated LN",
+  description = "A mixed logit model with uncorrelated log-normals",
   id = "ID",
   ct = "ct",
   choice = "choice",
@@ -59,9 +45,6 @@ model_opt <- list(
     draws_ch = "normal"
   )
 )
-
-# Validate options ----
-validated_options <- validate(estim_opt, model_opt, save_opt, db)
 
 # Likelihood function - returns the probability of the sequence of choices ----
 ll <- function(param) {
@@ -115,6 +98,13 @@ ll <- function(param) {
   return(-ll)
 }
 
+# Load and manipulate the data ----
+db <- apollo::apollo_swissRouteChoiceData
+db$ct <- rep(1:9, times = 388)
+
+# Validate options ----
+validated_options <- validate(estim_opt, model_opt, db)
+
 # Prepare inputs ----
 prepared_inputs <- prepare(db, ll, validated_options)
 
@@ -122,5 +112,5 @@ prepared_inputs <- prepare(db, ll, validated_options)
 model <- estimate(ll, prepared_inputs, validated_options)
 
 # Get a summary of the results ----
-summarize(model)
+summary(model)
 
