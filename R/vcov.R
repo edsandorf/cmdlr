@@ -8,7 +8,8 @@ stats::vcov
 #'
 #' @param object A model object of class 'cmdlr'
 #' @param robust A boolean equal to TRUE if you want to return a robust 
-#' variance covariance matrix based on a simple sandwich estimator 
+#' variance covariance matrix based on a simple sandwich estimator. The default
+#' value is FALSE 
 #' @param ... Other arguments passed to the function
 #'
 #' @return A matrix with row and column names equal to the parameters of the
@@ -17,12 +18,12 @@ stats::vcov
 #' @method vcov cmdlr
 #'
 #' @export
-vcov.cmdlr <- function(object, robust = TRUE, ...) {
+vcov.cmdlr <- function(object, robust = FALSE, ...) {
   if (robust) {
-    return(normal_vcov(object))
+    return(robust_vcov(object))
     
   } else {
-    return(robust_vcov(object))
+    return(normal_vcov(object))
     
   }
 }

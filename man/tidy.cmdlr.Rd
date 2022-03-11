@@ -4,13 +4,13 @@
 \alias{tidy.cmdlr}
 \title{Tidy a cmdlr object}
 \usage{
-\method{tidy}{cmdlr}(x, robust = TRUE, hypotheses = NULL, ...)
+\method{tidy}{cmdlr}(x, robust = FALSE, hypotheses = NULL, ...)
 }
 \arguments{
 \item{x}{A model object of class 'cmdlr'}
 
 \item{robust}{A boolean equal to TRUE if robust standard errors should be 
-used and reported. The default value is TRUE.}
+used and reported. The default value is FALSE}
 
 \item{hypotheses}{A vector the length of the number of parameters (incl.
 free and fixed) with values for the null hypothesis to test against. The

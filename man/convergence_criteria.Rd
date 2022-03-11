@@ -4,13 +4,14 @@
 \alias{convergence_criteria}
 \title{Calculate the convergence criteria}
 \usage{
-convergence_criteria(object, robust = TRUE, ...)
+convergence_criteria(object, robust = FALSE, ...)
 }
 \arguments{
 \item{object}{A model object of class 'cmdlr'}
 
 \item{robust}{A boolean equal to TRUE if you want to return a robust 
-variance covariance matrix based on a simple sandwich estimator}
+variance covariance matrix based on a simple sandwich estimator. The default
+value is FALSE}
 
 \item{...}{Other arguments passed to the function}
 }

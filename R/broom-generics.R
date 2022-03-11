@@ -6,7 +6,7 @@ generics::tidy
 #'
 #' @param x A model object of class 'cmdlr'
 #' @param robust A boolean equal to TRUE if robust standard errors should be 
-#' used and reported. The default value is TRUE.
+#' used and reported. The default value is FALSE
 #' @param hypotheses A vector the length of the number of parameters (incl.
 #' free and fixed) with values for the null hypothesis to test against. The
 #' default is a two-sided test against 0. 
