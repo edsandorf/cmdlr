@@ -7,7 +7,7 @@
 Modified from here: https://stats.stackexchange.com/questions/85664/r-procedure-for-comparing-multiple-categorical-variables-similar-to-anova-fol
 }
 \usage{
-pairwise_chisq_test(x, g, p.adjust.method = p.adjust.methods, ...)
+pairwise_chisq_test(x, g, p.adjust.method = stats::p.adjust.methods, ...)
 }
 \arguments{
 \item{x}{A response vector}
@@ -15,10 +15,18 @@ pairwise_chisq_test(x, g, p.adjust.method = p.adjust.methods, ...)
 \item{g}{A grouping vector. If not a factor it will be converted to one.}
 
 \item{p.adjust.method}{A character string specifying the method for multiple
-testing adjustments. See \link{\code{p.adjust.methods}}}
+testing adjustments. See \code{\link{p.adjust.methods}}}
 
-\item{...}{Additional arguments passed to \link{\code{chisq.test}}}
+\item{...}{Additional arguments passed to \code{\link{chisq.test}}}
 }
 \description{
-A pairwise Chi-squared test
+A pairwhise non-parametric chi-squared test for difference between grouped
+categorical variables.
+}
+\examples{
+group <- rep(LETTERS[1:3], 10)
+sex <- rep(c('Male', 'Female'), 15)
+
+pairwise_chisq_test(sex, group, p.adjust.method = "none")
+
 }
