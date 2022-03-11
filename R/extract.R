@@ -1,3 +1,102 @@
+#' Extract the control list
+#'
+#' @inheritParams get_function_value
+#' 
+#' @export
+get_control <- function(object, ...) {
+  return(
+    object[["control"]]
+  )
+}
+
+#' Extract the convergence of the model
+#'
+#' @inheritParams get_function_value
+#' 
+#' @export
+get_convergence <- function(object, ...) {
+  return(
+    object[["convergence"]]
+  )
+}
+
+#' Extract the convergence code 
+#'
+#' @inheritParams get_function_value
+#' 
+#' @export
+get_convergence_code <- function(object, ...) {
+  return(
+    object[["convergence_code"]]
+  )
+}
+
+#' Extract the description of the model 
+#'
+#' @inheritParams get_function_value
+#' 
+#' @export
+get_description <- function(object, ...) {
+  return(
+    object[["description"]]
+  )
+}
+
+#' Extract the gradient of a model object
+#'
+#' @inheritParams get_function_value
+#' 
+#' @export
+get_gradient <- function(object, ...) {
+  return(
+    object[["gradient"]]
+  )
+}
+
+#' Extract the gradient observations from a model object
+#'
+#' @inheritParams get_function_value
+#' 
+#' @export
+get_gradient_obs <- function(object, ...) {
+  return(
+    object[["gradient_obs"]]
+  )
+}
+
+#' Extract the Hessian
+#'
+#' @inheritParams get_function_value
+#' 
+#' @export
+get_hessian <- function(object, ...) {
+  return(
+    object[["hessian"]]
+  )
+}
+
+#' Extract the convergence message
+#'
+#' @inheritParams get_function_value
+#' 
+#' @export
+get_convergence_message <- function(object, ...) {
+  return(
+    object[["message"]]
+  )
+}
+
+#' Extract the name of the model
+#'
+#' @inheritParams get_function_value
+#' 
+#' @export
+get_name <- function(object, ...) {
+  return(
+    object[["name"]]
+  )
+}
+
 #' Extract the function value from the model object
 #' 
 #' @param object A 'cmdlr' model object
@@ -6,7 +105,7 @@
 #' @return A single numeric value
 #' 
 #' @export
-function_value <- function(object, ...) {
+get_function_value <- function(object, ...) {
   return(
     object[["optimum"]]
   )
@@ -14,12 +113,12 @@ function_value <- function(object, ...) {
 
 #' Extract the function values
 #' 
-#' @inheritParams function_value
+#' @inheritParams get_function_value
 #' 
 #' @return A vector of function values at the optimum
 #' 
 #' @export
-function_values <- function(object, ...) {
+get_function_values <- function(object, ...) {
   return(
     object[["optimum_values"]]
   )
@@ -27,45 +126,23 @@ function_values <- function(object, ...) {
 
 #' Extract the function value at zero from the model object
 #' 
-#' @inheritParams function_value
+#' @inheritParams get_function_value
 #' 
 #' @return A single numeric value
 #' 
 #' @export
-function_value_zero <- function(object, ...) {
+get_function_value_zero <- function(object, ...) {
   return(
     object[["optimum_at_zero"]]
   )
 }
 
-#' Extract the gradient of a model object
-#'
-#' @inheritParams function_value
-#' 
-#' @export
-gradient <- function(object, ...) {
-  return(
-    object[["gradient"]]
-  )
-}
-
-#' Extract the gradient observations from a model object
-#'
-#' @inheritParams function_value
-#' 
-#' @export
-gradient_obs <- function(object, ...) {
-  return(
-    object[["gradient_obs"]]
-  )
-}
-
 #' Extract free parameters from the model object
 #'
-#' @inheritParams function_value
+#' @inheritParams get_function_value
 #' 
 #' @export
-free_param <- function(object, ...) {
+get_param_free <- function(object, ...) {
   return(
     object[["param_free"]]
   )
@@ -73,10 +150,10 @@ free_param <- function(object, ...) {
 
 #' Extract fixed parameters from the model object
 #'
-#' @inheritParams function_value
+#' @inheritParams get_function_value
 #' 
 #' @export
-fixed_param <- function(object, ...) {
+get_param_fixed <- function(object, ...) {
   return(
     object[["param_fixed"]]
   )
@@ -84,10 +161,10 @@ fixed_param <- function(object, ...) {
 
 #' Extract starting parameters from the model object
 #'
-#' @inheritParams function_value
+#' @inheritParams get_function_value
 #' 
 #' @export
-start_param <- function(object, ...) {
+get_param_start <- function(object, ...) {
   return(
     object[["param_start"]]
   )
@@ -95,11 +172,33 @@ start_param <- function(object, ...) {
 
 #' Extract final parameters from the model object
 #'
-#' @inheritParams function_value
+#' @inheritParams get_function_value
 #' 
 #' @export
-final_param <- function(object, ...) {
+get_param_final <- function(object, ...) {
   return(
     object[["param_final"]]
+  )
+}
+
+#' Extract start time for estimation
+#'
+#' @inheritParams get_function_value
+#' 
+#' @export
+get_estimation_start <- function(object, ...) {
+  return(
+    object[["estimation_start"]]
+  )
+}
+
+#' Extract end time for estimation
+#'
+#' @inheritParams get_function_value
+#' 
+#' @export
+get_estimation_end <- function(object, ...) {
+  return(
+    object[["estimation_end"]]
   )
 }
