@@ -43,7 +43,7 @@ set_controls <- function(control) {
   # Fix the method and optimizer and check 
   method <- control_default$method <- toupper(control_default$method)
   optimizer <- control_default$optimizer <- tolower(control_default$optimizer)
-  
+    
   # Check that the specified optimizer is correct
   if (!(optimizer %in% c("maxlik", "ucminf"))) {
     stop("Optmizer must be 'maxlik' or 'ucminf'")

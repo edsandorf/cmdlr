@@ -113,9 +113,6 @@ validate <- function(model_options, db_names) {
     }
   }
   
-  # Return the validated list of model options
-  cli::cli_alert_success("Model options")
-  
   return(model_options_default)
   
 }
