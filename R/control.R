@@ -25,7 +25,7 @@ set_controls <- function(control) {
     gradtol = 1e-06,
     steptol = 1e-10,
     lambdatol = 1e-6,
-    print_level = 0,
+    print_level = 2,
     iterlim = 500,
     grad = "forward",
     gradstep = c(1e-6, 1e-8),
