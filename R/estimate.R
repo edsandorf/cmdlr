@@ -13,26 +13,30 @@
 #' routine. It is important that the user takes into account whether the 
 #' optimization routine is a minimizer (e.g. 'ucminf') or a maximizer 
 #' (e.g. 'maxlik').
+#' @param estim_env An estimation environment or list of estimation environments
+#' returned from \code{\link{prepare}}
+#' @param model_options A list of model options. Note, this list is validated
+#' for a second time here to set some necessary defaults. See
+#' \code{\link{validate}} for details.
+#' @param control A list of control options that are passed to
+#' \code{\link{set_controls}}.
 #' 
-#' @param prepared_inputs A list of prepared inputs returned from 
-#' \code{\link{prepare}}
-#' 
-#' @param validated_options A list of validated model options returned from 
-#' \code{\link{validate}}
-#' 
-#' @return A list with model results including the hessian, standard and
-#' robust variance-covariance matrixes and 
+#' @return A 'cmdlr' model object 
 #' 
 #' @examples
 #' \dontrun{
 #'   # See /examples for how to use
-#'   estimate(ll, prepared_inputs, validated_options)
+#'   estimate(ll, estim_env, model_options)
+#'   
+#'   # or 
+#'   estimate(ll, estim_env, model_options, control)
 #' }
 #' 
 #' @export
 estimate <- function(ll,
-                     prepared_inputs,
-                     validated_options) {
+                     estim_env,
+                     model_options,
+                     control = NULL) {
   
   # SETUP ----
   estimation_start <- Sys.time()
@@ -40,15 +44,12 @@ estimate <- function(ll,
   cli::cli_alert_info(paste0("Model estimation started: ", estimation_start))
   cli::cli_h2("Getting ready")
   
-  # Define useful variables and parameters
-  estim_env <- prepared_inputs[["estim_env"]]
-  control <- validated_options[["estim_opt"]]
-  model_opt <- validated_options[["model_opt"]]
-  
-  cores <- validated_options[["estim_opt"]][["cores"]]
-  str_param_fixed <- validated_options[["model_opt"]][["fixed"]]
+  # Set estimation controls
+  control <- set_controls(control = control)
+  cli::cli_alert_success("Estimation controls set")
   
   # WORKERS ----
+  cores <- control[["cores"]]
   if (cores > 1) {
     # Create the cluster of workers and add stopCluster to on.exit()
     workers <- parallel::makeCluster(cores, type = "PSOCK")
@@ -62,10 +63,12 @@ estimate <- function(ll,
       assign("estim_env", x, envir = .GlobalEnv)
       return(NULL)
     })
+    db_names_extra <- names(estim_env[[1L]])
     
   } else {
     workers <- NA
-  
+    db_names_extra <- names(estim_env)
+    
   }
   
   # LOG LIKELIHOOD FUNCTION ----
@@ -79,9 +82,11 @@ estimate <- function(ll,
   time_start_estimate <- Sys.time()
 
   # Define the sets of parameters
-  param_start <- unlist(model_opt[["param"]])
-  param_free <- param_start[!(names(param_start) %in% model_opt[["fixed"]])]
-  param_fixed <- param_start[model_opt[["fixed"]]]
+  model_options <- validate(model_options, db_names_extra)
+    
+  param_start <- unlist(model_options[["param"]])
+  param_free <- param_start[!(names(param_start) %in% model_options[["fixed"]])]
+  param_fixed <- param_start[model_options[["fixed"]]]
   
   model <- estimate_model(control[["optimizer"]],
                           log_lik,
@@ -230,8 +235,8 @@ estimate <- function(ll,
   # WRAP UP AND RETURN MODEL OBJECT ----
   cli::cli_h2("Wrapping up")
   
-  model[["name"]] <- model_opt[["name"]]
-  model[["description"]] <- model_opt[["description"]]
+  model[["name"]] <- model_options[["name"]]
+  model[["description"]] <- model_options[["description"]]
   model[["estimation_start"]] <- estimation_start
   model[["estimation_end"]] <- Sys.time()
   

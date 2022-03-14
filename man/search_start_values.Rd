@@ -21,6 +21,16 @@ routine. It is important that the user takes into account whether the
 optimization routine is a minimizer (e.g. 'ucminf') or a maximizer 
 (e.g. 'maxlik').}
 
+\item{estim_env}{An estimation environment or list of estimation environments
+returned from \code{\link{prepare}}}
+
+\item{model_options}{A list of model options. Note, this list is validated
+for a second time here to set some necessary defaults. See
+\code{\link{validate}} for details.}
+
+\item{control}{A list of control options that are passed to
+\code{\link{set_controls}}.}
+
 \item{type}{A character string indicating whether to use a simple or a smart
 search algorithm. Default is 'simple'}
 

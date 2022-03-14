@@ -28,6 +28,13 @@ pad the data with NA.}
 function. It forces the number of cores to 1. Then you can simply
 \code{\link{attach}} the estimation environment and the list of parameters
 to run the log likelihood function line by line. The default is FALSE.}
+
+\item{...}{Additional named arguments that are added to the estimation
+environment. If cores > 1 the arguments are added to each individual 
+estimation environment. No attempts at splitting across cores. This is
+useful if you need to pass e.g. a restriction matrix or other variables 
+to the estimation environment so that they can be called by name/reference 
+within the log-likelihood function.}
 }
 \value{
 The estimation environment or a list of estimation environments if
