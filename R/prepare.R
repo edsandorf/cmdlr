@@ -1,65 +1,89 @@
-#' Prepare the model components and log likelihood function for estimation
+#' Prepare the estimation environment
 #' 
-#' The function prepares the data, draws and alternative availabilites, and 
-#' creates an estimation environment providing the context for evaluating the
-#' log-likelihood function. 
+#' The function prepares the data, draws and alternative availabilites for 
+#' estimation. All model components are placed in an estimation environment
+#' which provides the context for evaluating the log likelihood function.
 #'
 #' @param db A \code{data.frame()} or \code{tibble()} containing the data
-#' @param ll The log likelihood funciton
-#' @param validated_options A list of options returned by \code{\link{validate}}
-#'
-#' @return A list with the estimation environment and the log likelihood
-#' function
+#' @param model_options A list of user supplied model options. This list is 
+#' validated within the function. See \code{\link{validate}} for details.
+#' @param control A list of control options
+#' @param check_data A boolean equal to TRUE if we should run data checks and 
+#' pad the data with NA.
+#' @param debug A boolean equal to TRUE if you are debugging the log likelihood
+#' function. It forces the number of cores to 1. Then you can simply
+#' \code{\link{attach}} the estimation environment and the list of parameters
+#' to run the log likelihood function line by line. The default is FALSE.
+#' 
+#' @return The estimation environment or a list of estimation environments if
+#' cores > 1. 
 #' 
 #' @export
-prepare <- function(db,
-                    ll, 
-                    validated_options) {
-  # Start the timer
+prepare <- function(db, 
+                    model_options,
+                    control = NULL,
+                    check_data = TRUE,
+                    debug = FALSE,
+                    ...) {
+
   time_start <- Sys.time()
   cli::cli_h1("Preparing for estimation")
   
-  # Define variables and indexes
-  str_id <- validated_options[["model_opt"]][["id"]]
-  str_ct <- validated_options[["model_opt"]][["ct"]]
-  str_choice <- validated_options[["model_opt"]][["choice"]]
-  str_param_fixed <- validated_options[["model_opt"]][["fixed"]]
-
+  db_names <- names(db)
+  
+  # Validate model options ----
+  cli::cli_h2("Validating model options")
+  model_options <- validate(model_options, db_names)
+  cli::cli_alert_success("Model options validated and defaults set")
+  
+  # Core check ----
+  # Just get the defaults to set cores
+  cores <- set_controls(control = control)[["cores"]]
+  
+  if (debug) {
+    cores <- 1
+  
+  }
+  
+  # Extract variables from the model options ----
+  str_id <- model_options[["id"]]
+  str_ct <- model_options[["ct"]]
+  str_choice <- model_options[["choice"]]
+  str_param_fixed <- model_options[["fixed"]]
+  n_draws <- model_options[["n_draws"]]
+  draws_type <- model_options[["draws_type"]]
+  rpar <- model_options[["rpar"]]
+  seed <- model_options[["seed"]]
   n_id <- length(unique(db[[str_id]]))
   n_ct <- length(unique(db[[str_ct]]))
   n_obs <- nrow(db)
-  n_draws <- validated_options[["model_opt"]][["n_draws"]]
-  
-  mixing <- validated_options[["model_opt"]][["mixing"]]
-  draws_type <- validated_options[["model_opt"]][["draws_type"]]
-  rpar <- validated_options[["model_opt"]][["rpar"]]
-  seed <- validated_options[["model_opt"]][["seed"]]
-  
-  cores <- validated_options[["estim_opt"]][["cores"]]
-  check_data <- validated_options[["estim_opt"]][["check_data"]]
-  
-  param <- validated_options[["model_opt"]][["param"]]
+  param <- model_options[["param"]]
   param_fixed <- unlist(param[str_param_fixed])
   
-  # Prepare the data
+  # Prepare the data ----
   db <- prepare_data(db, str_id, str_ct, cores, check_data)
   
-  # Prepare alternative availability
-  alt_avail <- validated_options[["model_opt"]][["alt_avail"]]
-  alt_avail <- prepare_alt_avail(alt_avail, db)
+  # Prepare alternative availability ----
+  alt_avail <- prepare_alt_avail(model_options[["alt_avail"]], db)
   
-  # Prepare the draws
-  if (mixing) {
+  # Prepare the draws ----
+  if (model_options[["mixing"]]) {
     draws <- prepare_draws(n_id, n_ct, n_draws, draws_type, rpar, seed)
   } else {
     draws <- NULL
   }
   
-  # Prepare the estimation environment
-  estim_env <- prepare_estimation_environment(db, alt_avail, draws, cores, 
-                                              str_id, str_ct, str_choice,
-                                              n_obs)
-  
+  # Prepare estim_env() ----
+  estim_env <- prepare_estimation_environment(db,
+                                              alt_avail,
+                                              draws,
+                                              cores, 
+                                              str_id,
+                                              str_ct, 
+                                              str_choice,
+                                              n_obs,
+                                              ...)
+
   # Return the list of prepared objects
   cli::cli_alert_success("All preparations complete")
   
@@ -68,13 +92,8 @@ prepare <- function(db,
                             round(time_diff, 2),
                             attr(time_diff, "units"),
                             sep = " "))
-  return(
-    list(
-      estim_env = estim_env#,
-      # log_lik = log_lik,
-      # num_grad = num_grad
-    )
-  )
+  
+  return(estim_env)
 }
 
 #' Prepare the estimation environment
@@ -101,6 +120,8 @@ prepare <- function(db,
 #' @param str_ct A character string giving the name of the ct variable
 #' @param str_choice A character string giving the name of the choice variable
 #' @param n_obs An integer giving the number of observations
+#' @param ... Additional objects passed on to the estimation environment. NOTE:
+#' these are NOT split by core or respondents, but exported in its entirety.
 #' 
 #' @return An environment or list of environments providing the context for 
 #' evaluating the log-likelihood function. 
@@ -113,10 +134,11 @@ prepare_estimation_environment <- function(db,
                                            str_id,
                                            str_ct,
                                            str_choice,
-                                           n_obs) {
+                                           n_obs,
+                                           ...) {
   # Define useful variables
   n_alt <- length(alt_avail)
-
+  
   # Check if we are using more than one core
   if (cores > 1) {
     db <- split_data(db, str_id, cores)
@@ -149,7 +171,8 @@ prepare_estimation_environment <- function(db,
             alt_avail = alt_avail[[i]]
           ),
           as.list(db[[i]]),
-          as.list(draws[[i]])
+          as.list(draws[[i]]),
+          list(...)
         ), envir = estim_env
       )
     })
@@ -169,7 +192,8 @@ prepare_estimation_environment <- function(db,
           alt_avail = alt_avail  
         ),
         as.list(db), 
-        as.list(draws)
+        as.list(draws),
+        list(...)
       ), envir = estim_env
     )
     
@@ -291,7 +315,7 @@ prepare_draws <- function(n_id,
                           type,
                           rpar,
                           seed) {
-  # Extract the relevant information from model_opt() ----
+  # Extract the relevant information from model_options() ----
   n_rpar <- length(rpar)
   
   # Make the draws and repeat rows equal to S - N*S x R
@@ -328,7 +352,7 @@ prepare_draws <- function(n_id,
 #' convenient wrappers that ensure the function can be evaluated both using a
 #' single core and multiple cores. 
 #' 
-#' @inheritParams prepare
+#' @inheritParams estimate
 #' @param estim_env An estimation environment returned by 
 #' \code{\link{prepare_estimation_environment}}
 #' @param workers A list of workers created using the parallel package

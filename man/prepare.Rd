@@ -2,27 +2,24 @@
 % Please edit documentation in R/prepare.R
 \name{prepare}
 \alias{prepare}
-\title{Prepare the model components and log likelihood function for estimation}
+\title{Prepare the estimation environment}
 \usage{
 prepare(
-  ll,
   db,
   model_options,
-  cores = 1,
+  control = NULL,
   check_data = TRUE,
   debug = FALSE,
   ...
 )
 }
 \arguments{
-\item{ll}{The log likelihood funciton}
-
 \item{db}{A \code{data.frame()} or \code{tibble()} containing the data}
 
-\item{model_options}{A list of user supplied model options to be validated}
+\item{model_options}{A list of user supplied model options. This list is 
+validated within the function. See \code{\link{validate}} for details.}
 
-\item{cores}{An integer giving the number of cores to use in estimation. The
-default is to use a single core.}
+\item{control}{A list of control options}
 
 \item{check_data}{A boolean equal to TRUE if we should run data checks and 
 pad the data with NA.}
@@ -33,10 +30,11 @@ function. It forces the number of cores to 1. Then you can simply
 to run the log likelihood function line by line. The default is FALSE.}
 }
 \value{
-The estimation environment
+The estimation environment or a list of estimation environments if
+cores > 1.
 }
 \description{
-The function prepares the data, draws and alternative availabilites, and 
-creates an estimation environment providing the context for evaluating the
-log-likelihood function.
+The function prepares the data, draws and alternative availabilites for 
+estimation. All model components are placed in an estimation environment
+which provides the context for evaluating the log likelihood function.
 }

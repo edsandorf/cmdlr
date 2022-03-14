@@ -4,6 +4,7 @@
 * Added S3 Generic for vcov
 * Added S3 generics for glance() and tidy(), and a placeholder for augment() that are consistent with the 'broom' package.
 * save_opt() is no longer part of the code. Instead a new function save with arguments is provided. 
+* prepare() now returns the estimation environment and not a named list. Furthermore, it can take additional named objects in the ... which are added to the estimation environment. Also works for parallel where the objects are exported in their entirety (no splits on cores). 
 * All examples are updated to reflect changes to the overall structure
 
 
