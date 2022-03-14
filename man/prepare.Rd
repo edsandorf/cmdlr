@@ -4,18 +4,36 @@
 \alias{prepare}
 \title{Prepare the model components and log likelihood function for estimation}
 \usage{
-prepare(db, ll, validated_options)
+prepare(
+  ll,
+  db,
+  model_options,
+  cores = 1,
+  check_data = TRUE,
+  debug = FALSE,
+  ...
+)
 }
 \arguments{
-\item{db}{A \code{data.frame()} or \code{tibble()} containing the data}
-
 \item{ll}{The log likelihood funciton}
 
-\item{validated_options}{A list of options returned by \code{\link{validate}}}
+\item{db}{A \code{data.frame()} or \code{tibble()} containing the data}
+
+\item{model_options}{A list of user supplied model options to be validated}
+
+\item{cores}{An integer giving the number of cores to use in estimation. The
+default is to use a single core.}
+
+\item{check_data}{A boolean equal to TRUE if we should run data checks and 
+pad the data with NA.}
+
+\item{debug}{A boolean equal to TRUE if you are debugging the log likelihood
+function. It forces the number of cores to 1. Then you can simply
+\code{\link{attach}} the estimation environment and the list of parameters
+to run the log likelihood function line by line. The default is FALSE.}
 }
 \value{
-A list with the estimation environment and the log likelihood
-function
+The estimation environment
 }
 \description{
 The function prepares the data, draws and alternative availabilites, and 

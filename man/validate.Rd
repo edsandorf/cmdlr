@@ -2,23 +2,27 @@
 % Please edit documentation in R/validate.R
 \name{validate}
 \alias{validate}
-\title{Validate all options}
+\title{Validate model options}
 \usage{
-validate(input_estim_opt, input_model_opt, db)
+validate(model_options, db_names)
 }
 \arguments{
-\item{input_estim_opt}{A named list of estimation options}
+\item{model_options}{A user supplied list of model options}
 
-\item{input_model_opt}{A named list of model options}
-
-\item{db}{A data.frame with the data used for estimation}
+\item{db_names}{A character string of variable names in the data}
 }
 \value{
-Returns a list with three elements.
+A list of model options with missing input values replaced by 
+default values
 }
 \description{
-The function validates all user supplied lists of options and sets reasonable
-default values for missing options. All checks are intentionally aggressive
+The function validates the user supplied list of model options and sets 
+defaults for missing options. All checks are intentionally aggressive
 and will throw an error rather than make assumptions about what the user
 intended to do.
+}
+\details{
+The function is run once inside of \code{\link{prepare}} to correctly set up 
+the estimation environment. It is meant for internal use only and is not 
+exported.
 }
