@@ -7,13 +7,13 @@ pkgs <- c("cmdlr")
 invisible(lapply(pkgs, require, character.only = TRUE))
 
 # Define the list of estimation options ----
-estim_opt <- list(
+control <- list(
   optimizer = "ucminf",
   method = "BFGS"
 )
 
 # Define the list of model options ----
-model_opt <- list(
+model_options <- list(
   name = "MNL model",
   description = "A simple MNL model using the Apollo dataset 'mode choice'.",
   id = "ID",
@@ -99,7 +99,7 @@ db <- db[db$SP == 1, ]
 db$ct <- rep(1:14, times = 500)
 
 # Prepare estimation environment ----
-estim_env <- prepare(db, model_options)
+estim_env <- prepare(db, model_options, control)
 
 # Search for starting values ----
 start_values <- search_start_values(ll,
@@ -111,7 +111,7 @@ start_values <- search_start_values(ll,
 model_options[["param"]] <- as.list(start_values[1, ])
 
 # Estimate the model ----
-model <- estimate(ll, prepared_inputs, validated_options)
+model <- estimate(ll, estim_env, model_options, control)
 
 # Get a summary of the results ----
 summary(model)

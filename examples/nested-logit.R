@@ -7,13 +7,13 @@ pkgs <- c("cmdlr")
 invisible(lapply(pkgs, require, character.only = TRUE))
 
 # Define the list of estimation options ----
-estim_opt <- list(
+control <- list(
   optimizer = "maxlik",
   method = "BFGS"
 )
 
 # Define the list of model options ----
-model_opt <- list(
+model_options <- list(
   name = "Nested logit model",
   description = "A simple NL model with 2 nests using the Apollo dataset 'mode choice'.",
   id = "ID",
@@ -179,14 +179,11 @@ db <- db[db$SP == 1, ]
 db$ct <- rep(1:14, times = 500)
 db$mean_income <- mean(db$income)
 
-# Validate options ----
-validated_options <- validate(estim_opt, model_opt, db)
-
-# Prepare inputs ----
-prepared_inputs <- prepare(db, ll, validated_options)
+# Prepare estimation environment ----
+estim_env <- prepare(db, model_options)
 
 # Estimate the model ----
-model <- estimate(ll, prepared_inputs, validated_options)
+model <- estimate(ll, estim_env, model_options, control)
 
 # Get a summary of the results ----
 summary(model)

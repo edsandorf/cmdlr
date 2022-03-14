@@ -7,7 +7,7 @@ pkgs <- c("cmdlr")
 invisible(lapply(pkgs, require, character.only = TRUE))
 
 # Define the list of estimation options ----
-estim_opt <- list(
+control <- list(
   optimizer = "ucminf",
   method = "BFGS"
 )
@@ -15,7 +15,7 @@ estim_opt <- list(
 # Define the list of model options ----
 # NOTE: The outside good must be the first good and it is always available and 
 # consumed.
-model_opt <- list(
+model_options <- list(
   name = "MDCEV with outside good",
   description = "A MDCEV model with an outside good using the Apollo time use data to check code performance. Check out the Apollo package",
   id = "indivID",
@@ -198,14 +198,11 @@ db$t_leisure <- rowSums(db[, c("t_a07", "t_a08", "t_a09")])
 db$constant <- 1
 db$ct <- Reduce("c", lapply(unique(db$indivID), function(x) seq_len(length(which(db$indivID == x)))))
 
-# Validate options ----
-validated_options <- validate(estim_opt, model_opt, db)
-
-# Prepare inputs ----
-prepared_inputs <- prepare(db, ll, validated_options)
+# Prepare estimation environment ----
+estim_env <- prepare(db, model_options, control)
 
 # Estimate the model ----
-model <- estimate(ll, prepared_inputs, validated_options)
+model <- estimate(ll, estim_env, model_options, control)
 
 # Get a summary of the results ----
 summary(model)
