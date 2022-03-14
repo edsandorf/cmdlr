@@ -98,18 +98,17 @@ db <- apollo::apollo_modeChoiceData
 db <- db[db$SP == 1, ]
 db$ct <- rep(1:14, times = 500)
 
-# Validate options ----
-validated_options <- validate(estim_opt, model_opt, db)
-
-# Prepare inputs ----
-prepared_inputs <- prepare(db, ll, validated_options)
+# Prepare estimation environment ----
+estim_env <- prepare(db, model_options)
 
 # Search for starting values ----
 start_values <- search_start_values(ll,
-                                     prepared_inputs, 
-                                    validated_options,
+                                    estim_env, 
+                                    model_options,
+                                    control,
                                     type = "simple")
-validated_options[["model_opt"]][["param"]] <- as.list(start_values[1, ])
+
+model_options[["param"]] <- as.list(start_values[1, ])
 
 # Estimate the model ----
 model <- estimate(ll, prepared_inputs, validated_options)

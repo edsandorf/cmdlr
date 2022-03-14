@@ -1,6 +1,5 @@
-#' Function to search for starting values
+#' Search for starting values
 #' 
-#' @description
 #' The function searches for new starting values. Either in a random fashion or
 #' based on a smarter search algorithm. The smart search algorithm is a rewritten
 #' version of the search algorithm implemented in the Apollo package. The function
@@ -9,14 +8,14 @@
 #' @inheritParams estimate
 #' @param type A character string indicating whether to use a simple or a smart
 #' search algorithm. Default is 'simple'
-#' @param n_candidates An integer giving the numer of candidates to evaluate.
+#' @param n_candidates An integer giving the number of candidates to evaluate.
 #' Default is 100.
 #' @param n_return An integer giving the number of parameter vectors to return.
 #' The default is 10
 #' @param multiplier A double indicating a multiplier for the 'simple' search
 #' algorithm. The default is 1. 
 #' 
-#' @return A list of parameters
+#' @return A matrix of starting values
 #' 
 #' @references 
 #' Hess, S. & Palma, D., 2019, Apollo: A flexible, powerful and customisable f
@@ -27,20 +26,17 @@
 #' 
 #' @export
 search_start_values <- function(ll,
-                                prepared_inputs,
-                                validated_options,
+                                estim_env,
+                                model_options,
+                                control = NULL,
                                 type = "simple",
                                 n_candidates = 100,
                                 n_return = 10, 
                                 multiplier = 1) {
+  
   cli::cli_h1("Searching for starting values")
   
-  # Get the search options 
-  estim_env <- prepared_inputs[["estim_env"]]
-  estim_opt <- validated_options[["estim_opt"]]
-  model_opt <- validated_options[["model_opt"]]
-  save_opt <- validated_options[["save_opt"]]
-  cores <- validated_options[["estim_opt"]][["cores"]]
+  cores <- set_controls(control = control)[["cores"]]
   
   # Workers
   if (cores > 1) {
@@ -57,39 +53,36 @@ search_start_values <- function(ll,
       return(NULL)
     })
     
-    # Get the nubmer of observations
-    n_obs <- estim_env[[1L]][["n_obs"]]
-    
   } else {
     workers <- NA
-    n_obs <- estim_env[["n_obs"]]
+    
   }
   
   # Prepare the log-likelihood functions
   log_lik <- prepare_log_lik(ll, estim_env, workers)
   
   # Only search for parameters that are not fixed
-  param <- unlist(model_opt[["param"]])
-  param_free <- param[!(names(param) %in% model_opt[["fixed"]])]
-  param_fixed <- param[model_opt[["fixed"]]]
+  param <- unlist(model_options[["param"]])
+  param_free <- param[!(names(param) %in% model_options[["fixed"]])]
+  param_fixed <- param[model_options[["fixed"]]]
   
   start_values_free <- switch(type,
-                         simple = search_simple(ll,
-                                                log_lik,
-                                                param_free,
-                                                param_fixed,
-                                                n_candidates,
-                                                n_return, 
-                                                multiplier,
-                                                workers),
-                         smart = search_smart(ll,
-                                              log_lik,
-                                              param_free,
-                                              param_fixed,
-                                              n_candidates,
-                                              n_return, 
-                                              multiplier,
-                                              workers))
+                              simple = search_simple(ll,
+                                                     log_lik,
+                                                     param_free,
+                                                     param_fixed,
+                                                     n_candidates,
+                                                     n_return, 
+                                                     multiplier,
+                                                     workers),
+                              smart = search_smart(ll,
+                                                   log_lik,
+                                                   param_free,
+                                                   param_fixed,
+                                                   n_candidates,
+                                                   n_return, 
+                                                   multiplier,
+                                                   workers))
   
   start_values <- matrix(NA, nrow = n_return, ncol = length(param),
                          dimnames = list(NULL, names(param)))
@@ -120,6 +113,7 @@ search_simple <- function(ll,
                           n_return, 
                           multiplier,
                           workers) {
+  
   pb <- progress::progress_bar$new(
     format = "[:bar] :percent :elapsed",
     total = n_candidates,

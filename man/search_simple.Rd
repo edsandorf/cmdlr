@@ -29,7 +29,7 @@ optimization routine is a minimizer (e.g. 'ucminf') or a maximizer
 \item{param_fixed}{A list of parameters that are held fixed at their 
 starting values}
 
-\item{n_candidates}{An integer giving the numer of candidates to evaluate.
+\item{n_candidates}{An integer giving the number of candidates to evaluate.
 Default is 100.}
 
 \item{n_return}{An integer giving the number of parameter vectors to return.
