@@ -28,4 +28,12 @@ test_that("is_used correctly returns TRUE/FALSE if a variable is
   expect_true(
     is_used("alt1", ll)
   )
+  expect_identical(
+    is_used(c("asc_1", "var_2"), ll),
+    c(asc_1 = TRUE, var_2 = TRUE)
+  )
+  expect_identical(
+    is_used(c("asc_1", "var_2", "alt"), ll),
+    c(asc_1 = TRUE, var_2 = TRUE, alt = FALSE)
+  )
 })

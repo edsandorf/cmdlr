@@ -7,7 +7,8 @@
 is_used(x, ll)
 }
 \arguments{
-\item{x}{A character string with a variable or parameter}
+\item{x}{A character string or vector with one or more variables or 
+parameters}
 
 \item{ll}{A function}
 }
@@ -25,5 +26,6 @@ ll <- function(param) {
 is_used("var_1", ll)
 is_used("var_2", ll)
 is_used("b_1", ll)
+is_used(c("b_1", "var_1"), ll)
 
 }

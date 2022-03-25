@@ -15,7 +15,8 @@ hessian_complete <- function(hess) {
 #' This assertion is useful for debugging and to check if necessary varibles
 #' and parameters are included and used. 
 #' 
-#' @param x A character string with a variable or parameter
+#' @param x A character string or vector with one or more variables or 
+#' parameters
 #' @param ll A function
 #' 
 #' @examples 
@@ -28,12 +29,19 @@ hessian_complete <- function(hess) {
 #' is_used("var_1", ll)
 #' is_used("var_2", ll)
 #' is_used("b_1", ll)
+#' is_used(c("b_1", "var_1"), ll)
 #' 
 #' @export
 is_used <- function(x, ll) {
   text <- deparse1(ll)
   regex <- paste0("\\b", x, "\\b")
+  
+  matches <- sapply(regex, grepl, text, perl = TRUE)
+  names(matches) <- x
+  
   return(
-    grepl(regex, text, perl = TRUE)  
+    matches
   )
 }
+
+
