@@ -1,35 +1,57 @@
 #' Subset the data to only include used variables
 #' 
-#' The function deparses the log likelihood function to find only the variables
-#' used in the actual function, which is then added to the estimation
-#' environment. This has the following benefits: 
+#' The function deparses the supplied function to find only the variables
+#' used. 
 #' 
-#'   1. When using multicore, it will reduce overall memory use because fewer
-#'   variables are split and passed to the workers.
-#'   2. When using post-processing functions, e.g., augment, only the relevant
-#'   variables are added to the post-estimation matrix. 
-#'   
-#' Note that the original data is deleted by default, which means that we are 
-#' removing some data kept in memory. If this is not desirable, you can either
-#' set the `keep_original` option to `TRUE` or read in the data again after 
-#' estimation.
+#' @param func A user supplied function
+#' @param db A tibble or data.frame
+#' @param ... Other variables in `db` to keep that are not used in the 
+#' supplied function. Must be supplied as character strings.
 #' 
-#' The function is intended for internal use inside the funtions creating the 
-#' estimation environment and the augment function, but is exported for
-#' convenience. 
+#' @examples 
+#' ll <- function(param) {
+#'   V <- list(
+#'     alt1 = asc_1 + b_1 * variable_1,
+#'     alt2 = asc_2 + b_2 * var_2
+#'   )
+#' }
 #' 
-#' @param ll A user supplied log likelihood function
-#' @param db A dataset
-#' @param keep_original A boolean equal to TRUE if we should keep the original
-#' data. The default is FALSE.
+#' db <- tibble::tibble(
+#'   variable_1 = runif(10),
+#'   var_2 = runif(10),
+#'   id = seq(1, 10, 1),
+#'   ct = rep(1:2, 5),
+#'   income = sample(100:1000, 10)
+#' )
+#' 
+#' subset_data(ll, db, c("id", "ct"))
+#' subset_data(ll, db, "id", "ct")
+#' subset_data(ll, db, c("id", "ct"), "income")
 #' 
 #' @export
-subset_data <- function(ll, db, keep_original = FALSE) {
+subset_data <- function(func,
+                        db,
+                        ...) {
   
-  words <- names(db)
-  text <- deparse1(ll)
-  sapply(words, grepl, text)
+  # Collect additional variables
+  other_vars <- list(...)
   
+  # Check if all supplied are character vectors
+  stopifnot("All additional variables passed to '...' must be characters"= 
+              all(do.call(c, lapply(other_vars, is.character))))
+  
+  # Collect to a vector of additional variables
+  other_vars <- do.call(c, other_vars)
+  
+  # Check which variables are used in the log-likelihood function
+  vars_to_keep <- is_used(names(db), func)
+  
+  # Set the additional variables to keep to TRUE
+  vars_to_keep[other_vars] <- TRUE
+  
+  return(
+    db[, vars_to_keep]
+  )
 }
 
 #' Split the data into a list
