@@ -96,7 +96,7 @@ ll <- function(param) {
 db <- cmdlr::data_petr_test
 
 # Prepare estimation environment ----
-estim_env <- prepare(db, model_options, control)
+estim_env <- prepare(ll, db, model_options, control)
 
 # Estimate the model ----
 model <- estimate(ll, estim_env, model_options, control)

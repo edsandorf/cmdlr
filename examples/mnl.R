@@ -17,7 +17,7 @@ model_options <- list(
   name = "MNL model",
   description = "A simple MNL model using the Apollo dataset 'mode choice'.",
   id = "ID",
-  ct = "ct",
+  ct = "SP_task",
   choice = "choice",
   alt_avail = list(
     alt1 = "av_car",
@@ -96,10 +96,9 @@ ll <- function(param) {
 # Load and manipulate the data ----
 db <- apollo::apollo_modeChoiceData
 db <- db[db$SP == 1, ]
-db$ct <- rep(1:14, times = 500)
 
 # Prepare estimation environment ----
-estim_env <- prepare(db, model_options, control)
+estim_env <- prepare(ll, db, model_options, control)
 
 # Search for starting values ----
 start_values <- search_start_values(ll,
@@ -115,3 +114,4 @@ model <- estimate(ll, estim_env, model_options, control)
 
 # Get a summary of the results ----
 summary(model)
+

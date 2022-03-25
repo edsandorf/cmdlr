@@ -199,7 +199,7 @@ db$constant <- 1
 db$ct <- Reduce("c", lapply(unique(db$indivID), function(x) seq_len(length(which(db$indivID == x)))))
 
 # Prepare estimation environment ----
-estim_env <- prepare(db, model_options, control)
+estim_env <- prepare(ll, db, model_options, control)
 
 # Estimate the model ----
 model <- estimate(ll, estim_env, model_options, control)

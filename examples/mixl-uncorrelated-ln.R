@@ -103,7 +103,7 @@ db <- apollo::apollo_swissRouteChoiceData
 db$ct <- rep(1:9, times = 388)
 
 # Prepare estimation environment ----
-estim_env <- prepare(db, model_options, control)
+estim_env <- prepare(ll, db, model_options, control)
 
 # Estimate the model ----
 model <- estimate(ll, estim_env, model_options, control)

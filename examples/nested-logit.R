@@ -180,7 +180,7 @@ db$ct <- rep(1:14, times = 500)
 db$mean_income <- mean(db$income)
 
 # Prepare estimation environment ----
-estim_env <- prepare(db, model_options)
+estim_env <- prepare(ll, db, model_options, control)
 
 # Estimate the model ----
 model <- estimate(ll, estim_env, model_options, control)
