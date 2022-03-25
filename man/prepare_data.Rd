@@ -4,7 +4,7 @@
 \alias{prepare_data}
 \title{Prepare the data for estimation}
 \usage{
-prepare_data(db, str_id, str_ct, cores, check_data)
+prepare_data(db, str_id, str_ct, n_id, n_ct, cores, check_data)
 }
 \arguments{
 \item{db}{A \code{data.frame()} or \code{tibble()} containing the data}
@@ -12,6 +12,10 @@ prepare_data(db, str_id, str_ct, cores, check_data)
 \item{str_id}{A character string giving the name of the id variable}
 
 \item{str_ct}{A character string giving the name of the ct variable}
+
+\item{n_id}{An integer giving the nubmer of respondents}
+
+\item{n_ct}{An integer giving the number of choice situations}
 
 \item{cores}{An integer indicating the number of cores to use in estimation}
 

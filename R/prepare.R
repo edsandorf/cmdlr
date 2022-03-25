@@ -4,6 +4,7 @@
 #' estimation. All model components are placed in an estimation environment
 #' which provides the context for evaluating the log likelihood function.
 #'
+#' @param ll A user supplied log-likelihood function
 #' @param db A \code{data.frame()} or \code{tibble()} containing the data
 #' @param model_options A list of user supplied model options. This list is 
 #' validated within the function. See \code{\link{validate}} for details.
@@ -25,7 +26,8 @@
 #' cores > 1. 
 #' 
 #' @export
-prepare <- function(db, 
+prepare <- function(ll,
+                    db, 
                     model_options,
                     control = NULL,
                     check_data = TRUE,
@@ -35,11 +37,26 @@ prepare <- function(db,
   time_start <- Sys.time()
   cli::cli_h1("Preparing for estimation")
   
-  db_names <- names(db)
+  # Check that the function inputs are of the correct type
+  stopifnot("'db' must be a data.frame or tibble"= 
+              is.data.frame(db) || tibble::is_tibble(db))
+  
+  stopifnot("'model_options' must be a list"= 
+              is.list(model_options))
+  
+  stopifnot("'control' must be a list or NULL"= 
+              is.list(control) || is.null(control))
+  
+  stopifnot("'check_data' must be TRUE/FALSE"= 
+              is.logical(check_data))
+  
+  stopifnot("'debug' must be TRUE/FALSE"= 
+              is.logical(debug))
+  
   
   # Validate model options ----
   cli::cli_h2("Validating model options")
-  model_options <- validate(model_options, db_names)
+  model_options <- validate(model_options, names(db))
   cli::cli_alert_success("Model options validated and defaults set")
   
   # Core check ----
@@ -67,10 +84,13 @@ prepare <- function(db,
   param_fixed <- unlist(param[str_param_fixed])
   
   # Prepare the data ----
-  db <- prepare_data(db, str_id, str_ct, cores, check_data)
+  db <- prepare_data(db, str_id, str_ct, n_id, n_ct, cores, check_data)
   
   # Prepare alternative availability ----
   alt_avail <- prepare_alt_avail(model_options[["alt_avail"]], db)
+  
+  # Subset the data *after* alt_avail since alt_avail won't be part of the LL
+  db <- subset_data(ll, db, str_id, str_ct, str_choice)
   
   # Prepare the draws ----
   if (model_options[["mixing"]]) {
@@ -131,8 +151,6 @@ prepare <- function(db,
 #' 
 #' @return An environment or list of environments providing the context for 
 #' evaluating the log-likelihood function. 
-#' 
-#' @export
 prepare_estimation_environment <- function(db,
                                            alt_avail,
                                            draws,
@@ -174,7 +192,8 @@ prepare_estimation_environment <- function(db,
             n_alt = n_alt,
             n_obs = n_obs,
             choice_var = db[[i]][[str_choice]],
-            alt_avail = alt_avail[[i]]
+            alt_avail = alt_avail[[i]],
+            db_names = names(db[[i]])
           ),
           as.list(db[[i]]),
           as.list(draws[[i]]),
@@ -195,7 +214,8 @@ prepare_estimation_environment <- function(db,
           n_alt = n_alt,
           n_obs = n_obs,
           choice_var = db[[str_choice]],
-          alt_avail = alt_avail  
+          alt_avail = alt_avail,
+          db_names = names(db)
         ),
         as.list(db), 
         as.list(draws),
@@ -223,20 +243,19 @@ prepare_estimation_environment <- function(db,
 #' @param check_data A boolean eqaul to TRUE if the code should skip the 
 #' data checks on number of choice tasks per individual. 
 #' @inheritParams prepare_estimation_environment
+#' @inheritParams prepare_draws
 #' 
 #' @return A \code{\link{data.frame}} padded with NA 
 prepare_data <- function(db,
                          str_id,
                          str_ct,
+                         n_id,
+                         n_ct,
                          cores,
                          check_data) {
-  # Checks
-  stopifnot(is.data.frame(db) || tibble::is_tibble(db))
-  stopifnot(is.character(str_id) || is.character(str_ct))
   
   # Define variables and indexes
-  n_id <- length(unique(db[[str_id]]))
-  n_ct <- length(unique(db[[str_ct]]))
+
   unique_id <- unique(db[[str_id]])
   
   # Check choice tasks

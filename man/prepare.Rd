@@ -5,6 +5,7 @@
 \title{Prepare the estimation environment}
 \usage{
 prepare(
+  ll,
   db,
   model_options,
   control = NULL,
@@ -14,6 +15,8 @@ prepare(
 )
 }
 \arguments{
+\item{ll}{A user supplied log-likelihood function}
+
 \item{db}{A \code{data.frame()} or \code{tibble()} containing the data}
 
 \item{model_options}{A list of user supplied model options. This list is 
