@@ -101,7 +101,7 @@ identify_choice_patterns <- function(db, str_id, str_ct, str_choice, sq_alt) {
     return(
       tibble::tibble(always_sq = rep(1L * all(choices == sq_alt), rows),
                      never_sq = rep(1L * all(choices != sq_alt), rows),
-                     sometimes_sq = 1L - (always_sq + never_sq))
+                     sometimes_sq = 1L - (.data$always_sq + .data$never_sq))
     )
   })
   
@@ -173,15 +173,15 @@ plot_choice <- function(db,
     tidyr::pivot_longer(starts_with("choice_"), names_to = "alt", values_to = "choice") %>%
     dplyr::mutate(
       !!str_ct := as_factor(!!sym(str_ct)),
-      alt = as_factor(alt)
+      alt = as_factor(.data$alt)
     ) %>%
-    dplyr::filter(choice == 1) %>%
-    group_by(!!sym(str_ct), alt) %>% # Create an if to handle block
+    dplyr::filter(.data$choice == 1) %>%
+    group_by(!!sym(str_ct), .data$alt) %>% # Create an if to handle block
     dplyr::summarize(
       n_choices = n()
     ) %>%
     ggplot() + 
-    geom_bar(stat = "identity", position = "fill", aes(x = !!sym(str_ct), y = n_choices, fill = alt)) + 
+    geom_bar(stat = "identity", position = "fill", aes(x = !!sym(str_ct), y = .data$n_choices, fill = .data$alt)) + 
     ggtitle("Distribution of choice shares by alternative across choice tasks") +
     xlab("Choice task") +
     ylab("Share of choices") +

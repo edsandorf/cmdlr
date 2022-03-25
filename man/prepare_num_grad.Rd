@@ -7,7 +7,10 @@
 prepare_num_grad(ll, estim_env, workers)
 }
 \arguments{
-\item{ll}{The log likelihood funciton}
+\item{ll}{This is the 'raw' log-likelihood function passed to the estimation
+routine. It is important that the user takes into account whether the 
+optimization routine is a minimizer (e.g. 'ucminf') or a maximizer 
+(e.g. 'maxlik').}
 
 \item{estim_env}{An estimation environment returned by 
 \code{\link{prepare_estimation_environment}}}

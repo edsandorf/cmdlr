@@ -1,4 +1,4 @@
-#' cmdlR: Choice Modeling in R
+#' cmdlr: Choice Modeling in R
 #' 
 #' The problem of choice is fundamental to economics and understanding how 
 #' people make decisions is important. As researchers we try to find or 
@@ -19,7 +19,7 @@
 #' @name cmldr
 #' 
 #' @importFrom stats runif qnorm
-#' @importFrom rlang sym :=
+#' @importFrom rlang sym := .data
 #' @importFrom dplyr bind_cols bind_rows n group_by starts_with
 #' @importFrom magrittr %>%
 #' @importFrom forcats as_factor

@@ -3,7 +3,7 @@
 \docType{package}
 \name{cmldr}
 \alias{cmldr}
-\title{cmdlR: Choice Modeling in R}
+\title{cmdlr: Choice Modeling in R}
 \description{
 The problem of choice is fundamental to economics and understanding how 
 people make decisions is important. As researchers we try to find or 

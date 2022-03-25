@@ -1,65 +1,115 @@
-#' Prepare the model components and log likelihood function for estimation
+#' Prepare the estimation environment
 #' 
-#' The function prepares the data, draws and alternative availabilites, and 
-#' creates an estimation environment providing the context for evaluating the
-#' log-likelihood function. 
+#' The function prepares the data, draws and alternative availabilites for 
+#' estimation. All model components are placed in an estimation environment
+#' which provides the context for evaluating the log likelihood function.
 #'
+#' @param ll A user supplied log-likelihood function
 #' @param db A \code{data.frame()} or \code{tibble()} containing the data
-#' @param ll The log likelihood funciton
-#' @param validated_options A list of options returned by \code{\link{validate}}
-#'
-#' @return A list with the estimation environment and the log likelihood
-#' function
+#' @param model_options A list of user supplied model options. This list is 
+#' validated within the function. See \code{\link{validate}} for details.
+#' @param control A list of control options
+#' @param check_data A boolean equal to TRUE if we should run data checks and 
+#' pad the data with NA.
+#' @param debug A boolean equal to TRUE if you are debugging the log likelihood
+#' function. It forces the number of cores to 1. Then you can simply
+#' \code{\link{attach}} the estimation environment and the list of parameters
+#' to run the log likelihood function line by line. The default is FALSE.
+#' @param ... Additional named arguments that are added to the estimation
+#' environment. If cores > 1 the arguments are added to each individual 
+#' estimation environment. No attempts at splitting across cores. This is
+#' useful if you need to pass e.g. a restriction matrix or other variables 
+#' to the estimation environment so that they can be called by name/reference 
+#' within the log-likelihood function. 
+#' 
+#' @return The estimation environment or a list of estimation environments if
+#' cores > 1. 
 #' 
 #' @export
-prepare <- function(db,
-                    ll, 
-                    validated_options) {
-  # Start the timer
+prepare <- function(ll,
+                    db, 
+                    model_options,
+                    control = NULL,
+                    check_data = TRUE,
+                    debug = FALSE,
+                    ...) {
+
   time_start <- Sys.time()
   cli::cli_h1("Preparing for estimation")
   
-  # Define variables and indexes
-  str_id <- validated_options[["model_opt"]][["id"]]
-  str_ct <- validated_options[["model_opt"]][["ct"]]
-  str_choice <- validated_options[["model_opt"]][["choice"]]
-  str_param_fixed <- validated_options[["model_opt"]][["fixed"]]
-
+  # Check that the function inputs are of the correct type
+  stopifnot("'db' must be a data.frame or tibble"= 
+              is.data.frame(db) || tibble::is_tibble(db))
+  
+  stopifnot("'model_options' must be a list"= 
+              is.list(model_options))
+  
+  stopifnot("'control' must be a list or NULL"= 
+              is.list(control) || is.null(control))
+  
+  stopifnot("'check_data' must be TRUE/FALSE"= 
+              is.logical(check_data))
+  
+  stopifnot("'debug' must be TRUE/FALSE"= 
+              is.logical(debug))
+  
+  
+  # Validate model options ----
+  cli::cli_h2("Validating model options")
+  model_options <- validate(model_options, names(db))
+  cli::cli_alert_success("Model options validated and defaults set")
+  
+  # Core check ----
+  # Just get the defaults to set cores
+  cores <- set_controls(control = control)[["cores"]]
+  
+  if (debug) {
+    cores <- 1
+  
+  }
+  
+  # Extract variables from the model options ----
+  str_id <- model_options[["id"]]
+  str_ct <- model_options[["ct"]]
+  str_choice <- model_options[["choice"]]
+  str_param_fixed <- model_options[["fixed"]]
+  n_draws <- model_options[["n_draws"]]
+  draws_type <- model_options[["draws_type"]]
+  rpar <- model_options[["rpar"]]
+  seed <- model_options[["seed"]]
   n_id <- length(unique(db[[str_id]]))
   n_ct <- length(unique(db[[str_ct]]))
   n_obs <- nrow(db)
-  n_draws <- validated_options[["model_opt"]][["n_draws"]]
-  
-  mixing <- validated_options[["model_opt"]][["mixing"]]
-  draws_type <- validated_options[["model_opt"]][["draws_type"]]
-  rpar <- validated_options[["model_opt"]][["rpar"]]
-  seed <- validated_options[["model_opt"]][["seed"]]
-  
-  cores <- validated_options[["estim_opt"]][["cores"]]
-  check_data <- validated_options[["estim_opt"]][["check_data"]]
-  
-  param <- validated_options[["model_opt"]][["param"]]
+  param <- model_options[["param"]]
   param_fixed <- unlist(param[str_param_fixed])
   
-  # Prepare the data
-  db <- prepare_data(db, str_id, str_ct, cores, check_data)
+  # Prepare the data ----
+  db <- prepare_data(db, str_id, str_ct, n_id, n_ct, cores, check_data)
   
-  # Prepare alternative availability
-  alt_avail <- validated_options[["model_opt"]][["alt_avail"]]
-  alt_avail <- prepare_alt_avail(alt_avail, db)
+  # Prepare alternative availability ----
+  alt_avail <- prepare_alt_avail(model_options[["alt_avail"]], db)
   
-  # Prepare the draws
-  if (mixing) {
+  # Subset the data *after* alt_avail since alt_avail won't be part of the LL
+  db <- subset_data(ll, db, str_id, str_ct, str_choice)
+  
+  # Prepare the draws ----
+  if (model_options[["mixing"]]) {
     draws <- prepare_draws(n_id, n_ct, n_draws, draws_type, rpar, seed)
   } else {
     draws <- NULL
   }
   
-  # Prepare the estimation environment
-  estim_env <- prepare_estimation_environment(db, alt_avail, draws, cores, 
-                                              str_id, str_ct, str_choice,
-                                              n_obs)
-  
+  # Prepare estim_env() ----
+  estim_env <- prepare_estimation_environment(db,
+                                              alt_avail,
+                                              draws,
+                                              cores, 
+                                              str_id,
+                                              str_ct, 
+                                              str_choice,
+                                              n_obs,
+                                              ...)
+
   # Return the list of prepared objects
   cli::cli_alert_success("All preparations complete")
   
@@ -68,13 +118,8 @@ prepare <- function(db,
                             round(time_diff, 2),
                             attr(time_diff, "units"),
                             sep = " "))
-  return(
-    list(
-      estim_env = estim_env#,
-      # log_lik = log_lik,
-      # num_grad = num_grad
-    )
-  )
+  
+  return(estim_env)
 }
 
 #' Prepare the estimation environment
@@ -101,11 +146,11 @@ prepare <- function(db,
 #' @param str_ct A character string giving the name of the ct variable
 #' @param str_choice A character string giving the name of the choice variable
 #' @param n_obs An integer giving the number of observations
+#' @param ... Additional objects passed on to the estimation environment. NOTE:
+#' these are NOT split by core or respondents, but exported in its entirety.
 #' 
 #' @return An environment or list of environments providing the context for 
 #' evaluating the log-likelihood function. 
-#' 
-#' @export
 prepare_estimation_environment <- function(db,
                                            alt_avail,
                                            draws,
@@ -113,10 +158,11 @@ prepare_estimation_environment <- function(db,
                                            str_id,
                                            str_ct,
                                            str_choice,
-                                           n_obs) {
+                                           n_obs,
+                                           ...) {
   # Define useful variables
   n_alt <- length(alt_avail)
-
+  
   # Check if we are using more than one core
   if (cores > 1) {
     db <- split_data(db, str_id, cores)
@@ -146,10 +192,12 @@ prepare_estimation_environment <- function(db,
             n_alt = n_alt,
             n_obs = n_obs,
             choice_var = db[[i]][[str_choice]],
-            alt_avail = alt_avail[[i]]
+            alt_avail = alt_avail[[i]],
+            db_names = names(db[[i]])
           ),
           as.list(db[[i]]),
-          as.list(draws[[i]])
+          as.list(draws[[i]]),
+          list(...)
         ), envir = estim_env
       )
     })
@@ -166,10 +214,12 @@ prepare_estimation_environment <- function(db,
           n_alt = n_alt,
           n_obs = n_obs,
           choice_var = db[[str_choice]],
-          alt_avail = alt_avail  
+          alt_avail = alt_avail,
+          db_names = names(db)
         ),
         as.list(db), 
-        as.list(draws)
+        as.list(draws),
+        list(...)
       ), envir = estim_env
     )
     
@@ -193,20 +243,19 @@ prepare_estimation_environment <- function(db,
 #' @param check_data A boolean eqaul to TRUE if the code should skip the 
 #' data checks on number of choice tasks per individual. 
 #' @inheritParams prepare_estimation_environment
+#' @inheritParams prepare_draws
 #' 
 #' @return A \code{\link{data.frame}} padded with NA 
 prepare_data <- function(db,
                          str_id,
                          str_ct,
+                         n_id,
+                         n_ct,
                          cores,
                          check_data) {
-  # Checks
-  stopifnot(is.data.frame(db) || tibble::is_tibble(db))
-  stopifnot(is.character(str_id) || is.character(str_ct))
   
   # Define variables and indexes
-  n_id <- length(unique(db[[str_id]]))
-  n_ct <- length(unique(db[[str_ct]]))
+
   unique_id <- unique(db[[str_id]])
   
   # Check choice tasks
@@ -291,7 +340,7 @@ prepare_draws <- function(n_id,
                           type,
                           rpar,
                           seed) {
-  # Extract the relevant information from model_opt() ----
+  # Extract the relevant information from model_options() ----
   n_rpar <- length(rpar)
   
   # Make the draws and repeat rows equal to S - N*S x R
@@ -328,7 +377,7 @@ prepare_draws <- function(n_id,
 #' convenient wrappers that ensure the function can be evaluated both using a
 #' single core and multiple cores. 
 #' 
-#' @inheritParams prepare
+#' @inheritParams estimate
 #' @param estim_env An estimation environment returned by 
 #' \code{\link{prepare_estimation_environment}}
 #' @param workers A list of workers created using the parallel package

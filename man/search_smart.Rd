@@ -21,14 +21,15 @@ routine. It is important that the user takes into account whether the
 optimization routine is a minimizer (e.g. 'ucminf') or a maximizer 
 (e.g. 'maxlik').}
 
-\item{log_lik}{A log likelihood expression}
+\item{log_lik}{A log-likelihood expression prepared by 
+\code{\link{prepare_log_lik}}}
 
-\item{param_free}{A named vector of freely estimated parameters}
+\item{param_free}{A list of freely estimated parameters}
 
-\item{param_fixed}{A named vector of parameters to keep fixed at their
-starting values during estimation}
+\item{param_fixed}{A list of parameters that are held fixed at their 
+starting values}
 
-\item{n_candidates}{An integer giving the numer of candidates to evaluate.
+\item{n_candidates}{An integer giving the number of candidates to evaluate.
 Default is 100.}
 
 \item{n_return}{An integer giving the number of parameter vectors to return.
@@ -37,7 +38,7 @@ The default is 10}
 \item{multiplier}{A double indicating a multiplier for the 'simple' search
 algorithm. The default is 1.}
 
-\item{workers}{A list of workers or NA if single core}
+\item{workers}{A list of workers for parallel computing}
 }
 \value{
 A matrix of starting values (free parameters only)

@@ -2,12 +2,13 @@
 % Please edit documentation in R/search_start_values.R
 \name{search_start_values}
 \alias{search_start_values}
-\title{Function to search for starting values}
+\title{Search for starting values}
 \usage{
 search_start_values(
   ll,
-  prepared_inputs,
-  validated_options,
+  estim_env,
+  model_options,
+  control = NULL,
   type = "simple",
   n_candidates = 100,
   n_return = 10,
@@ -20,16 +21,20 @@ routine. It is important that the user takes into account whether the
 optimization routine is a minimizer (e.g. 'ucminf') or a maximizer 
 (e.g. 'maxlik').}
 
-\item{prepared_inputs}{A list of prepared inputs returned from 
-\code{\link{prepare}}}
+\item{estim_env}{An estimation environment or list of estimation environments
+returned from \code{\link{prepare}}}
 
-\item{validated_options}{A list of validated model options returned from 
-\code{\link{validate}}}
+\item{model_options}{A list of model options. Note, this list is validated
+for a second time here to set some necessary defaults. See
+\code{\link{validate}} for details.}
+
+\item{control}{A list of control options that are passed to
+\code{\link{set_controls}}.}
 
 \item{type}{A character string indicating whether to use a simple or a smart
 search algorithm. Default is 'simple'}
 
-\item{n_candidates}{An integer giving the numer of candidates to evaluate.
+\item{n_candidates}{An integer giving the number of candidates to evaluate.
 Default is 100.}
 
 \item{n_return}{An integer giving the number of parameter vectors to return.
@@ -39,7 +44,7 @@ The default is 10}
 algorithm. The default is 1.}
 }
 \value{
-A list of parameters
+A matrix of starting values
 }
 \description{
 The function searches for new starting values. Either in a random fashion or

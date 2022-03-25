@@ -12,7 +12,8 @@ prepare_estimation_environment(
   str_id,
   str_ct,
   str_choice,
-  n_obs
+  n_obs,
+  ...
 )
 }
 \arguments{
@@ -32,6 +33,9 @@ model}
 \item{str_choice}{A character string giving the name of the choice variable}
 
 \item{n_obs}{An integer giving the number of observations}
+
+\item{...}{Additional objects passed on to the estimation environment. NOTE:
+these are NOT split by core or respondents, but exported in its entirety.}
 }
 \value{
 An environment or list of environments providing the context for 

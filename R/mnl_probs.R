@@ -20,30 +20,25 @@
 #' Calculate the MNL probabilities taking the difference from the chosen
 #' alternative.
 #'
-#' @param V A list of the observable part of utility
-#' @param model_opt List of model options
+#' @param V A list of utilities
+#' @param choice_var A vector with the chosen alternative
+#' @param alt_avail A list of alternative availabilities
 #'
 #' @export
-
-mnl_probs <- function(V, model_opt) {
+mnl_probabilities <- function(V, choice_var, alt_avail) {
+  # Get the utility of the chosen alternative and 
+  v_chosen <- get_v_chosen(V, choice_var)
   
-  # Extract the utility of the chosen alternative
-  v_chosen <- Reduce("+", lapply(seq_along(V), function(j) {
-    V[[j]] * (model_opt$choice == j)
-  }))
+  # Subtract it from all utilities
+  V <- difference_utility(V, v_chosen)
   
-  # Subtract the utility of the chosen alternative from all utilities
-  V <- lapply(V, function(v) v - v_chosen)
+  # Exponentiate all the utilities
+  V <- exp_v(V, alt_avail)
   
-  # Calculate the exponent and sum of utilities
-  exp_v <- lapply(V, function(v) exp(v))
-  sum_v <- Reduce("+", exp_v)
-  
-  # Calculate the probability of the chosen alt
-  pr_chosen <- 1 / sum_v
+  sum_v <- Reduce("+", V)
   
   # Return the probability of the chosen alternative
-  return(pr_chosen)
+  return(lapply(V, function(v, sum_v) v / sum_v, sum_v = sum_v))
 }
 
 
@@ -53,7 +48,6 @@ mnl_probs <- function(V, model_opt) {
 #' available alternatives. 
 #' 
 #' @param alt_avail List of alternative availabilities
-#' @inheritParams mnl_probability
 #' 
 #' @return A vector of length equal to the number of choice observations in 
 #' the data (incl. NAs from the padding during data setup)

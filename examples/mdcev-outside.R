@@ -6,39 +6,18 @@ rm(list = ls(all = TRUE))
 pkgs <- c("cmdlr")
 invisible(lapply(pkgs, require, character.only = TRUE))
 
-# Load and manipulate the data ----
-db <- apollo::apollo_timeUseData
-db$t_outside <- rowSums(db[, c("t_a01", "t_a06", "t_a10", "t_a11", "t_a12")])
-db$t_leisure <- rowSums(db[, c("t_a07", "t_a08", "t_a09")])
-
-# Create a constant and a new choice task variable 
-db$constant <- 1
-db$ct <- Reduce("c", lapply(unique(db$indivID), function(x) seq_len(length(which(db$indivID == x)))))
-
-# Define the list of saving options ----
-save_opt <- list(
-  name = "MDCEV with outside good",
-  description = "A MDCEV model with an outside good using the Apollo time use data to check code performance. Check out the Apollo package",
-  path = file.path("outputs"),
-  save_summary = FALSE,
-  save_model_object = FALSE,
-  save_choice_analysis = FALSE
-)
-
 # Define the list of estimation options ----
-estim_opt <- list(
+control <- list(
   optimizer = "ucminf",
-  method = "BFGS",
-  cores = 1,
-  calculate_hessian = TRUE,
-  robust_vcov = TRUE,
-  print_level = 2
+  method = "BFGS"
 )
 
 # Define the list of model options ----
 # NOTE: The outside good must be the first good and it is always available and 
 # consumed.
-model_opt <- list(
+model_options <- list(
+  name = "MDCEV with outside good",
+  description = "A MDCEV model with an outside good using the Apollo time use data to check code performance. Check out the Apollo package",
   id = "indivID",
   ct = "ct",
   choice = "weekend", # This is not used for the MDCEV model, but needs to be specified
@@ -71,9 +50,6 @@ model_opt <- list(
     sigma              = 0
   )
 )
-
-# Validate options ----
-validated_options <- validate(estim_opt, model_opt, save_opt, db)
 
 # Likelihood function - returns the probability of the sequence of choices ----
 ll <- function(param) {
@@ -213,11 +189,20 @@ ll <- function(param) {
   return(-ll)
 }
 
-# Prepare inputs ----
-prepared_inputs <- prepare(db, ll, validated_options)
+# Load and manipulate the data ----
+db <- apollo::apollo_timeUseData
+db$t_outside <- rowSums(db[, c("t_a01", "t_a06", "t_a10", "t_a11", "t_a12")])
+db$t_leisure <- rowSums(db[, c("t_a07", "t_a08", "t_a09")])
+
+# Create a constant and a new choice task variable 
+db$constant <- 1
+db$ct <- Reduce("c", lapply(unique(db$indivID), function(x) seq_len(length(which(db$indivID == x)))))
+
+# Prepare estimation environment ----
+estim_env <- prepare(ll, db, model_options, control)
 
 # Estimate the model ----
-model <- estimate(ll, prepared_inputs, validated_options)
+model <- estimate(ll, estim_env, model_options, control)
 
 # Get a summary of the results ----
-summarize(model)
+summary(model)
