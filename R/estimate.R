@@ -82,7 +82,7 @@ estimate <- function(ll,
   time_start_estimate <- Sys.time()
 
   # Define the sets of parameters
-  model_options <- validate(model_options, db_names_extra)
+  # model_options <- validate(model_options, db_names_extra)
     
   param_start <- unlist(model_options[["param"]])
   param_free <- param_start[!(names(param_start) %in% model_options[["fixed"]])]
