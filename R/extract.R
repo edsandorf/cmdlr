@@ -202,3 +202,14 @@ get_estimation_end <- function(object, ...) {
     object[["estimation_end"]]
   )
 }
+
+#' Extract the model_frame
+#' 
+#' @inheritParams get_function_value
+#' 
+#' @export
+get_model_frame <- function(object, ...) {
+  return(
+    object[["model_frame"]]
+  )
+}
