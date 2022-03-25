@@ -4,13 +4,13 @@
 \alias{is_used}
 \title{Checks if the supplied character string is used in the function}
 \usage{
-is_used(x, ll)
+is_used(x, func)
 }
 \arguments{
 \item{x}{A character string or vector with one or more variables or 
 parameters}
 
-\item{ll}{A function}
+\item{func}{A function}
 }
 \description{
 This assertion is useful for debugging and to check if necessary varibles

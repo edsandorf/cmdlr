@@ -17,7 +17,7 @@ hessian_complete <- function(hess) {
 #' 
 #' @param x A character string or vector with one or more variables or 
 #' parameters
-#' @param ll A function
+#' @param func A function
 #' 
 #' @examples 
 #' ll <- function(param) {
@@ -32,8 +32,8 @@ hessian_complete <- function(hess) {
 #' is_used(c("b_1", "var_1"), ll)
 #' 
 #' @export
-is_used <- function(x, ll) {
-  text <- deparse1(ll)
+is_used <- function(x, func) {
+  text <- deparse1(func)
   regex <- paste0("\\b", x, "\\b")
   
   matches <- sapply(regex, grepl, text, perl = TRUE)
