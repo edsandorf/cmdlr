@@ -1,3 +1,37 @@
+#' Subset the data to only include used variables
+#' 
+#' The function deparses the log likelihood function to find only the variables
+#' used in the actual function, which is then added to the estimation
+#' environment. This has the following benefits: 
+#' 
+#'   1. When using multicore, it will reduce overall memory use because fewer
+#'   variables are split and passed to the workers.
+#'   2. When using post-processing functions, e.g., augment, only the relevant
+#'   variables are added to the post-estimation matrix. 
+#'   
+#' Note that the original data is deleted by default, which means that we are 
+#' removing some data kept in memory. If this is not desirable, you can either
+#' set the `keep_original` option to `TRUE` or read in the data again after 
+#' estimation.
+#' 
+#' The function is intended for internal use inside the funtions creating the 
+#' estimation environment and the augment function, but is exported for
+#' convenience. 
+#' 
+#' @param ll A user supplied log likelihood function
+#' @param db A dataset
+#' @param keep_original A boolean equal to TRUE if we should keep the original
+#' data. The default is FALSE.
+#' 
+#' @export
+subset_data <- function(ll, db, keep_original = FALSE) {
+  
+  words <- names(db)
+  text <- deparse1(ll)
+  sapply(words, grepl, text)
+  
+}
+
 #' Split the data into a list
 #'
 #' The function takes the data and splits it into roughly equal chunks to be
