@@ -101,5 +101,8 @@ generics::augment
 #' 
 #' @export
 augment.cmdlr <- function(x, ...) {
-  stop("Not implemented yet")
+  cli::cli_alert_info("Minimal functionality implemented. Only returns model frame")
+  return(
+    get_model_frame(x)
+  )
 }
