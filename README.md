@@ -11,27 +11,16 @@ The problem of choice is fundamental to economics. Choice models are used to und
 
 WARNING: The package is currently under development and while it works, backwards incompatible changes can happen at any point. This warning will be removed when development of the package has stabilized.
 
-# Release notes cmdlR v0.0.2
-This release includes the ability to estimate models using the 'ucminf' package along with other code improvements and minor bug fixes. Under the hood, the code now creates an estimation environment and evaluates the log-likelihood function in that context, which avoids the need to make multiple calls to 'attach()' and 'detach()'.
-
-* Added hybrid choice model example and a new mixed logit example. 
-* Added function 'ordered_logit()'
-* Added function 'inspect_list()' to aid with development and exploratory work
-* Added option 'calcualte_hessian' to 'estim_opt'. 
-* Removed NLOPTR as an optimizer since it cannot use referencing by name 
-* Added functionality to analyze choices prior to estimation. 
-* alt_availability is no longer specified in the log-likelihood function, but
-as the list entry `alt_avail` in `model_opt`. `alt_avail` is also used to work
-out `J`, which means that it is a required entry. The change was necessary to allow development of `analyze_choices()`. This change breaks earlier code. 
-* The code no longer uses `attach()/detach()` for parameters and data. Breaks all earlier code.
-* Removed the need for `summary_opt`. This list of options duplicated information found in other options and complicated maintainance. 
-* Options for name and description are moved from `model_opt` to `save_opt` to reduce number of objects passed between functions. 
-* Starting value search options are moved from model options to estimation options, and starting value search is no longer called explicitly by the user, but from within `estimate`. 
-* The user must now specify the log of the likelihood value and whether to return a positive or negative value (depends on the optimizer). 
-* It is now possible to pass data from inside the log-likelihood function along as `attributes()` of the ll value. This change should make it easier to extend functionality in the future. Breaks code prior to development version v.0.0.1.9007
-* Took dependence on 'rlang' to make work with environments and expression evaluation easier.
-* Fixed a bug where `ids` in `split_data()` was not always a vector, which caused `sort()` to fail.
-* Various minor bug fixes
+# cmdlr v0.0.4
+* Major structural changes to the code with multiple changes breaking existing code.
+* Code refactoring
+* No longer needs a named list of validated options but makes on-the-fly checks prior to estimation at a very slight pre-estimation overhead, but at reduced risk of passing incorrect objects through to the functions.
+* Standardized the model object which now has the class 'cmdlr'. This means that the model object has fewer elements and rely on S3 generics for many operations. For example, neither the standard nor robust vcov is available, but can be obtained with the S3 generic for vcov
+* Added S3 Generic for vcov
+* Added S3 generics for glance() and tidy(), and a placeholder for augment() that are consistent with the 'broom' package. The augment() function currently only returns the model_matrix, but is ready for extensions.
+* save_opt() is no longer part of the code. Instead a new function save with arguments is provided. 
+* prepare() now returns the estimation environment and not a named list. Furthermore, it can take additional named objects in the ... which are added to the estimation environment. Also works for parallel where the objects are exported in their entirety (no splits on cores). 
+* All examples are updated to reflect changes to the overall structure
 
 # How to install cmdlR?
 

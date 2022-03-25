@@ -4,7 +4,7 @@
 * No longer needs a named list of validated options but makes on-the-fly checks prior to estimation at a very slight pre-estimation overhead, but at reduced risk of passing incorrect objects through to the functions.
 * Standardized the model object which now has the class 'cmdlr'. This means that the model object has fewer elements and rely on S3 generics for many operations. For example, neither the standard nor robust vcov is available, but can be obtained with the S3 generic for vcov
 * Added S3 Generic for vcov
-* Added S3 generics for glance() and tidy(), and a placeholder for augment() that are consistent with the 'broom' package.
+* Added S3 generics for glance() and tidy(), and a placeholder for augment() that are consistent with the 'broom' package. The augment() function currently only returns the model_matrix, but is ready for extensions.
 * save_opt() is no longer part of the code. Instead a new function save with arguments is provided. 
 * prepare() now returns the estimation environment and not a named list. Furthermore, it can take additional named objects in the ... which are added to the estimation environment. Also works for parallel where the objects are exported in their entirety (no splits on cores). 
 * All examples are updated to reflect changes to the overall structure
