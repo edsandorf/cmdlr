@@ -1,3 +1,8 @@
+## cmdlr v0.0.5
+* Added a function to standardize variables 
+* General bug fixes
+
+
 ## cmdlr v0.0.4
 * Major structural changes to the code with multiple changes breaking existing code.
 * Code refactoring

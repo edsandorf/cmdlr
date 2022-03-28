@@ -101,3 +101,28 @@ load_packages <- function(pkgs) {
   
   return(NULL)
 }
+
+#' Standardize a variable
+#'
+#' Standardize a variable by subtracting the mean and dividing by the standard
+#' deviation
+#' 
+#' @param x A numeric vector
+#' @param na.rm A boolean equal to TRUE if ignore NA when calculating the mean
+#' and standard deviations. See \code{\link{mean}} and \code{\link{sd}}
+#'
+#' @examples
+#' x <- runif(10)
+#' standardize(x)
+#' 
+#' x[1] <- NA
+#' standardize(x, na.rm = TRUE)
+#' 
+#' @return A vector of standardized numbers
+#' 
+#' @export
+standardize <- function(x, na.rm = FALSE) {
+  return(
+    (x - mean(x, na.rm = na.rm)) / sd(x, na.rm = na.rm)
+  )
+}

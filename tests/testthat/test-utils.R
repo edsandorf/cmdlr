@@ -21,3 +21,27 @@ test_that("Repeat columns correctly repeats the columns of a matrix", {
     )
   )
 })
+
+x <- runif(50)
+y <- c(runif(49), NA)
+
+test_that("Standardize works correctly", {
+  expect_equal(
+    standardize(x), standardize(x, na.rm = TRUE)
+  )
+  
+  expect_equal(
+    mean(standardize(x)), 0
+  )
+  
+  expect_equal(
+    sd(standardize(x)), 1
+  )
+  
+  expect_equal(
+    mean(standardize(y)), mean(rep(NA, length(y)))
+  )
+  
+  expect_true(all(is.numeric(standardize(y, na.rm = TRUE))))
+  
+})

@@ -18,7 +18,7 @@
 #' @docType package
 #' @name cmldr
 #' 
-#' @importFrom stats runif qnorm
+#' @importFrom stats runif qnorm sd
 #' @importFrom rlang sym := .data
 #' @importFrom dplyr bind_cols bind_rows n group_by starts_with
 #' @importFrom magrittr %>%
