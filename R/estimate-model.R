@@ -46,7 +46,7 @@ estimate_model <- function(type,
   
   # Currently not returning any useful debug information here
   if (is.null(model)) {
-    return(NULL)
+    model[["convergence"]] <- FALSE
   }
   
   # Set convergence to TRUE if set to converge at starting values
