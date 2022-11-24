@@ -237,8 +237,9 @@ estimate <- function(ll,
   
   model[["name"]] <- model_options[["name"]]
   model[["description"]] <- model_options[["description"]]
-  model[["model_frame"]] <- tibble::as_tibble(mget(estim_env[["db_names"]],
-                                           envir = estim_env))
+  # model[["model_frame"]] <- tibble::as_tibble(
+  #   mget(estim_env[["db_names"]], envir = estim_env)
+  # )
   model[["estimation_start"]] <- estimation_start
   model[["estimation_end"]] <- Sys.time()
   
