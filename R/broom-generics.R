@@ -69,8 +69,8 @@ generics::glance
 glance.cmdlr <- function(x, ...) {
   
   fit <- tibble::tibble(
-    name = x[["name"]],
-    log_lik = x[["optimum"]], 
+    name = get_name(x),
+    log_lik = get_function_value(x), 
     convergence_crit = convergence_criteria(x, ...), 
     adj_rho_sqrd = model_fit(x, "adj_rho_sqrd"),
     aic = model_fit(x, "aic"),
