@@ -14,9 +14,10 @@ summary.cmdlr <- function(object, robust = FALSE, ...) {
   
   cat("----------------------------- Model fit -----------------------------\n")
   glance(object) %>%
-    tidyr::pivot_longer(tidyselect::everything(),
+    tidyr::pivot_longer(-name,
                         names_to = "stat", 
                         values_to = "value") %>% 
+    dplyr::select(-name) %>% 
     dplyr::mutate(
       value = round(.data$value, 4L)
     ) %>% 
@@ -38,7 +39,7 @@ summary.cmdlr <- function(object, robust = FALSE, ...) {
   cat("'***' - 0.1% level, '**' - 1% level, '*' - 5% level, '.' - 10% level\n")
   cat(paste0("Reported using ",
              ifelse(robust, "robust", "normal"),
-             "standard errors\n"))
+             " standard errors\n"))
   cat("\n\n")
   
 }
