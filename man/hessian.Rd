@@ -4,7 +4,7 @@
 \alias{hessian}
 \title{Calculate the Hessian}
 \usage{
-hessian(type, log_lik, param_free, param_fixed, workers, ll, method)
+hessian(type, log_lik, param_free, method, optimizer)
 }
 \arguments{
 \item{type}{A character string giving the method to use when approximating
@@ -15,15 +15,10 @@ the Hessian. One of: "numderiv" or "maxlik".}
 
 \item{param_free}{A list of freely estimated parameters}
 
-\item{param_fixed}{A list of parameters that are held fixed at their 
-starting values}
-
-\item{workers}{A list of workers for parallel computing}
-
-\item{ll}{The 'raw' log likelihood function passed by the user}
-
 \item{method}{A method for the approximation of the Hessian. Only necessary
 for the maxlik package}
+
+\item{optimizer}{A character string giving the optimizer used}
 }
 \description{
 The function is a wrapper around several methods for calculating the

@@ -80,13 +80,13 @@ estimate <- function(ll,
   # ESTIMATE ----
   cli::cli_h2("Estimating")
   time_start_estimate <- Sys.time()
-
-  # Define the sets of parameters
-  # model_options <- validate(model_options, db_names_extra)
     
   param_start <- unlist(model_options[["param"]])
   param_free <- param_start[!(names(param_start) %in% model_options[["fixed"]])]
+  # This is just for the model object. The actual parameters are loaded as
+  # part of the estimation environment
   param_fixed <- param_start[model_options[["fixed"]]]
+  
   
   model <- estimate_model(control[["optimizer"]],
                           log_lik,
@@ -112,27 +112,18 @@ estimate <- function(ll,
                             sep = " "))
   
   # OPTIMUM VALUES ----
-  model[["optimum_values"]] <- log_lik(get_param_free(model),
-                                       param_fixed,
-                                       workers,
-                                       ll,
-                                       return_sum = FALSE,
-                                       pb = NULL)
+  model[["optimum_values"]] <- log_lik(get_param_free(model))
+  
+  
   # OPTIMUM AT 0 ----
   ll_0 <- tryCatch({
-    ll_0_tmp <- log_lik(get_param_free(model) * 0,
-                        param_fixed = param_fixed,
-                        workers = workers,
-                        ll =ll,
-                        return_sum = TRUE,
-                        pb = NULL)
+    ll_0_tmp <- log_lik(get_param_free(model) * 0)
     
-    if (control[["optimizer"]] %in% c("ucminf")) {
-      -ll_0_tmp
-      
-    } else {
-      ll_0_tmp
-    }
+    switch(control[["optimizer"]],
+           ucminf = -ll_0_tmp,
+           maxlik = ll_0_tmp,
+           bgw = log(ll_0_tmp)
+    )
     
   }, error = function(e) {
     cli::cli_alert_danger("Failed to calculate 'll(0)'")
@@ -142,28 +133,31 @@ estimate <- function(ll,
   model[["optimum_at_zero"]] <- ll_0
   
   # GRADIENT ----
-  model[["gradient"]] <- numDeriv::grad(log_lik,
-                                        get_param_free(model),
-                                        param_fixed = param_fixed,
-                                        workers = workers,
-                                        ll = ll,
-                                        return_sum = TRUE,
-                                        pb = NULL)
+  # We only derive the gradient if we are not using 'bgw'
+  if (control[["optimizer"]] %in% c("maxlik", "ucminf")) {
+    model[["gradient"]] <- numDeriv::grad(log_lik,
+                                          get_param_free(model),
+                                          return_sum = TRUE)
+  }
   
   # JACOBIAN ----
   if (control[["calculate_jacobian"]]) {
     cli::cli_h2("Calculating the Jacobian (gradient observations)")
     time_start_jacobian <- Sys.time()
-    
-    model[["gradient_obs"]] <- numDeriv::jacobian(log_lik,
-                                                  get_param_free(model),
-                                                  param_fixed = param_fixed,
-                                                  workers = workers,
-                                                  ll = ll, 
-                                                  return_sum = FALSE,
-                                                  pb = NULL,
-                                                  method = "simple")
-    
+  
+    if (control[["optimizer"]] == "bgw") {
+      model[["gradient_obs"]] <- numDeriv::jacobian(log_lik,
+                                                    get_param_free(model),
+                                                    method = "simple",
+                                                    return_log = TRUE) 
+      
+    } else {
+      model[["gradient_obs"]] <- numDeriv::jacobian(log_lik,
+                                                    get_param_free(model),
+                                                    method = "simple")
+      
+    }
+      
     time_diff <- Sys.time() - time_start_jacobian
     cli::cli_alert_info(paste("Jacobian calculation took",
                               round(time_diff, 2),
@@ -179,15 +173,13 @@ estimate <- function(ll,
   if (control[["calculate_hessian"]]) {
     time_start_hessian <- Sys.time()
     cli::cli_h2("Calculating the Hessian matrix")
-
+    
     # Calculate Hessian using the 'numderiv' package
     model[["hessian"]] <- hessian("numderiv",
                                   log_lik, 
                                   get_param_free(model),
-                                  param_fixed,
-                                  workers, 
-                                  ll,
-                                  control[["method"]])
+                                  control[["method"]],
+                                  control[["optimizer"]])
 
     # If calculation failed, try different method for calculating the Hessian
     if (!hessian_complete(model[["hessian"]])) {
@@ -203,10 +195,8 @@ estimate <- function(ll,
       model[["hessian"]] <- hessian("maxlik",
                                     log_lik, 
                                     get_param_free(model),
-                                    param_fixed,
-                                    workers, 
-                                    ll,
-                                    control[["method"]])
+                                    control[["method"]],
+                                    control[["optimizer"]])
     }
     
     # If the Hessian still cannot be calculated end and return the model object

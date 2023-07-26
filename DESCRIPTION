@@ -30,6 +30,7 @@ Imports:
     maxLik,
     numDeriv,
     ucminf,
+    bgw,
     generics
 Suggests:
     testthat,

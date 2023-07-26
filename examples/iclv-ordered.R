@@ -8,7 +8,7 @@ invisible(lapply(pkgs, require, character.only = TRUE))
 
 # Define the list of estimation options ----
 control <- list(
-  optimizer = "maxlik",
+  optimizer = "bgw",
   method = "BFGS",
   cores = 4
 )
@@ -187,7 +187,8 @@ ll <- function(param) {
   # correctly if indicator observations are at the choice task level. 
   pr_seq <- pr_seq * pr_indicators
   pr_seq <- Rfast::rowmeans(pr_seq)
-  ll <- log(pr_seq)
+  # ll <- log(pr_seq)
+  ll <- pr_seq
   
   # Return the likelihood value
   return(ll)

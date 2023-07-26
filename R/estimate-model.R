@@ -30,16 +30,13 @@ estimate_model <- function(type,
   model <- tryCatch(switch(type,
                            maxlik = estimate_maxlik(log_lik,
                                                     param_free,
-                                                    param_fixed,
-                                                    workers,
-                                                    ll,
                                                     control),
                            ucminf = estimate_ucminf(log_lik,
                                                     param_free,
-                                                    param_fixed,
-                                                    workers,
-                                                    ll,
-                                                    control)),
+                                                    control),
+                           bgw = estimate_bgw(log_lik,
+                                              param_free,
+                                              control)),
                     error = function(e) {
                       return(NULL)
                     })
@@ -76,18 +73,10 @@ estimate_model <- function(type,
 #' @return A custom model object with the results fo the estimation.
 estimate_maxlik <- function(log_lik,
                             param_free,
-                            param_fixed,
-                            workers,
-                            ll,
                             control) {
   
   model_obj <- maxLik::maxLik(log_lik,
                               start = param_free,
-                              param_fixed = param_fixed,
-                              workers = workers,
-                              ll = ll,
-                              return_sum = FALSE,
-                              pb = NULL,
                               method = control[["method"]],
                               finalHessian = FALSE,
                               tol = control[["tol"]],
@@ -111,6 +100,7 @@ estimate_maxlik <- function(log_lik,
     
   }   else {
     model[["convergence"]] <- FALSE
+    
   }
   
   return(model)
@@ -125,26 +115,20 @@ estimate_maxlik <- function(log_lik,
 #' @return A custom model object with the results of the estimation
 estimate_ucminf <- function(log_lik,
                             param_free,
-                            param_fixed,
-                            workers,
-                            ll,
                             control) {
 
   model_obj <- ucminf::ucminf(par = param_free,
                               fn = log_lik,
                               hessian = 0,
-                              param_fixed = param_fixed,
-                              workers = workers,
-                              ll = ll,
                               return_sum = TRUE,
-                              pb = NULL, 
                               control = list(
                                 grtol = control[["gradtol"]],
                                 xtol = control[["steptol"]],
                                 stepmax = control[["stepmax"]],
                                 maxeval = control[["iterlim"]],
                                 grad = control[["grad"]],
-                                gradstep = control[["gradstep"]]
+                                gradstep = control[["gradstep"]],
+                                trace = 5
                               ))
   
   # Added a minus to make the fit calculations correct
@@ -156,9 +140,59 @@ estimate_ucminf <- function(log_lik,
   
   if (model_obj[["convergence"]] %in% c(1, 2, 3, 4)) {
     model[["convergence"]] <- TRUE
+    
   } else {
     model[["convergence"]] <- FALSE
+    
   }
   
+  return(model)
+}
+
+#' Estimate the model using the 'bgw' package
+#' 
+#' The function is a convenient wrapper around \code{\link{bgw_mle}}. 
+#' 
+#' @inheritParams estimate_model
+#' 
+#' @return A custom model object with the results of the estimation
+estimate_bgw <- function(log_lik,
+                         param_free,
+                         control) {
+  
+  model_obj <- bgw::bgw_mle(
+    calcR = log_lik,
+    betaStart = param_free,
+    calcJ = NULL, # Change if using non-numeric Jacobian
+    bgw_settings = list(
+      printLevel = control[["print_level"]]
+    )
+  )
+  
+  # Added a minus to make the fit calculations correct
+  model <- list()
+  model[["optimum"]] <- -model_obj[["maximum"]]
+  model[["message"]] <- model_obj[["message"]]
+  model[["param_free"]] <- model_obj[["estimate"]]
+  model[["convergence_code"]] <- model_obj[["code"]]
+  model[["vcov"]] <- model_obj[["varcovBGW"]]
+  model[["param_stop"]] <- model_obj[["betaStop"]]
+  model[["gradient"]] <- model_obj[["gradient"]]
+  model[["hessian_condition_number_bgw"]] <- model_obj[["vcHessianConditionNumber"]]
+  model[["final_ll_bgw"]] <- model_obj[["finalLL"]]
+  
+  
+  # This is dangerous, but I don't know what return codes are successful conv.
+  model[["convergence"]] <- TRUE
+  
+  # if (model_obj[["code"]] %in% c(1, 2, 3, 4)) {
+  #   model[["convergence"]] <- TRUE
+  #   
+  # } else {
+  #   model[["convergence"]] <- FALSE
+  #   
+  # }
+  
+    
   return(model)
 }

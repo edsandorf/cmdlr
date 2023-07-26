@@ -70,7 +70,6 @@ search_start_values <- function(ll,
                               simple = search_simple(ll,
                                                      log_lik,
                                                      param_free,
-                                                     param_fixed,
                                                      n_candidates,
                                                      n_return, 
                                                      multiplier,
@@ -78,7 +77,6 @@ search_start_values <- function(ll,
                               smart = search_smart(ll,
                                                    log_lik,
                                                    param_free,
-                                                   param_fixed,
                                                    n_candidates,
                                                    n_return, 
                                                    multiplier,
@@ -103,12 +101,12 @@ search_start_values <- function(ll,
 #' 
 #' @inheritParams search_start_values
 #' @inheritParams estimate_maxlik
+#' @param workers A list of workers
 #' 
 #' @return A matrix of starting values (free parameters only)
 search_simple <- function(ll,
                           log_lik,
                           param_free,
-                          param_fixed,
                           n_candidates,
                           n_return, 
                           multiplier,
@@ -142,27 +140,27 @@ search_simple <- function(ll,
   
   start_values <- do.call(rbind, list_start_values)
   
+  log_lik_wrapper <- function(param_free, pb) {
+    pb$tick()
+    
+    return(
+      log_lik(param_free)
+    )
+  }
+  
   values <- lapply(list_start_values, function(param_free,
-                                               param_fixed,
                                                workers,
                                                ll,
-                                               return_sum,
                                                pb) {
-    values <- log_lik(
+    values <- log_lik_wrapper(
       param_free,
-      param_fixed,
-      workers,
-      ll,
-      return_sum,
       pb
     )
     
-    return(values)
+    return(sum(values))
   }, 
-  param_fixed = param_fixed,
   workers = workers,
   ll = ll,
-  return_sum = TRUE,
   pb = pb)
   
   values <- do.call(rbind, values)
@@ -182,7 +180,6 @@ search_simple <- function(ll,
 search_smart <- function(ll,
                          log_lik,
                          param_free,
-                         param_fixed,
                          n_candidates,
                          n_return, 
                          multiplier,

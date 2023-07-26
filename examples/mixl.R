@@ -8,7 +8,7 @@ invisible(lapply(pkgs, require, character.only = TRUE))
 
 # Define the list of estimation options ----
 control <- list(
-  optimizer = "ucminf",
+  optimizer = "bgw",
   method = "BFGS",
   cores = 4
 )
@@ -87,9 +87,10 @@ ll <- function(param) {
   pr_seq <- Rfast::rowmeans(pr_seq)
   
   # Return the likelihood value
-  ll <- log(pr_seq)
+  # ll <- log(pr_seq)
+  ll <- pr_seq
   
-  return(-ll)
+  return(ll)
 }
 
 # Load and manipulate the data ----

@@ -81,7 +81,7 @@ prepare <- function(ll,
   n_ct <- length(unique(db[[str_ct]]))
   n_obs <- nrow(db)
   param <- model_options[["param"]]
-  param_fixed <- unlist(param[str_param_fixed])
+  param_fixed <- param[str_param_fixed]
   
   # Prepare the data ----
   db <- prepare_data(db, str_id, str_ct, n_id, n_ct, cores, check_data)
@@ -95,20 +95,22 @@ prepare <- function(ll,
   # Prepare the draws ----
   if (model_options[["mixing"]]) {
     draws <- prepare_draws(n_id, n_ct, n_draws, draws_type, rpar, seed)
+    
   } else {
     draws <- NULL
+    
   }
   
   # Prepare estim_env() ----
   estim_env <- prepare_estimation_environment(db,
                                               alt_avail,
                                               draws,
-                                              cores, 
+                                              cores,
                                               str_id,
-                                              str_ct, 
+                                              str_ct,
                                               str_choice,
                                               n_obs,
-                                              ...)
+                                              param_fixed)
 
   # Return the list of prepared objects
   cli::cli_alert_success("All preparations complete")
@@ -146,6 +148,7 @@ prepare <- function(ll,
 #' @param str_ct A character string giving the name of the ct variable
 #' @param str_choice A character string giving the name of the choice variable
 #' @param n_obs An integer giving the number of observations
+#' @param param_fixed A list of fixed parameters to add to environment
 #' @param ... Additional objects passed on to the estimation environment. NOTE:
 #' these are NOT split by core or respondents, but exported in its entirety.
 #' 
@@ -159,6 +162,7 @@ prepare_estimation_environment <- function(db,
                                            str_ct,
                                            str_choice,
                                            n_obs,
+                                           param_fixed, 
                                            ...) {
   # Define useful variables
   n_alt <- length(alt_avail)
@@ -197,6 +201,7 @@ prepare_estimation_environment <- function(db,
           ),
           as.list(db[[i]]),
           as.list(draws[[i]]),
+          as.list(param_fixed),
           list(...)
         ), envir = estim_env
       )
@@ -219,6 +224,7 @@ prepare_estimation_environment <- function(db,
         ),
         as.list(db), 
         as.list(draws),
+        as.list(param_fixed),
         list(...)
       ), envir = estim_env
     )
@@ -383,25 +389,27 @@ prepare_draws <- function(n_id,
 #' @param workers A list of workers created using the parallel package
 #' 
 #' @return The estimation-ready log likelihood function
-prepare_log_lik <- function(ll, estim_env, workers) {
+prepare_log_lik <- function(ll,
+                            estim_env,
+                            workers) {
   
+  # The inner part of the estimation algorithm
   log_lik_inner <- function(param, ll) {
-    # return(is.environment(estim_env))
     list2env(as.list(param), envir = estim_env)
-    return(eval(body(ll), estim_env))
+
+    return(
+      eval(body(ll), estim_env)
+    )
   }
   
   # Set the environment for the inner function
-  # environment(log_lik_inner) <- new.env(parent = environment())
   if (!anyNA(workers)) {
     environment(log_lik_inner) <- environment(prepare_log_lik)
   }
   
-  
-  log_lik_outer <- function(param_free,
-                            param_fixed,
-                            workers,
-                            ll,
+  log_lik_outer <- function(param_free, 
+                            parallel = !anyNA(workers),
+                            return_log = FALSE,
                             return_sum = FALSE,
                             pb = NULL) {
     
@@ -409,17 +417,22 @@ prepare_log_lik <- function(ll, estim_env, workers) {
       pb$tick()
     }
     
-    param <- c(param_free, param_fixed)
-    
-    if (anyNA(workers)) {
-      values <- log_lik_inner(param, ll)
-    } else {
+    if (parallel) {
       values <- parallel::clusterCall(cl = workers,
                                       fun = log_lik_inner,
-                                      param = param,
+                                      param = param_free,
                                       ll = ll)
       
-      values <- do.call(c, values)
+      values <- do.call(c, values)      
+      
+    } else {
+      values <- log_lik_inner(param = param_free, ll = ll)
+      
+    }
+    
+    # Make the necessary transformations of the return value
+    if (return_log) {
+      values <- log(values)
     }
     
     if (return_sum) {
@@ -428,8 +441,6 @@ prepare_log_lik <- function(ll, estim_env, workers) {
     
     return(values)
   }
-  
-  
   
   # Return the log likelihood function
   cli::cli_alert_success("Log-likelihood function")

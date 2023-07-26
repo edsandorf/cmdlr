@@ -53,6 +53,7 @@ cat_summary_info <- function(x, ...) {
   cat("Model description     ", get_description(x), "\n")
   cat("Convergence message   ", get_convergence_message(x), "\n")
   cat("Convergence criteria  ", convergence_criteria(x, ...), "\n")
+  cat("")
   cat(paste0("Estimation started     ", get_estimation_start(x), "\n"))
   cat(paste0("Estimation completed   ", get_estimation_end(x), "\n"))
 }
@@ -169,5 +170,34 @@ convergence_criteria <- function(object, robust = FALSE, ...) {
   
   return(
     crit
+  )
+}
+
+#' Get the hessian condition number
+#'
+#' The condition number is the ratio of the largest to the smallest Eigen value
+#' of the Hessian matrix. If this number is very large, then the Hessian matrix
+#' is ill-conditioned. If this number is smaller than machine precision, the
+#' Hessian is numerically rank deficient as is 'indefinite'
+#'
+#' @inheritParams vcov.cmdlr
+#'
+#' @export
+hessian_condition_number <- function(object, ...) {
+  eigen_values <- grad <- rep(NA, length(get_param_start(object)))
+  names(eigen_values) <- names(grad) <- names(get_param_start(object))
+  
+  # Get the Eigen values
+  eigen_values[names(get_param_free(object))] <- tryCatch({
+    eigen(get_hessian(object))[["values"]]
+  },
+  error = function(e) {
+    return(
+      rep(NA, nrow(get_hessian(object)))
+    )
+  })
+  
+  return(
+    min(abs(eigen_values), na.rm = TRUE) / max(abs(eigen_values), na.rm = TRUE)
   )
 }

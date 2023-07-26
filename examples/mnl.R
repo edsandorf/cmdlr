@@ -8,7 +8,7 @@ invisible(lapply(pkgs, require, character.only = TRUE))
 
 # Define the list of estimation options ----
 control <- list(
-  optimizer = "ucminf",
+  optimizer = "maxlik",
   method = "BFGS"
 )
 
@@ -86,11 +86,13 @@ ll <- function(param) {
   
   # Return the likelihood value
   ll <- log(pr_seq)
-  attributes(ll) <- list(
-    pr_chosen = pr_chosen
-  )
+  # ll <- pr_seq
   
-  return(-ll)
+  # attributes(ll) <- list(
+  #   pr_chosen = pr_chosen
+  # )
+  
+  return(ll)
 }
 
 # Load and manipulate the data ----

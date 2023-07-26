@@ -4,20 +4,13 @@
 \alias{estimate_maxlik}
 \title{Estimate the model using the maxLik package}
 \usage{
-estimate_maxlik(log_lik, param_free, param_fixed, workers, ll, control)
+estimate_maxlik(log_lik, param_free, control)
 }
 \arguments{
 \item{log_lik}{A log-likelihood expression prepared by 
 \code{\link{prepare_log_lik}}}
 
 \item{param_free}{A list of freely estimated parameters}
-
-\item{param_fixed}{A list of parameters that are held fixed at their 
-starting values}
-
-\item{workers}{A list of workers for parallel computing}
-
-\item{ll}{The 'raw' log likelihood function passed by the user}
 
 \item{control}{A list of estimation controls passed to the optimizer}
 }

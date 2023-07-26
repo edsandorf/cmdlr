@@ -9,14 +9,13 @@
 #' @inheritParams estimate_model
 #' @param method A method for the approximation of the Hessian. Only necessary
 #' for the maxlik package
+#' @param optimizer A character string giving the optimizer used
 #' 
 hessian <- function(type,
                     log_lik,
                     param_free,
-                    param_fixed,
-                    workers,
-                    ll,
-                    method) {
+                    method,
+                    optimizer) {
   
   # Define n_par
   n_par <- length(param_free)
@@ -29,20 +28,22 @@ hessian <- function(type,
     width = 80
   )
   
+  # Return log if we are using 'bgw'
+  return_log <- FALSE
+  if (optimizer == "bgw") {
+    return_log = TRUE
+  }
+  
   # Choose method for calculating Hessian. 
   hessian <- tryCatch(switch(type,
                              numderiv = numDeriv::hessian(func = log_lik,
                                                           x = param_free,
-                                                          param_fixed = param_fixed,
-                                                          workers = workers,
-                                                          ll = ll, 
+                                                          return_log = return_log,
                                                           return_sum = TRUE,
                                                           pb = pb),
                              maxlik = maxLik::maxLik(logLik = log_lik,
                                                      start = param_free,
-                                                     param_fixed = param_fixed,
-                                                     workers = workers,
-                                                     ll = ll,
+                                                     return_log = return_log,
                                                      return_sum = TRUE,
                                                      pb = pb, 
                                                      print.level = 0,

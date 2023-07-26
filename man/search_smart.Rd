@@ -8,7 +8,6 @@ search_smart(
   ll,
   log_lik,
   param_free,
-  param_fixed,
   n_candidates,
   n_return,
   multiplier,
@@ -26,9 +25,6 @@ optimization routine is a minimizer (e.g. 'ucminf') or a maximizer
 
 \item{param_free}{A list of freely estimated parameters}
 
-\item{param_fixed}{A list of parameters that are held fixed at their 
-starting values}
-
 \item{n_candidates}{An integer giving the number of candidates to evaluate.
 Default is 100.}
 
@@ -38,7 +34,7 @@ The default is 10}
 \item{multiplier}{A double indicating a multiplier for the 'simple' search
 algorithm. The default is 1.}
 
-\item{workers}{A list of workers for parallel computing}
+\item{workers}{A list of workers}
 }
 \value{
 A matrix of starting values (free parameters only)

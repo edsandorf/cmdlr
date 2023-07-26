@@ -13,6 +13,7 @@ prepare_estimation_environment(
   str_ct,
   str_choice,
   n_obs,
+  param_fixed,
   ...
 )
 }
@@ -33,6 +34,8 @@ model}
 \item{str_choice}{A character string giving the name of the choice variable}
 
 \item{n_obs}{An integer giving the number of observations}
+
+\item{param_fixed}{A list of fixed parameters to add to environment}
 
 \item{...}{Additional objects passed on to the estimation environment. NOTE:
 these are NOT split by core or respondents, but exported in its entirety.}
