@@ -185,6 +185,8 @@ estimate_bgw <- function(log_lik,
   # This is dangerous, but I don't know what return codes are successful conv.
   model[["convergence"]] <- TRUE
   
+  if (model_obj[["code"]] == 0) model[["convergence"]] <- FALSE
+  
   # if (model_obj[["code"]] %in% c(1, 2, 3, 4)) {
   #   model[["convergence"]] <- TRUE
   #   
