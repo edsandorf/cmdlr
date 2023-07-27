@@ -1,7 +1,7 @@
 Package: cmdlr
 Type: Package
 Title: Choice Modeling in R
-Version: 0.0.4.9003
+Version: 0.0.4.9004
 Authors@R: person("Erlend", "Dancke Sandorf", email = "erlend.dancke.sandorf@nmbu.no", role = c("aut", "cre"))
 Maintainer: Erlend Dancke Sandorf <erlend.dancke.sandorf@nmbu.no>
 Description: The problem of choice is fundamental to economics. Choice models are used to understand how people make choices in markets. cmdlR is a set of wrapper functions around a user written log-likelihood function. The package also contain several functions to check for local-optima, calculate welfare measures, compare results and make predictions. To get started, the package contains several examples with pre-programmed log-likelihood functions that can be easily tweaked by the user.
