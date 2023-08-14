@@ -1,6 +1,6 @@
 
 #year <- sub("-.*", "", meta$Date)
-year <- 2019
+year <- 2023
 note <- sprintf("R package version %s", meta$Version)
 
 bibentry(bibtype = "Manual",

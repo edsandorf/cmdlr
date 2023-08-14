@@ -7,30 +7,23 @@
 
 # cmdlR: Choice Modeling in R
 
-The problem of choice is fundamental to economics. Choice models are used to understand how people make choices in markets. cmdlR is a set of wrapper functions around a user written log-likelihood function. The package also contains several functions to check for local-optima, calculate welfare measures, compare results and make predictions. To make it easier for new choice modelers to get started with writing their own log-likelihood functions, the package comes with several applied examples that can be easily tweaked by the user.
+The problem of choice is fundamental to economics. Choice models are used to understand how people make choices in markets. `cmdlr` is a set of wrapper functions around a user written log-likelihood function. 
+
+To make it easier for new choice modelers to get started with writing their own log-likelihood functions, the package comes with several applied examples that can be easily tweaked by the user.
 
 WARNING: The package is currently under development and while it works, backwards incompatible changes can happen at any point. This warning will be removed when development of the package has stabilized.
 
-# cmdlr v0.0.4
-* Major structural changes to the code with multiple changes breaking existing code.
-* Code refactoring
-* No longer needs a named list of validated options but makes on-the-fly checks prior to estimation at a very slight pre-estimation overhead, but at reduced risk of passing incorrect objects through to the functions.
-* Standardized the model object which now has the class 'cmdlr'. This means that the model object has fewer elements and rely on S3 generics for many operations. For example, neither the standard nor robust vcov is available, but can be obtained with the S3 generic for vcov
-* Added S3 Generic for vcov
-* Added S3 generics for glance() and tidy(), and a placeholder for augment() that are consistent with the 'broom' package. The augment() function currently only returns the model_matrix, but is ready for extensions.
-* save_opt() is no longer part of the code. Instead a new function save with arguments is provided. 
-* prepare() now returns the estimation environment and not a named list. Furthermore, it can take additional named objects in the ... which are added to the estimation environment. Also works for parallel where the objects are exported in their entirety (no splits on cores). 
-* All examples are updated to reflect changes to the overall structure
+[See the NEWS for a current list of changes (breaking or not)](NEWS.md)
 
 # How to install cmdlR?
 
 The latest version of the package is available from Github. 
 
-`devtools::install_github("edsandorf/cmdlR")`
+`devtools::install_github("edsandorf/cmdlr")`
 
 # How to cite?
 
-Sandorf, E. D., 2020, cmdlR: Choice Modeling in R, v0.0.2, https://github.com/edsandorf/cmdlR
+Run `citation("cmdlr")` to see citation information.
 
 # Getting help
 The package does not have its own help forum nor do I provide much in terms of e-mail support. I do try to document each function sufficiently, provide relevant examples and publish articles and vignettes detailing functionality and use to the package website: ([https://cmdlR.edsandorf.me](https://cmdlR.edsandorf.me)).

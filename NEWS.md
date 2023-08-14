@@ -24,7 +24,7 @@ data checks. Useful for Monte Carlo analysis.
 * 'N', 'S' and 'nobs' are no longer specified in 'model_opt' but inferred from the data using the data, id- and choice task variables.
 * Bug fixes
 
-## cmdlR v0.0.2
+## cmdlr v0.0.2
 * Added hybrid choice model example and a new mixed logit example. 
 * Added function 'ordered_logit()'
 * Added function 'inspect_list()' to aid with development and exploratory work
@@ -45,7 +45,7 @@ out `J`, which means that it is a required entry. The change was necessary to al
 * Various minor bug fixes
 
 
-## cmdlR v0.0.1
+## cmdlr v0.0.1
 * Added a simple search for starting values function
 * Added functions to calculate the standard errors of variances, covariances, correlations and standard deviations of variance-covariance matrix of random parameters in a MIXL model
 * Can specify paramters to stay fixed at the starting values using model_opt$fixed
