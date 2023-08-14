@@ -218,8 +218,9 @@ estimate <- function(ll,
                               sep = " "))
   
   } else {
-    model[["hessian"]] <- NA
-
+    if (control[["optimizer"]] != "bgw") {
+      model[["hessian"]] <- NA  
+    }
   }
   
   # WRAP UP AND RETURN MODEL OBJECT ----
