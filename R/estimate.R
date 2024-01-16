@@ -130,7 +130,7 @@ estimate <- function(ll,
     return(NA)
   })
   
-  model[["optimum_at_zero"]] <- ll_0
+  model[["optimum_at_zero"]] <- sum(ll_0, na.rm = TRUE)
   
   # GRADIENT ----
   # We only derive the gradient if we are not using 'bgw'
